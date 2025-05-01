@@ -1098,23 +1098,63 @@ class UiController {
      * Exports the advanced fetch results to a CSV file
      */
     handleExportResults() {
-        if (!this.advancedFetchResults || this.advancedFetchResults.length === 0) {
+        if (!this.advancedFetchResults || !this.advancedFetchResults.results || Object.keys(this.advancedFetchResults.results).length === 0) {
             alert('No results to export');
             return;
         }
         
         // Create CSV content
-        let csvContent = 'Student ID,Name,CGPA,Total Credits,Status\n';
+        let csvContent = 'Student ID,Name,Department,CGPA,Total Credits,Status\n';
         
-        this.advancedFetchResults.forEach(result => {
-            // Escape any fields that might contain commas
-            const name = result.name ? `"${result.name.replace(/"/g, '""')}"` : 'N/A';
-            const cgpa = result.cgpa ? result.cgpa.toFixed(2) : 'N/A';
-            const credits = result.totalCredits || 'N/A';
-            const status = result.error ? 'Failed' : 'Success';
+        // Process each student result
+        Object.entries(this.advancedFetchResults.results).forEach(([studentId, data]) => {
+            // Get student info if available
+            const studentInfo = data.studentInfo || {};
+            const name = studentInfo.name || studentInfo.studentName || 'Unknown';
+            const department = studentInfo.department || studentInfo.departmentName || 'Unknown';
             
-            csvContent += `${result.id},${name},${cgpa},${credits},${status}\n`;
+            // Calculate CGPA and credits if results available
+            let cgpa = 'N/A';
+            let totalCredits = 0;
+            
+            if (data.results) {
+                try {
+                    // Filter out missingSemesters key
+                    const semesterResults = {};
+                    Object.entries(data.results).forEach(([key, value]) => {
+                        if (key !== 'missingSemesters' && Array.isArray(value)) {
+                            semesterResults[key] = value;
+                        }
+                    });
+                    
+                    // Calculate CGPA if we have semester results
+                    if (Object.keys(semesterResults).length > 0) {
+                        const result = this.calculator.calculateCgpa(semesterResults);
+                        cgpa = result.cgpa;
+                        totalCredits = result.totalCredits;
+                    }
+                } catch (error) {
+                    console.error(`Error calculating CGPA for ${studentId}:`, error);
+                }
+            }
+            
+            // Escape any fields that might contain commas
+            const escapedName = name.includes(',') ? `"${name}"` : name;
+            const escapedDepartment = department.includes(',') ? `"${department}"` : department;
+            const status = this.advancedFetchResults.errors && this.advancedFetchResults.errors[studentId] ? 'Failed' : 'Success';
+            
+            csvContent += `${studentId},${escapedName},${escapedDepartment},${cgpa},${totalCredits},${status}\n`;
         });
+        
+        // Add error entries 
+        if (this.advancedFetchResults.errors) {
+            Object.entries(this.advancedFetchResults.errors).forEach(([studentId, error]) => {
+                if (!this.advancedFetchResults.results[studentId]) {
+                    // Only add if not already included in results
+                    csvContent += `${studentId},N/A,N/A,N/A,N/A,Failed\n`;
+                }
+            });
+        }
         
         // Create a blob and download link
         const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
