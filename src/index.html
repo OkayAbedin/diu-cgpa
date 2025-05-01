@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DIU CGPA Calculator</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome for icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Google Fonts - GitHub uses system fonts, but we'll use similar web fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="assets/styles/main.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Header - GitHub style -->
+        <header class="gh-header">
+            <div class="gh-header-inner">
+                <div class="gh-header-logo">
+                    <i class="fas fa-graduation-cap"></i>
+                    <h1>DIU CGPA Calculator</h1>
+                </div>
+                <nav class="gh-nav">
+                    <ul>
+                        <li class="active" data-tab="auto-calculator">
+                            <i class="fas fa-calculator"></i>
+                            <span>Fetch CGPA</span>
+                        </li>
+                        <li data-tab="manual-calculator">
+                            <i class="fas fa-edit"></i>
+                            <span>Calculate CGPA</span>
+                        </li>
+                        <li data-tab="advanced-fetch">
+                            <i class="fas fa-cogs"></i>
+                            <span>Advanced Fetch</span>
+                        </li>
+                        <li data-tab="about">
+                            <i class="fas fa-info-circle"></i>
+                            <span>About</span>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </header>
+        
+        <!-- Main Content -->
+        <main class="gh-main">
+            <div class="gh-container">
+                <!-- Tab content container -->
+                <div class="tab-content" id="calculatorTabsContent">
+                    <!-- Automatic Calculator Tab -->
+                    <div class="tab-pane active" id="auto-calculator">
+                        <div class="gh-content-header">
+                            <h2>Fetch Your CGPA</h2>
+                            <p class="gh-desc">Automatically calculate your CGPA by entering your student ID</p>
+                        </div>
+                        
+                        <div class="gh-box">
+                            <div class="gh-form">
+                                <div class="form-group">
+                                    <label for="student-id">Student ID</label>
+                                    <div class="gh-input-group">
+                                        <input type="text" id="student-id" placeholder="e.g. 221-15-4919">
+                                        <button id="calculate-btn" class="gh-btn gh-btn-primary">Calculate CGPA</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <section id="loading" class="gh-loading hidden">
+                            <div class="gh-spinner"></div>
+                            <p>Fetching data...</p>
+                        </section>
+                        
+                        <section id="student-info" class="gh-box hidden"></section>
+                        
+                        <section id="results-container" class="hidden">
+                            <div class="gh-stats-container">
+                                <div class="gh-stats-box" id="cgpa-summary">
+                                    <h3>CGPA Summary</h3>
+                                    <div class="gh-stats-value" id="total-cgpa"></div>
+                                    <div class="gh-stats-label" id="total-credits"></div>
+                                </div>
+                                <div class="gh-chart-box">
+                                    <div class="gh-chart-header">
+                                        <h3>CGPA Progress</h3>
+                                    </div>
+                                    <div class="gh-chart-body">
+                                        <canvas id="cgpa-chart"></canvas>
+                                    </div>
+                                </div>
+                            </div>
+                            <div id="semester-results" class="gh-list"></div>
+                        </section>
+                        
+                        <section id="error-message" class="gh-alert gh-alert-error hidden">
+                            <div class="gh-alert-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="gh-alert-content">
+                                <p>Error occurred. Please try again with a valid student ID.</p>
+                            </div>
+                        </section>
+                    </div>
+                    
+                    <!-- Manual Calculator Tab -->
+                    <div class="tab-pane" id="manual-calculator">
+                        <div class="gh-content-header">
+                            <h2>Calculate CGPA Manually</h2>
+                            <p class="gh-desc">Add your courses to manually calculate your expected CGPA</p>
+                        </div>
+                        
+                        <div class="gh-box">
+                            <div id="manual-semester-list">
+                                <!-- Semester entries will be added here -->
+                                <div class="gh-semester">
+                                    <div class="gh-semester-header">
+                                        <h4>Semester 1</h4>
+                                        <button class="gh-btn gh-btn-sm gh-btn-danger remove-semester-btn">
+                                            <i class="fas fa-trash"></i>
+                                            <span>Remove</span>
+                                        </button>
+                                    </div>
+                                    
+                                    <div class="courses-container">
+                                        <div class="gh-course-row">
+                                            <div class="gh-course-inputs">
+                                                <input type="text" class="gh-form-control course-name" placeholder="Course Name (optional)">
+                                                <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0" step="0.5">
+                                                <select class="gh-form-select course-grade">
+                                                    <option value="">Grade</option>
+                                                    <option value="4.00">A+ (4.00)</option>
+                                                    <option value="3.75">A (3.75)</option>
+                                                    <option value="3.50">A- (3.50)</option>
+                                                    <option value="3.25">B+ (3.25)</option>
+                                                    <option value="3.00">B (3.00)</option>
+                                                    <option value="2.75">B- (2.75)</option>
+                                                    <option value="2.50">C+ (2.50)</option>
+                                                    <option value="2.25">C (2.25)</option>
+                                                    <option value="2.00">D (2.00)</option>
+                                                    <option value="0.00">F (0.00)</option>
+                                                </select>
+                                                <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <button class="gh-btn gh-btn-secondary add-course-btn">
+                                        <i class="fas fa-plus"></i> Add Course
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div class="gh-button-group">
+                                <button id="add-semester-btn" class="gh-btn gh-btn-secondary">
+                                    <i class="fas fa-plus"></i> Add Semester
+                                </button>
+                                <button id="calculate-manual-btn" class="gh-btn gh-btn-primary">
+                                    Calculate CGPA
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <div class="gh-stats-container hidden" id="manual-results-container">
+                            <div class="gh-stats-box" id="manual-results">
+                                <h3>Manual Calculation Results</h3>
+                                <div class="gh-stats-value" id="manual-total-cgpa">CGPA: 0.00</div>
+                                <div class="gh-stats-label" id="manual-total-credits">Total Credits: 0</div>
+                            </div>
+                            <div class="gh-chart-box" id="manual-chart-container">
+                                <div class="gh-chart-header">
+                                    <h3>CGPA Analysis</h3>
+                                </div>
+                                <div class="gh-chart-body">
+                                    <canvas id="manual-cgpa-chart"></canvas>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <!-- Advanced Fetch Tab -->
+                    <div class="tab-pane" id="advanced-fetch">
+                        <div class="gh-content-header">
+                            <h2>Advanced CGPA Fetch</h2>
+                            <p class="gh-desc">Configure advanced options for fetching CGPA data</p>
+                        </div>
+                        
+                        <div class="gh-box">
+                            <div class="gh-form">
+                                <!-- Fetch Options -->
+                                <div class="gh-section-title">
+                                    <h3>Fetch Options</h3>
+                                </div>
+
+                                <!-- Timeout setting -->
+                                <div class="form-group">
+                                    <label for="advanced-timeout">Response Timeout (seconds)</label>
+                                    <input type="number" id="advanced-timeout" class="gh-form-control" value="15" min="5" max="120">
+                                    <small>How long to wait for the server response before timing out. Default: 15 seconds.</small>
+                                </div>
+                                
+                                <!-- Custom Base URL -->
+                                <div class="form-group">
+                                    <label for="advanced-base-url">Custom API Base URL (Optional)</label>
+                                    <input type="text" id="advanced-base-url" class="gh-form-control" placeholder="e.g. http://peoplepulse.diu.edu.bd:8189/result">
+                                    <small>Leave empty to use the default university API. Only change if instructed.</small>
+                                </div>
+                                
+                                <!-- Fetch Mode -->
+                                <div class="gh-section-title">
+                                    <h3>Fetch Mode</h3>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <div class="gh-radio-group">
+                                        <div class="gh-radio">
+                                            <input type="radio" name="fetch-mode" id="fetch-single" value="single" checked>
+                                            <label for="fetch-single">Single Student</label>
+                                        </div>
+                                        <div class="gh-radio">
+                                            <input type="radio" name="fetch-mode" id="fetch-range" value="range">
+                                            <label for="fetch-range">ID Range</label>
+                                        </div>
+                                        <div class="gh-radio">
+                                            <input type="radio" name="fetch-mode" id="fetch-multiple" value="multiple">
+                                            <label for="fetch-multiple">Multiple IDs</label>
+                                        </div>
+                                    </div>
+                                    <input type="hidden" id="fetch-mode" value="single">
+                                </div>
+                                
+                                <!-- Single Student -->
+                                <div id="single-student-form" class="fetch-form-section">
+                                    <div class="form-group">
+                                        <label for="advanced-student-id">Student ID</label>
+                                        <input type="text" id="advanced-student-id" class="gh-form-control" placeholder="e.g. 221-15-4919">
+                                    </div>
+                                </div>
+                                
+                                <!-- ID Range -->
+                                <div id="id-range-form" class="fetch-form-section hidden">
+                                    <div class="form-group">
+                                        <label for="id-range-prefix">ID Prefix</label>
+                                        <input type="text" id="id-range-prefix" class="gh-form-control" placeholder="e.g. 221-15-">
+                                        <small>Common prefix for all IDs in the range</small>
+                                    </div>
+                                    <div class="form-group">
+                                        <label>ID Range</label>
+                                        <div class="gh-input-group">
+                                            <input type="number" id="id-range-start" class="gh-form-control" placeholder="Start" min="1">
+                                            <span class="gh-input-group-text">to</span>
+                                            <input type="number" id="id-range-end" class="gh-form-control" placeholder="End" min="1">
+                                        </div>
+                                        <small>For example, 4500 to 4550 will try IDs like 221-15-4500, 221-15-4501, etc.</small>
+                                    </div>
+                                </div>
+                                
+                                <!-- Multiple IDs -->
+                                <div id="multiple-ids-form" class="fetch-form-section hidden">
+                                    <div class="form-group">
+                                        <label for="multiple-student-ids">Multiple Student IDs</label>
+                                        <textarea id="multiple-student-ids" class="gh-form-control" rows="5" placeholder="Enter one ID per line, e.g.:&#10;221-15-4919&#10;221-15-4920&#10;221-15-5000"></textarea>
+                                    </div>
+                                </div>
+                                
+                                <button id="advanced-fetch-btn" class="gh-btn gh-btn-primary">
+                                    <i class="fas fa-search"></i> Fetch CGPA
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Advanced fetch results container -->
+                        <section id="advanced-results-container" class="hidden">
+                            <div class="gh-section-title">
+                                <h3>Fetch Results</h3>
+                                <div class="gh-section-actions">
+                                    <button id="export-results-btn" class="gh-btn gh-btn-sm gh-btn-secondary">
+                                        <i class="fas fa-download"></i> Export Results
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <div id="advanced-results" class="gh-list">
+                                <!-- Results will be displayed here -->
+                            </div>
+                        </section>
+                        
+                        <section id="advanced-error-message" class="gh-alert gh-alert-error hidden">
+                            <div class="gh-alert-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="gh-alert-content">
+                                <p>Error occurred during advanced fetch. Please check your inputs and try again.</p>
+                            </div>
+                        </section>
+                    </div>
+                    
+                    <!-- About Tab -->
+                    <div class="tab-pane" id="about">
+                        <div class="gh-content-header">
+                            <h2>About DIU CGPA Calculator</h2>
+                        </div>
+                        
+                        <div class="gh-box gh-markdown-body">
+                            <h3>About This Tool</h3>
+                            <p>The DIU CGPA Calculator helps students calculate their Cumulative Grade Point Average (CGPA) easily and accurately.</p>
+                            
+                            <h4>Features</h4>
+                            <ul>
+                                <li>Automatically fetch and calculate your CGPA using your student ID</li>
+                                <li>Manually input courses to calculate expected CGPA</li>
+                                <li>View your progress through interactive charts</li>
+                                <li>Clean, GitHub-inspired interface for easy navigation</li>
+                            </ul>
+                            
+                            <div class="gh-about-footer">
+                                <p>Made with ❤️ by Minhaz.</p>
+                                <p class="gh-version">Version 1.0.0</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+    
+    <!-- Timeout Modal Dialog -->
+    <div id="timeoutModal" class="gh-modal">
+        <div class="gh-modal-content">
+            <div class="gh-modal-header">
+                <h3>API Timeout Settings</h3>
+                <button class="gh-modal-close" id="closeTimeoutModal">&times;</button>
+            </div>
+            <div class="gh-modal-body">
+                <p>The university API can sometimes be slow to respond. How long would you like to wait for a response before timing out?</p>
+                <div class="form-group">
+                    <label for="timeoutValue">Timeout (seconds):</label>
+                    <input type="number" id="timeoutValue" class="gh-form-control" value="15" min="5" max="60">
+                    <small>Recommended: 15-30 seconds. Higher values may be needed during peak times.</small>
+                </div>
+            </div>
+            <div class="gh-modal-footer">
+                <button id="cancelTimeoutBtn" class="gh-btn">Cancel</button>
+                <button id="confirmTimeoutBtn" class="gh-btn gh-btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Timeout Dialog Modal -->
+    <div id="timeout-dialog" class="gh-modal">
+        <div class="gh-modal-content">
+            <div class="gh-modal-header">
+                <h3>Server Response Timeout</h3>
+                <button class="gh-modal-close" id="timeout-dialog-close">&times;</button>
+            </div>
+            <div class="gh-modal-body">
+                <p>The university API can sometimes be slow. How long would you like to wait for a response?</p>
+                <div class="form-group">
+                    <label for="timeout-seconds">Timeout in seconds:</label>
+                    <input type="number" id="timeout-seconds" class="gh-form-control" value="15" min="5" max="120">
+                    <small>Default: 15 seconds. Minimum: 5 seconds. Maximum: 120 seconds.</small>
+                </div>
+            </div>
+            <div class="gh-modal-footer">
+                <button id="timeout-dialog-cancel" class="gh-btn">Cancel</button>
+                <button id="timeout-dialog-confirm" class="gh-btn gh-btn-primary">Confirm</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Chart.js for CGPA Visualization -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- JavaScript Files -->
+    <script src="utils/helpers.js"></script>
+    <script src="utils/Iterator.js"></script>
+    <script src="js/api.js"></script>
+    <script src="js/calculator.js"></script>
+    <script src="components/StudentInfo.js"></script>
+    <script src="components/SemesterList.js"></script>
+    <script src="components/ResultCard.js"></script>
+    <script src="js/ui.js"></script>
+</body>
+</html>
