@@ -39,17 +39,8 @@ class SemesterList {
             semesterCards += ResultCard.render(semester, index++);
         }
         
-        // Calculate summary data
-        const totalCredits = semesterIterator.getTotalCredits();
-        const averageCGPA = semesterIterator.getAverageCGPA().toFixed(2);
-        
         return `
             <div class="gh-semester-list">
-                <h3 class="gh-section-title">Semester Results</h3>
-                <div class="gh-semester-summary">
-                    <div class="gh-meta-item"><i class="fas fa-graduation-cap"></i> Total Credits: ${totalCredits}</div>
-                    <div class="gh-meta-item"><i class="fas fa-calculator"></i> Average CGPA: ${averageCGPA}</div>
-                </div>
                 ${semesterCards}
             </div>
         `;
