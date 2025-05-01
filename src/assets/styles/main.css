@@ -1095,3 +1095,165 @@ select:focus {
 .tab-pane.active {
     display: block;
 }
+
+/* Transcript styles for PDF generation */
+.transcript-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: 20px;
+    font-family: 'Inter', Arial, sans-serif;
+    color: #24292e;
+}
+
+.transcript-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: 30px;
+    border-bottom: 2px solid #0366d6;
+    padding-bottom: 20px;
+}
+
+.transcript-logo {
+    width: 100px;
+    margin-right: 20px;
+}
+
+.transcript-logo img {
+    width: 100%;
+    height: auto;
+}
+
+.transcript-title {
+    flex: 1;
+    text-align: center;
+}
+
+.transcript-title h2 {
+    margin: 0;
+    font-size: 24px;
+    color: #0366d6;
+}
+
+.transcript-title h3 {
+    margin: 5px 0;
+    font-size: 20px;
+}
+
+.transcript-title p {
+    margin: 5px 0;
+    font-size: 14px;
+    color: #586069;
+}
+
+.transcript-student-info {
+    margin-bottom: 30px;
+    padding: 15px;
+    background-color: #f6f8fa;
+    border-radius: 6px;
+    border: 1px solid #e1e4e8;
+}
+
+.transcript-student-info table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.transcript-student-info th {
+    text-align: left;
+    padding: 8px;
+    font-weight: 600;
+    width: 30%;
+}
+
+.transcript-student-info td {
+    padding: 8px;
+}
+
+.transcript-summary {
+    margin-bottom: 30px;
+}
+
+.transcript-summary-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #e1e4e8;
+}
+
+.transcript-summary-table th,
+.transcript-summary-table td {
+    text-align: center;
+    padding: 12px;
+    border: 1px solid #e1e4e8;
+}
+
+.transcript-summary-table th {
+    background-color: #f6f8fa;
+    font-weight: 600;
+}
+
+.transcript-semester-results {
+    margin-bottom: 30px;
+}
+
+.transcript-semester {
+    margin-bottom: 20px;
+}
+
+.transcript-semester-header {
+    background-color: #f6f8fa;
+    padding: 10px 15px;
+    border: 1px solid #e1e4e8;
+    border-top-left-radius: 6px;
+    border-top-right-radius: 6px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.transcript-semester-header h4 {
+    margin: 0;
+    font-size: 16px;
+    font-weight: 600;
+}
+
+.transcript-semester-stats {
+    display: flex;
+    gap: 15px;
+}
+
+.transcript-semester-stats span {
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.transcript-semester-table {
+    width: 100%;
+    border-collapse: collapse;
+    border: 1px solid #e1e4e8;
+    border-top: none;
+}
+
+.transcript-semester-table th,
+.transcript-semester-table td {
+    padding: 10px;
+    border-bottom: 1px solid #e1e4e8;
+    text-align: left;
+}
+
+.transcript-semester-table th {
+    font-weight: 600;
+    background-color: #fafbfc;
+}
+
+.transcript-footer {
+    margin-top: 40px;
+    text-align: center;
+    font-size: 12px;
+    color: #586069;
+    border-top: 1px solid #e1e4e8;
+    padding-top: 20px;
+}
+
+.transcript-footer p {
+    margin: 5px 0;
+}
