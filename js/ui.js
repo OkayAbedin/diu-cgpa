@@ -31,6 +31,9 @@ class UiController {
         this.navItems = document.querySelectorAll('.gh-nav li');
         this.tabPanes = document.querySelectorAll('.tab-pane');
         
+        // Theme Toggle
+        this.themeToggleBtn = document.getElementById('theme-toggle-btn');
+        
         // Charts
         this.cgpaChart = null;
         this.manualCgpaChart = null;
@@ -97,6 +100,13 @@ class UiController {
                 this.handleCalculate();
             }
         });
+        
+        // Theme toggle event
+        if (this.themeToggleBtn) {
+            this.themeToggleBtn.addEventListener('click', () => this.toggleTheme());
+            // Initialize theme from localStorage
+            this.initTheme();
+        }
         
         // Save as PDF button event
         const savePdfBtn = document.getElementById('save-pdf-btn');
@@ -167,6 +177,62 @@ class UiController {
         
         // Initialize the fetch mode UI
         this.handleFetchModeChange();
+    }
+    
+    /**
+     * Initialize theme from localStorage or system preference
+     */
+    initTheme() {
+        // Check localStorage first
+        const savedTheme = localStorage.getItem('theme');
+        
+        if (savedTheme) {
+            // Apply saved theme
+            document.documentElement.setAttribute('data-theme', savedTheme);
+            this.updateThemeToggleIcon(savedTheme);
+        } else {
+            // Check system preference
+            const prefersDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const initialTheme = prefersDarkMode ? 'dark' : 'light';
+            
+            // Apply theme based on system preference
+            document.documentElement.setAttribute('data-theme', initialTheme);
+            this.updateThemeToggleIcon(initialTheme);
+            
+            // Save initial theme to localStorage
+            localStorage.setItem('theme', initialTheme);
+        }
+    }
+    
+    /**
+     * Toggle between light and dark themes
+     */
+    toggleTheme() {
+        const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+        const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+        
+        // Apply new theme
+        document.documentElement.setAttribute('data-theme', newTheme);
+        
+        // Update toggle button icon
+        this.updateThemeToggleIcon(newTheme);
+        
+        // Save theme preference
+        localStorage.setItem('theme', newTheme);
+    }
+    
+    /**
+     * Update theme toggle button icon based on current theme
+     * @param {string} theme - 'light' or 'dark'
+     */
+    updateThemeToggleIcon(theme) {
+        if (!this.themeToggleBtn) return;
+        
+        if (theme === 'dark') {
+            this.themeToggleBtn.setAttribute('title', 'Switch to light mode');
+        } else {
+            this.themeToggleBtn.setAttribute('title', 'Switch to dark mode');
+        }
     }
     
     /**

@@ -1,6 +1,6 @@
 /* Modern UI styles for DIU CGPA Calculator */
 :root {
-    /* Colors - Modern palette */
+    /* Colors - Modern palette (Light mode) */
     --color-bg: #ffffff;
     --color-header-bg: #1a1c2c;
     --color-text: #2d3748;
@@ -27,6 +27,10 @@
     --color-success: #38b2ac;
     --color-chart-1: #4361ee;
     --color-chart-2: #38b2ac;
+    --main-bg: #f8fafc;
+    --header-gradient-start: #1a1c2c;
+    --header-gradient-end: #293245;
+    --header-icon-color: #6dd5ed;
     
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -57,6 +61,37 @@
     --transition-default: all 0.25s ease-in-out;
 }
 
+/* Dark mode colors */
+[data-theme="dark"] {
+    --color-bg: #171923;
+    --color-header-bg: #0f1117;
+    --color-text: #e2e8f0;
+    --color-text-secondary: #a0aec0;
+    --color-border: #2d3748;
+    --color-btn-bg: #2d3748;
+    --color-btn-border: #4a5568;
+    --color-btn-text: #e2e8f0;
+    --color-btn-hover-bg: #4a5568;
+    --color-box-bg: #1a202c;
+    --color-box-border: #2d3748;
+    --color-box-header: #0f1117;
+    --color-link: #63b3ed;
+    --color-alert-error-bg: #2a161a;
+    --color-alert-error-border: #822727;
+    --color-alert-warning-bg: #2a2516;
+    --color-alert-warning-border: #8f8127;
+    --color-success: #38b2ac;
+    --color-chart-1: #63b3ed;
+    --color-chart-2: #4fd1c5;
+    --main-bg: #0f1117;
+    --header-gradient-start: #0f1117;
+    --header-gradient-end: #1a1c2c;
+    --header-icon-color: #4fd1c5;
+    --shadow-small: 0 2px 4px rgba(0, 0, 0, 0.3);
+    --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.4);
+    --shadow-large: 0 10px 30px rgba(0, 0, 0, 0.5);
+}
+
 /* Base styles */
 * {
     margin: 0;
@@ -69,8 +104,9 @@ body {
     font-size: var(--font-size-normal);
     line-height: 1.6;
     color: var(--color-text);
-    background-color: #f8fafc;
+    background-color: var(--main-bg);
     -webkit-font-smoothing: antialiased;
+    transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 /* App container */
@@ -82,7 +118,7 @@ body {
 
 /* Modern header */
 .gh-header {
-    background: linear-gradient(120deg, var(--color-header-bg), #293245);
+    background: linear-gradient(120deg, var(--header-gradient-start), var(--header-gradient-end));
     color: white;
     padding: var(--spacing-md) var(--spacing-lg);
     position: sticky;
@@ -108,7 +144,7 @@ body {
 .gh-header-logo i {
     font-size: var(--font-size-large);
     margin-right: var(--spacing-sm);
-    color: #6dd5ed;
+    color: var(--header-icon-color);
 }
 
 .gh-header-logo h1 {
@@ -149,14 +185,14 @@ body {
 
 .gh-nav li i {
     margin-right: var(--spacing-sm);
-    color: #6dd5ed;
+    color: var(--header-icon-color);
 }
 
 /* Main content area */
 .gh-main {
     flex: 1;
     padding: var(--spacing-lg) 0;
-    background-color: #f8fafc;
+    background-color: var(--main-bg);
 }
 
 .gh-container {
@@ -250,6 +286,7 @@ textarea {
     box-shadow: var(--shadow-small);
     transition: var(--transition-default);
     width: 100%;
+    transition: background-color 0.3s ease, border-color 0.3s ease, box-shadow 0.3s ease, transform 0.25s ease-in-out;
 }
 
 .gh-form-control:focus, 
@@ -1403,4 +1440,57 @@ textarea::placeholder {
 
 .transcript-footer p {
     margin: 5px 0;
+}
+
+/* Theme toggle button styling */
+.theme-toggle {
+    display: flex;
+    align-items: center;
+}
+
+.theme-btn {
+    background-color: transparent;
+    color: white;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: var(--transition-default);
+}
+
+.theme-btn:hover {
+    background-color: rgba(255, 255, 255, 0.15);
+    transform: rotate(15deg);
+}
+
+[data-theme="dark"] .theme-btn i.fa-sun {
+    display: none;
+}
+
+[data-theme="dark"] .theme-btn i.fa-moon {
+    display: inline-block;
+}
+
+.theme-btn i.fa-moon {
+    display: none;
+}
+
+.theme-btn i.fa-sun {
+    display: inline-block;
+}
+
+/* Additional dark mode fixes */
+[data-theme="dark"] .gh-content-header h2 {
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .gh-content-header h2::after {
+    background: linear-gradient(90deg, var(--color-chart-1), var(--color-chart-2));
+}
+
+[data-theme="dark"] .gh-stats-box::before {
+    background: linear-gradient(90deg, var(--color-chart-1), var(--color-chart-2));
+}
+
+[data-theme="dark"] .gh-stats-value {
+    background: linear-gradient(90deg, var(--color-success), var(--color-chart-1));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
 }
