@@ -461,10 +461,22 @@ class ResultCard {
                         transcriptContainer.appendChild(noData);
                     }
                     
+                    // Add timer information display
+                    if (this.fetchTimerValue) {
+                        const timerInfo = previewWindow.document.createElement("div");
+                        timerInfo.className = "timer-info";
+                        timerInfo.style.marginTop = "10mm";
+                        timerInfo.style.fontSize = "8pt";
+                        timerInfo.style.color = "#999";
+                        timerInfo.style.textAlign = "center";
+                        timerInfo.textContent = `Data fetched in ${this.fetchTimerValue} seconds`;
+                        transcriptContainer.appendChild(timerInfo);
+                    }
+                    
                     // Add footer
                     const footer = previewWindow.document.createElement("div");
                     footer.className = "transcript-footer";
-                    footer.innerHTML = "<p>This is not an official document. Generated with DIUCGPA</p>";
+                    footer.innerHTML = "<p>This is not an official document. Generated with https://diucgpa.netlify.app</p>";
                     transcriptContainer.appendChild(footer);
                     
                     // Add to the content container

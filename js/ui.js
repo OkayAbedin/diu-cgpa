@@ -1055,6 +1055,24 @@ class UiController {
                 this.apiService.setBaseUrl(this.advancedBaseUrl.value.trim());
             }
             
+            // Start timer
+            const startTime = performance.now();
+            const timerDisplay = document.createElement('div');
+            timerDisplay.className = 'timer-display';
+            timerDisplay.style.marginTop = '10px';
+            timerDisplay.style.fontSize = '14px';
+            timerDisplay.style.color = 'var(--color-text-secondary)';
+            timerDisplay.textContent = 'Time elapsed: 0.0 seconds';
+            
+            // Add timer display to results container
+            resultsContainer.appendChild(timerDisplay);
+            
+            // Set up timer update interval
+            const timerInterval = setInterval(() => {
+                const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(1);
+                timerDisplay.textContent = `Time elapsed: ${elapsedTime} seconds`;
+            }, 100);
+            
             let studentIds = [];
             
             // Get student IDs based on the selected mode
@@ -1134,14 +1152,37 @@ class UiController {
                         <p>Current ID: ${currentId}</p>
                         <p><small>Timeout setting: ${timeout} seconds per request</small></p>
                     </div>`;
+                    
+                    // Re-add timer display during progress updates
+                    const newTimerDisplay = document.createElement('div');
+                    newTimerDisplay.className = 'timer-display';
+                    newTimerDisplay.style.marginTop = '10px';
+                    newTimerDisplay.style.fontSize = '14px';
+                    newTimerDisplay.style.color = 'var(--color-text-secondary)';
+                    const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(1);
+                    newTimerDisplay.textContent = `Time elapsed: ${elapsedTime} seconds`;
+                    resultsContainer.appendChild(newTimerDisplay);
                 }
             );
             
             // Store results for export
             this.advancedFetchResults = results;
             
-            // Display results
-            this.displayAdvancedResults(results);
+            // Stop timer and store the final time
+            clearInterval(timerInterval);
+            const fetchEndTime = performance.now();
+            const totalFetchTime = ((fetchEndTime - startTime) / 1000).toFixed(2);
+            
+            // Store the fetch time for display in various places
+            this.fetchTimerValue = totalFetchTime;
+            
+            // Add ResultCard instance property for PDF generation
+            if (window.ResultCard && window.ResultCard.prototype) {
+                window.ResultCard.prototype.fetchTimerValue = totalFetchTime;
+            }
+            
+            // Display results with timer information
+            this.displayAdvancedResults(results, totalFetchTime);
             
             // Show export button
             Helpers.showElement(document.getElementById('export-results-btn'));
@@ -1538,8 +1579,9 @@ class UiController {
     /**
      * Display advanced fetch results
      * @param {Object} results - Results from fetchMultipleStudentsCGPA
+     * @param {string} fetchTime - Total fetch time in seconds
      */
-    displayAdvancedResults(results) {
+    displayAdvancedResults(results, fetchTime) {
         const resultsContainer = document.getElementById('advanced-results');
         resultsContainer.innerHTML = '';
         
@@ -1574,7 +1616,7 @@ class UiController {
         const summaryHtml = `
             <div class="gh-box">
                 <h3>Results Summary</h3>
-                <div class="gh-stats-container" style="grid-template-columns: 1fr 1fr 1fr;">
+                <div class="gh-stats-container" style="grid-template-columns: 1fr 1fr 1fr 1fr;">
                     <div class="gh-stats-box">
                         <div class="gh-stats-value">${totalStudents}</div>
                         <div class="gh-stats-label">Total Students</div>
@@ -1586,6 +1628,10 @@ class UiController {
                     <div class="gh-stats-box">
                         <div class="gh-stats-value" style="color: var(--color-btn-danger-bg);">${totalErrors}</div>
                         <div class="gh-stats-label">Failed</div>
+                    </div>
+                    <div class="gh-stats-box">
+                        <div class="gh-stats-value" style="color: var(--color-text-secondary);">${fetchTime}s</div>
+                        <div class="gh-stats-label">Fetch Time</div>
                     </div>
                 </div>
             </div>
