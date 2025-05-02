@@ -119,20 +119,364 @@ class ResultCard {
      * @param {Object} cgpaData - Object containing CGPA and total credits
      */
     generatePdfTranscript(studentInfo, semesterData, cgpaData) {
-        const htmlTemplate = this.createTranscriptHtml(studentInfo, semesterData, cgpaData);
-        
-        // Options for html2pdf - exactly matched to design requirements
-        const options = {
-            margin: [10, 10],
-            filename: `${studentInfo.studentId}_transcript.pdf`,
-            image: { type: 'jpeg', quality: 1.0 },
-            html2canvas: { scale: 2, useCORS: true },
-            jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' },
-            pagebreak: { mode: 'avoid-all' }
-        };
-
-        // Generate PDF
-        html2pdf().set(options).from(htmlTemplate).save();
+        try {
+            // First create the preview window with minimal content and controls
+            const previewWindow = window.open("", "_blank");
+            if (!previewWindow) {
+                alert("Popup blocker might be preventing the transcript from opening. Please allow popups for this site.");
+                return;
+            }
+            
+            // Set up the preview window content with minimal structure first
+            previewWindow.document.write(`
+                <!DOCTYPE html>
+                <html>
+                <head>
+                    <title>Transcript Preview - ${studentInfo.studentName || studentInfo.name || "Student"}</title>
+                    <meta charset="utf-8">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <style>
+                        body {
+                            font-family: Arial, sans-serif;
+                            margin: 0;
+                            padding: 0;
+                            background-color: #f0f0f0;
+                        }
+                        .controls {
+                            position: fixed;
+                            top: 0;
+                            left: 0;
+                            right: 0;
+                            background-color: #333;
+                            color: white;
+                            padding: 10px;
+                            text-align: center;
+                            z-index: 1000;
+                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                        }
+                        .btn {
+                            background-color: #4CAF50;
+                            color: white;
+                            border: none;
+                            padding: 8px 16px;
+                            margin: 0 5px;
+                            border-radius: 4px;
+                            cursor: pointer;
+                            font-size: 14px;
+                        }
+                        .btn:hover {
+                            background-color: #45a049;
+                        }
+                        .content-wrapper {
+                            margin-top: 60px;
+                            padding: 20px;
+                            display: flex;
+                            justify-content: center;
+                        }
+                        .message {
+                            color: #999;
+                            font-size: 14px;
+                            margin: 20px;
+                        }
+                        @media print {
+                            .controls, .message {
+                                display: none;
+                            }
+                            .content-wrapper {
+                                margin-top: 0;
+                            }
+                        }
+                        /* Transcript styles */
+                        .transcript-container {
+                            width: 210mm;
+                            min-height: 297mm;
+                            padding: 10mm;
+                            margin: 0 auto;
+                            background-color: #fff;
+                            color: #000;
+                            font-family: Arial, sans-serif;
+                            font-size: 10pt;
+                            box-sizing: border-box;
+                            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+                        }
+                        .transcript-header {
+                            text-align: center;
+                            margin-bottom: 10mm;
+                        }
+                        .semester-table-container {
+                            margin-bottom: 10mm;
+                            page-break-inside: avoid;
+                        }
+                        .semester-table {
+                            width: 100%;
+                            border-collapse: collapse;
+                            border: 1px solid #000;
+                        }
+                        .semester-table th, .semester-table td {
+                            border: 1px solid #000;
+                            padding: 3px 5px;
+                        }
+                        .semester-table th {
+                            font-weight: bold;
+                        }
+                        .student-section {
+                            margin-bottom: 10mm;
+                        }
+                        .transcript-footer {
+                            margin-top: 20mm;
+                            text-align: center;
+                            font-size: 9pt;
+                            color: #555;
+                        }
+                    </style>
+                </head>
+                <body>
+                    <div class="controls">
+                        <button class="btn" id="savePdf">Save as PDF</button>
+                        <button class="btn" id="printBtn">Print</button>
+                        <button class="btn" id="closeBtn">Close</button>
+                        <span style="font-size: 12px; margin-left: 10px; color: #ddd;">You can preview the transcript and decide to save it or print it.</span>
+                    </div>
+                    <div class="content-wrapper" id="content">
+                        <div class="message">Loading transcript...</div>
+                    </div>
+                    <script>
+                        document.getElementById("closeBtn").addEventListener("click", function() {
+                            window.close();
+                        });
+                        
+                        document.getElementById("printBtn").addEventListener("click", function() {
+                            window.print();
+                        });
+                    </script>
+                </body>
+                </html>
+            `);
+            
+            // Close document to finish initial rendering
+            previewWindow.document.close();
+            
+            // Create the transcript content manually and insert it directly into the DOM
+            setTimeout(() => {
+                try {
+                    // Get the content container
+                    const contentContainer = previewWindow.document.getElementById("content");
+                    if (!contentContainer) {
+                        throw new Error("Content container not found");
+                    }
+                    
+                    // Clear any loading message
+                    contentContainer.innerHTML = "";
+                    
+                    // Create transcript container
+                    const transcriptContainer = previewWindow.document.createElement("div");
+                    transcriptContainer.className = "transcript-container";
+                    
+                    // Create header
+                    const header = previewWindow.document.createElement("div");
+                    header.className = "transcript-header";
+                    
+                    // Add logo
+                    const logo = previewWindow.document.createElement("img");
+                    logo.alt = "Daffodil International University";
+                    logo.style.height = "20mm";
+                    logo.style.marginBottom = "5mm";
+                    logo.src = "assets/img/diu-logo.svg"; // Use the actual DIU logo from assets
+                    
+                    // Add university address
+                    const address = previewWindow.document.createElement("div");
+                    address.style.fontSize = "9pt";
+                    address.style.lineHeight = "1.3";
+                    address.innerHTML = `
+                        Daffodil International University, Daffodil Smart City, Birulia, Savar, Dhaka-1216 Bangladesh<br>
+                        Tel: +88 02 9143254-5, 48111639, 48111670, 8411470(Ext. 01)/1350091, 01713485941, 01611458841, 01841149850<br>
+                        E-mail: info@daffodilvarsity.edu.bd, Fax: +88 02 9131947
+                    `;
+                    
+                    // Add title
+                    const title = previewWindow.document.createElement("div");
+                    title.style.fontWeight = "bold";
+                    title.style.fontSize = "16pt";
+                    title.style.marginTop = "5mm";
+                    title.textContent = "Transcript";
+                    
+                    // Assemble header
+                    header.appendChild(logo);
+                    header.appendChild(address);
+                    header.appendChild(title);
+                    transcriptContainer.appendChild(header);
+                    
+                    // Add student info section
+                    const studentSection = previewWindow.document.createElement("div");
+                    studentSection.className = "student-section";
+                    
+                    // Program info
+                    const program = previewWindow.document.createElement("div");
+                    program.style.fontStyle = "italic";
+                    program.style.marginBottom = "5mm";
+                    program.innerHTML = "<strong>Program:</strong> 4-Year B.Sc. in Computer Science and Engineering";
+                    
+                    // Student info table
+                    const studentTable = previewWindow.document.createElement("table");
+                    studentTable.style.width = "100%";
+                    studentTable.style.borderCollapse = "collapse";
+                    studentTable.innerHTML = `
+                        <tr>
+                            <td style="width:130px;">Name of the Student</td>
+                            <td>: ${studentInfo.studentName || studentInfo.name || ""}</td>
+                            <td style="width:130px;">Enrollment Session</td>
+                            <td>: ${studentInfo.enrollmentSession || "Spring 2022"}</td>
+                        </tr>
+                        <tr>
+                            <td>Student ID</td>
+                            <td>: ${studentInfo.studentId || studentInfo.id || ""}</td>
+                            <td>Date of Issue</td>
+                            <td>: ${new Date().toLocaleDateString()}</td>
+                        </tr>
+                        <tr>
+                            <td>Batch</td>
+                            <td>: ${studentInfo.batch || studentInfo.batchNo || "61"}</td>
+                            <td></td>
+                            <td></td>
+                        </tr>
+                    `;
+                    
+                    studentSection.appendChild(program);
+                    studentSection.appendChild(studentTable);
+                    transcriptContainer.appendChild(studentSection);
+                    
+                    // Add semester tables
+                    if (semesterData && semesterData.length > 0) {
+                        // Sort semesters chronologically
+                        const sortedSemesters = [...semesterData].sort((a, b) => a.id.localeCompare(b.id));
+                        
+                        sortedSemesters.forEach(semester => {
+                            // Semester container
+                            const semesterContainer = previewWindow.document.createElement("div");
+                            semesterContainer.className = "semester-table-container";
+                            
+                            // Semester header
+                            const semesterHeader = previewWindow.document.createElement("div");
+                            semesterHeader.style.marginBottom = "5mm";
+                            semesterHeader.innerHTML = `<strong>Semester:</strong> ${semester.name}`;
+                            
+                            // Semester table
+                            const semesterTable = previewWindow.document.createElement("table");
+                            semesterTable.className = "semester-table";
+                            
+                            // Table header
+                            let tableHTML = `
+                                <thead>
+                                    <tr>
+                                        <th style="width:100px;">Course Code</th>
+                                        <th>Course Title</th>
+                                        <th style="width:50px;">Credit</th>
+                                        <th style="width:60px;">Grade</th>
+                                        <th style="width:80px;">Grade Point</th>
+                                        <th style="width:50px;">GPA</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            `;
+                            
+                            // Course rows
+                            if (semester.courses && semester.courses.length > 0) {
+                                semester.courses.forEach(course => {
+                                    tableHTML += `
+                                        <tr>
+                                            <td style="text-align:center;">${course.courseCode || course.customCourseId || "-"}</td>
+                                            <td>${course.courseName || course.courseTitle || "Unknown Course"}</td>
+                                            <td style="text-align:center;">${course.totalCredit || "0"}</td>
+                                            <td style="text-align:center;">${course.gradeLetter || "-"}</td>
+                                            <td style="text-align:center;">${course.pointEquivalent || "0"}</td>
+                                            <td></td>
+                                        </tr>
+                                    `;
+                                });
+                                
+                                // GPA row
+                                tableHTML += `
+                                    <tr>
+                                        <td colspan="5"></td>
+                                        <td style="text-align:center;font-weight:bold;">${semester.gpa || semester.cgpa || "0.00"}</td>
+                                    </tr>
+                                `;
+                            } else {
+                                tableHTML += '<tr><td colspan="6" style="text-align:center;">No courses found for this semester</td></tr>';
+                            }
+                            
+                            tableHTML += '</tbody>';
+                            semesterTable.innerHTML = tableHTML;
+                            
+                            semesterContainer.appendChild(semesterHeader);
+                            semesterContainer.appendChild(semesterTable);
+                            transcriptContainer.appendChild(semesterContainer);
+                        });
+                    } else {
+                        const noData = previewWindow.document.createElement("div");
+                        noData.style.textAlign = "center";
+                        noData.style.padding = "20px";
+                        noData.textContent = "No semester data available";
+                        transcriptContainer.appendChild(noData);
+                    }
+                    
+                    // Add footer
+                    const footer = previewWindow.document.createElement("div");
+                    footer.className = "transcript-footer";
+                    footer.innerHTML = "<p>This is not an official document. Generated with DIUCGPA</p>";
+                    transcriptContainer.appendChild(footer);
+                    
+                    // Add to the content container
+                    contentContainer.appendChild(transcriptContainer);
+                    
+                    // Add PDF save button functionality
+                    previewWindow.document.getElementById("savePdf").addEventListener("click", function() {
+                        const element = previewWindow.document.querySelector(".transcript-container");
+                        
+                        if (!element) {
+                            console.error("Transcript container not found");
+                            return;
+                        }
+                        
+                        const options = {
+                            margin: [10, 10],
+                            filename: `${studentInfo.studentId || "student"}_transcript.pdf`,
+                            image: { type: "jpeg", quality: 1.0 },
+                            html2canvas: { 
+                                scale: 2, 
+                                useCORS: true,
+                                logging: true,
+                                letterRendering: true,
+                                allowTaint: true 
+                            },
+                            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
+                            pagebreak: { mode: "avoid-all" }
+                        };
+                        
+                        // Load html2pdf library dynamically
+                        const script = previewWindow.document.createElement("script");
+                        script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
+                        script.onload = function() {
+                            previewWindow.html2pdf().set(options).from(element).save();
+                        };
+                        script.onerror = function() {
+                            alert("Failed to load the PDF generation library. Please try again later.");
+                        };
+                        previewWindow.document.head.appendChild(script);
+                    });
+                } catch (err) {
+                    console.error("Error building transcript:", err);
+                    const contentContainer = previewWindow.document.getElementById("content");
+                    if (contentContainer) {
+                        contentContainer.innerHTML = `<div style="color:red;padding:20px;text-align:center;">Error generating transcript: ${err.message}</div>`;
+                    }
+                }
+            }, 300); // Short delay to ensure window is ready
+            
+        } catch (error) {
+            console.error("Error generating transcript:", error);
+            alert("An error occurred while generating the transcript: " + error.message);
+        }
     }
 
     /**
@@ -181,12 +525,21 @@ class ResultCard {
         header.style.textAlign = 'center';
         header.style.marginBottom = '10mm';
         
-        // University Logo
+        // Use embedded SVG for the DIU logo instead of external URL to avoid CORS issues
+        // This uses a data URI with an embedded SVG for the DIU logo
         const logo = document.createElement('img');
-        logo.src = 'assets/img/diu-logo.svg';
         logo.alt = 'Daffodil International University';
         logo.style.height = '20mm';
         logo.style.marginBottom = '5mm';
+        
+        // Use a local asset if available, otherwise use a data URI for the logo
+        if (window.location.href.includes('localhost') || window.location.href.includes('127.0.0.1')) {
+            // For local development
+            logo.src = 'assets/img/diu-logo.svg';
+        } else {
+            // Inline SVG data URI as fallback (simplified DIU logo)
+            logo.src = 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmciIHZpZXdCb3g9IjAgMCAyMDAgMTAwIj48c3R5bGU+LnN0MHtmaWxsOiMwMDYyMzk7fTwvc3R5bGU+PHBhdGggY2xhc3M9InN0MCIgZD0iTTI1IDI1aDE1MHY1MEgyNXoiLz48dGV4dCB4PSI1MCIgeT0iNjAiIGZpbGw9IiNmZmYiIGZvbnQtZmFtaWx5PSJBcmlhbCIgZm9udC1zaXplPSIyMCIgZm9udC13ZWlnaHQ9ImJvbGQiPkRJVTwvdGV4dD48L3N2Zz4=';
+        }
         
         // University Address and Contact Information
         const addressText = document.createElement('div');
