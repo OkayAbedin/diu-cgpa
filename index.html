@@ -11,42 +11,43 @@
     <!-- Google Fonts - GitHub uses system fonts, but we'll use similar web fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/styles/main.css">
+    <style>
+        /* Critical tab navigation styles that override any problematic CSS */
+        .tab-pane {
+            display: none;
+        }
+        .tab-pane.active {
+            display: block !important;
+        }
+    </style>
 </head>
 <body>
     <div class="app-container">
-        <!-- Header - GitHub style -->
+        <!-- Header - Updated to match the design in the image -->
         <header class="gh-header">
             <div class="gh-header-inner">
                 <div class="gh-header-logo">
-                    <i class="fas fa-graduation-cap"></i>
-                    <h1>DIU CGPA Calculator</h1>
+                    <img src="assets/img/DIU CGPA.svg" alt="DIU CGPA" class="header-logo">
                 </div>
                 <nav class="gh-nav">
                     <ul>
-                        <li class="active" data-tab="auto-calculator">
-                            <i class="fas fa-calculator"></i>
-                            <span>Fetch CGPA</span>
+                        <li>
+                            <a href="#" class="gh-btn gh-btn-primary" data-tab="auto-calculator">Fetch CGPA</a>
                         </li>
-                        <li data-tab="manual-calculator">
-                            <i class="fas fa-edit"></i>
-                            <span>Calculate CGPA</span>
+                        <li>
+                            <a href="#" class="gh-btn" data-tab="manual-calculator">Calculate CGPA</a>
                         </li>
-                        <li data-tab="advanced-fetch">
-                            <i class="fas fa-cogs"></i>
-                            <span>Advanced Fetch</span>
+                        <li>
+                            <a href="#" class="gh-btn" data-tab="advanced-fetch">Advanced Fetch</a>
                         </li>
-                        <li data-tab="about">
-                            <i class="fas fa-info-circle"></i>
-                            <span>About</span>
+                        <li>
+                            <a href="#" class="gh-btn" data-tab="about">About</a>
+                        </li>
+                        <li>
+                            <a href="https://github.com/okayabedin/diu-cgpa" target="_blank" class="gh-btn fork-btn">Fork on Github</a>
                         </li>
                     </ul>
                 </nav>
-                <div class="theme-toggle">
-                    <button id="theme-toggle-btn" class="gh-btn gh-btn-sm gh-btn-icon theme-btn">
-                        <i class="fas fa-sun"></i>
-                        <i class="fas fa-moon"></i>
-                    </button>
-                </div>
             </div>
         </header>
         
@@ -446,21 +447,29 @@
         </div>
     </div>
 
-    <!-- Bootstrap JS Bundle with Popper -->
+    <!-- Directly load our simplified navigation.js before any other scripts -->
+    <script src="js/navigation.js"></script>
+
+    <!-- JavaScript Files - Rearranged for proper dependency order -->
+    <!-- Third-party libraries -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <!-- Chart.js for CGPA Visualization -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <!-- HTML2PDF.js for PDF generation -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js"></script>
-    
-    <!-- JavaScript Files -->
+
+    <!-- App utilities -->
     <script src="js/utils/helpers.js"></script>
     <script src="js/utils/Iterator.js"></script>
+
+    <!-- Core functionality -->
     <script src="js/api.js"></script>
     <script src="js/calculator.js"></script>
+
+    <!-- UI Components -->
     <script src="js/components/StudentInfo.js"></script>
     <script src="js/components/SemesterList.js"></script>
     <script src="js/components/ResultCard.js"></script>
+
+    <!-- UI Controller - loaded last -->
     <script src="js/ui.js"></script>
 </body>
 </html>

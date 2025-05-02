@@ -121,18 +121,19 @@ body {
     width: 100%;
 }
 
-/* Dashboard Header */
+/* Dashboard Header - Redesigned to match the image */
 .gh-header {
-    background: linear-gradient(120deg, var(--header-gradient-start), var(--header-gradient-end));
-    color: white;
+    background: #fff;
+    color: #333;
     padding: 0 var(--spacing-lg);
     position: sticky;
     top: 0;
     z-index: 100;
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-small);
     height: var(--dash-header-height);
     display: flex;
     align-items: center;
+    border-bottom: 1px solid var(--color-border);
 }
 
 .gh-header-inner {
@@ -149,17 +150,9 @@ body {
     align-items: center;
 }
 
-.gh-header-logo i {
-    font-size: var(--font-size-large);
-    margin-right: var(--spacing-sm);
-    color: var(--header-icon-color);
-}
-
-.gh-header-logo h1 {
-    font-size: var(--font-size-medium);
-    font-weight: 600;
-    margin: 0;
-    letter-spacing: 0.5px;
+.gh-header-logo .header-logo {
+    height: 40px;
+    width: auto;
 }
 
 .gh-nav {
@@ -172,33 +165,124 @@ body {
     list-style: none;
     margin: 0;
     padding: 0;
+    gap: 10px;
 }
 
 .gh-nav li {
     display: flex;
     align-items: center;
-    margin: 0 var(--spacing-sm);
-    padding: var(--spacing-sm) var(--spacing-md);
-    border-radius: var(--border-radius-medium);
-    cursor: pointer;
-    transition: var(--transition-default);
-    font-size: var(--font-size-normal);
+    margin: 0;
+    padding: 0;
 }
 
-.gh-nav li:hover {
-    background-color: rgba(255, 255, 255, 0.15);
-    transform: translateY(-2px);
-}
-
-.gh-nav li.active {
-    background-color: rgba(255, 255, 255, 0.2);
+/* Dashboard Header - Button styling fixes */
+.gh-nav .gh-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 8px 16px;
+    font-size: 14px;
     font-weight: 500;
-    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+    border-radius: 6px;
+    color: var(--color-text);
+    background-color: #e9ecef;
+    border: none;
+    transition: all 0.2s ease;
+    text-decoration: none; /* Remove underline */
+    cursor: pointer;
 }
 
-.gh-nav li i {
-    margin-right: var(--spacing-sm);
-    color: var(--header-icon-color);
+.gh-nav .gh-btn:hover {
+    background-color: #dee2e6;
+    transform: translateY(-2px);
+    text-decoration: none; /* Ensure no underline on hover */
+}
+
+.gh-nav .gh-btn-primary {
+    background-color: #0d6efd;
+    color: white;
+}
+
+.gh-nav .gh-btn-primary:hover {
+    background-color: #0b5ed7;
+}
+
+.gh-nav .fork-btn {
+    background-color: #fff;
+    border: 1px solid #ced4da;
+    text-decoration: none; /* Ensure no underline */
+}
+
+/* Add active state for tab navigation */
+.gh-nav .gh-btn.active {
+    box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.3);
+    font-weight: 600;
+}
+
+.gh-nav .gh-btn-primary.active {
+    background-color: #0a58ca;
+}
+
+/* Dark mode header adjustments */
+[data-theme="dark"] .gh-header {
+    background-color: var(--color-box-bg);
+    border-bottom: 1px solid var(--color-border);
+}
+
+[data-theme="dark"] .gh-nav .gh-btn {
+    background-color: #343a40;
+    color: #e9ecef;
+}
+
+[data-theme="dark"] .gh-nav .gh-btn:hover {
+    background-color: #495057;
+}
+
+[data-theme="dark"] .gh-nav .gh-btn-primary {
+    background-color: #0d6efd;
+    color: white;
+}
+
+[data-theme="dark"] .gh-nav .fork-btn {
+    background-color: #212529;
+    border: 1px solid #495057;
+    color: #e9ecef;
+}
+
+[data-theme="dark"] .gh-nav .fork-btn:hover {
+    background-color: #343a40;
+}
+
+/* Responsive header adjustments */
+@media (max-width: 768px) {
+    .gh-header-inner {
+        flex-direction: column;
+        padding: 10px 0;
+    }
+    
+    .gh-header {
+        height: auto;
+        padding: 10px var(--spacing-md);
+    }
+    
+    .gh-nav {
+        margin-top: 15px;
+        width: 100%;
+        overflow-x: auto;
+    }
+    
+    .gh-nav ul {
+        display: flex;
+        width: 100%;
+        padding-bottom: 5px;
+    }
+}
+
+@media (max-width: 576px) {
+    .gh-nav .gh-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
 }
 
 /* Main Dashboard content area */
@@ -1117,7 +1201,7 @@ textarea::placeholder {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    box-shadow: var(--shadow-small);
+    box-shadow: var (--shadow-small);
     transition: var(--transition-default);
 }
 
@@ -1169,12 +1253,23 @@ textarea::placeholder {
     border-bottom-color: var(--color-link);
 }
 
+.tab-content {
+    display: block;
+    width: 100%;
+}
+
 .tab-pane {
     display: none;
 }
 
 .tab-pane.active {
     display: block;
+    animation: fadeIn 0.3s ease;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
 }
 
 /* Transcript styles for PDF generation */
@@ -1852,7 +1947,7 @@ textarea::placeholder {
     background: linear-gradient(135deg, #614385, #516395);
     border-radius: var(--border-radius-medium);
     padding: var(--spacing-lg);
-    margin-bottom: var(--spacing-lg);
+    margin-bottom: var (--spacing-lg);
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-medium);

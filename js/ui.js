@@ -1969,5 +1969,63 @@ class UiController {
 
 // Initialize UI on document load
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize the main UI controller
     window.uiController = new UiController();
+    
+    // Add direct event listeners for tab navigation
+    initDirectTabNavigation();
 });
+
+/**
+ * Initialize direct tab navigation that works independently of the UiController
+ * This ensures the header navigation buttons work properly
+ */
+function initDirectTabNavigation() {
+    // Get all tab buttons in the navigation
+    const tabButtons = document.querySelectorAll('.gh-nav .gh-btn[data-tab]');
+    
+    // Get all tab content panes
+    const tabPanes = document.querySelectorAll('.tab-pane');
+    
+    if (!tabButtons.length || !tabPanes.length) {
+        console.error('Tab navigation elements not found');
+        return;
+    }
+    
+    console.log('Initializing direct tab navigation with', tabButtons.length, 'buttons and', tabPanes.length, 'panes');
+    
+    // Add click event listeners to each tab button
+    tabButtons.forEach(button => {
+        button.addEventListener('click', (e) => {
+            e.preventDefault();
+            
+            // Get the target tab id
+            const targetTabId = button.getAttribute('data-tab');
+            console.log('Tab button clicked:', targetTabId);
+            
+            // Remove active class from all buttons
+            tabButtons.forEach(btn => btn.classList.remove('active'));
+            
+            // Add active class to clicked button
+            button.classList.add('active');
+            
+            // Hide all tab panes
+            tabPanes.forEach(pane => pane.classList.remove('active'));
+            
+            // Show the target tab pane
+            const targetPane = document.getElementById(targetTabId);
+            if (targetPane) {
+                targetPane.classList.add('active');
+            } else {
+                console.error('Target pane not found:', targetTabId);
+            }
+        });
+    });
+    
+    // Set the first tab as active by default
+    const defaultTab = tabButtons[0];
+    if (defaultTab) {
+        console.log('Setting default tab:', defaultTab.getAttribute('data-tab'));
+        defaultTab.click();
+    }
+}
