@@ -5,9 +5,20 @@
 
 class ApiService {
     constructor() {
+        // Check if we're running on Netlify (production)
+        const isProduction = window.location.hostname !== 'localhost' && 
+                             window.location.hostname !== '127.0.0.1';
+        
         // Use CORS proxy if needed to avoid cross-origin issues
         this.corsProxy = '';  // Set this to a CORS proxy URL if needed
-        this.baseUrl = 'http://peoplepulse.diu.edu.bd:8189/result';
+        
+        // Use Netlify function as proxy in production, direct API in development
+        if (isProduction) {
+            this.baseUrl = '/.netlify/functions/api-proxy';
+        } else {
+            this.baseUrl = 'http://peoplepulse.diu.edu.bd:8189/result';
+        }
+        
         this.missingSemesters = []; // Track missing semesters
         
         // Default timeout in milliseconds (15 seconds)
@@ -15,6 +26,8 @@ class ApiService {
         
         // Maximum number of retries
         this.maxRetries = 2;
+        
+        console.log(`API Service initialized with base URL: ${this.baseUrl}`);
     }
 
     /**
@@ -40,12 +53,27 @@ class ApiService {
      */
     setBaseUrl(url) {
         if (url && url.trim() !== '') {
-            this.baseUrl = url;
-            console.log(`API base URL set to ${url}`);
+            // Check if we're running on Netlify and using a custom URL that's not the Netlify function
+            const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+            const isNetlifyFunction = url.includes('/.netlify/functions/');
+            
+            if (isProduction && !isNetlifyFunction && !url.startsWith('https://')) {
+                console.warn('Using HTTP URL on production site may cause CORS issues. Consider using Netlify Functions.');
+            }
+            
+            this.baseUrl = url.endsWith('/') ? url : url + '/';
+            console.log(`API base URL set to ${this.baseUrl}`);
         } else {
-            // Reset to default if empty
-            this.baseUrl = 'http://peoplepulse.diu.edu.bd:8189/result';
-            console.log(`API base URL reset to default`);
+            // Reset to default based on environment
+            const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1';
+            
+            if (isProduction) {
+                this.baseUrl = '/.netlify/functions/api-proxy';
+            } else {
+                this.baseUrl = 'http://peoplepulse.diu.edu.bd:8189/result';
+            }
+            
+            console.log(`API base URL reset to default: ${this.baseUrl}`);
         }
     }
     
@@ -487,15 +515,6 @@ class ApiService {
             completed,
             total
         };
-    }
-
-    /**
-     * Set custom base URL for API calls
-     * @param {string} url - Base URL for API
-     */
-    setBaseUrl(url) {
-        // Make sure URL ends with a slash
-        this.baseUrl = url.endsWith('/') ? url : url + '/';
     }
 }
 

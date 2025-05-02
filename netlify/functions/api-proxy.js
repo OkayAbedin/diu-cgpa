@@ -20,13 +20,26 @@ exports.handler = async function(event, context) {
   try {
     // Get the path parameter from the event
     const path = event.path.replace('/.netlify/functions/api-proxy', '');
+    
+    // Parse query parameters
     const queryString = event.queryStringParameters 
       ? Object.keys(event.queryStringParameters)
           .map(key => `${key}=${encodeURIComponent(event.queryStringParameters[key])}`)
           .join('&')
       : '';
     
-    const url = `http://peoplepulse.diu.edu.bd:8189/result${path}${queryString ? '?' + queryString : ''}`;
+    // Build the target URL correctly with proper handling of path and query parameters
+    let url = `http://peoplepulse.diu.edu.bd:8189/result`;
+    
+    // Handle paths like /semesterList or /studentInfo correctly
+    if (path && path !== '/') {
+      url += path;
+    }
+    
+    // Add query parameters if available
+    if (queryString) {
+      url += `?${queryString}`;
+    }
     
     console.log(`Proxying request to: ${url}`);
 
@@ -36,9 +49,16 @@ exports.handler = async function(event, context) {
       url: url,
       headers: {
         'Accept': 'application/json',
-        ...(event.headers || {})
+        // Filter out headers that might cause issues
+        ...(event.headers ? 
+          Object.fromEntries(
+            Object.entries(event.headers).filter(([key]) => 
+              !['host', 'connection', 'content-length'].includes(key.toLowerCase())
+            )
+          ) : {})
       },
-      data: event.body ? JSON.parse(event.body) : undefined
+      data: event.body ? JSON.parse(event.body) : undefined,
+      timeout: 15000 // 15 second timeout
     });
 
     // Return the API response
@@ -51,7 +71,7 @@ exports.handler = async function(event, context) {
       body: JSON.stringify(response.data)
     };
   } catch (error) {
-    console.error('API proxy error:', error);
+    console.error('API proxy error:', error.message);
     
     // Return an appropriate error response
     return {
