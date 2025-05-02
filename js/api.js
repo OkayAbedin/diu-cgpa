@@ -318,10 +318,32 @@ class ApiService {
                 throw new Error('No semester list provided');
             }
             
-            // Sort semester IDs in descending order to get newest first
+            // Extract enrollment semester ID from student ID (first three digits)
+            const enrollmentSemesterId = studentId.split('-')[0];
+            if (!enrollmentSemesterId || enrollmentSemesterId.length !== 3) {
+                console.warn(`Could not extract enrollment semester from student ID: ${studentId}, using default approach`);
+                return this.getAllSemesterResultsLegacy(studentId, semesterList);
+            }
+            
+            console.log(`Student ID: ${studentId}, Enrollment Semester: ${enrollmentSemesterId}`);
+            
+            // Sort semesters in ascending order by semesterId for chronological processing
             const sortedSemesters = [...semesterList].sort((a, b) => 
-                parseInt(b.semesterId) - parseInt(a.semesterId)
+                parseInt(a.semesterId) - parseInt(b.semesterId)
             );
+            
+            // Find the starting semester (enrollment semester or the first available after it)
+            const startSemesterIndex = sortedSemesters.findIndex(s => 
+                parseInt(s.semesterId) >= parseInt(enrollmentSemesterId)
+            );
+            
+            if (startSemesterIndex === -1) {
+                console.warn(`Could not find enrollment semester ${enrollmentSemesterId} or later, using default approach`);
+                return this.getAllSemesterResultsLegacy(studentId, semesterList);
+            }
+            
+            // Get semesters from enrollment semester onwards
+            const relevantSemesters = sortedSemesters.slice(startSemesterIndex);
             
             const results = {};
             let emptyCount = 0;
@@ -331,8 +353,8 @@ class ApiService {
             const validSemesterIds = [];
             const emptySemesterIds = [];
             
-            for (const semester of sortedSemesters) {
-                // Stop after four consecutive empty semesters instead of two
+            for (const semester of relevantSemesters) {
+                // Stop after four consecutive empty semesters
                 if (emptyCount >= 4) {
                     break;
                 }
@@ -392,6 +414,94 @@ class ApiService {
             return results;
         } catch (error) {
             console.error('Error fetching all semester results:', error);
+            throw error;
+        }
+    }
+    
+    /**
+     * Legacy method for fetching all semester results (starting from newest)
+     * Kept for fallback compatibility
+     * @param {string} studentId - The student ID
+     * @param {Array} semesterList - Array of semester objects
+     * @returns {Promise<Object>} Object containing semester results by semesterId
+     * @private
+     */
+    async getAllSemesterResultsLegacy(studentId, semesterList) {
+        try {
+            // Sort semester IDs in descending order to get newest first
+            const sortedSemesters = [...semesterList].sort((a, b) => 
+                parseInt(b.semesterId) - parseInt(a.semesterId)
+            );
+            
+            const results = {};
+            let emptyCount = 0;
+            this.missingSemesters = []; // Reset missing semesters list
+            
+            // Track valid semesters to identify gaps later
+            const validSemesterIds = [];
+            const emptySemesterIds = [];
+            
+            for (const semester of sortedSemesters) {
+                // Stop after four consecutive empty semesters
+                if (emptyCount >= 4) {
+                    break;
+                }
+                
+                console.log(`Fetching results for semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
+                const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
+                
+                if (semesterResult && semesterResult.length > 0) {
+                    results[semester.semesterId] = semesterResult;
+                    validSemesterIds.push(parseInt(semester.semesterId));
+                    emptyCount = 0; // Reset counter when we find results
+                } else {
+                    emptyCount++;
+                    emptySemesterIds.push({
+                        id: parseInt(semester.semesterId),
+                        name: `${semester.semesterName} ${semester.semesterYear}`,
+                        consecutive: emptyCount
+                    });
+                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}`);
+                }
+            }
+            
+            // Identify missing semesters (gaps between valid semesters)
+            if (validSemesterIds.length > 1) {
+                validSemesterIds.sort((a, b) => a - b); // Sort in ascending order
+                
+                for (let i = 0; i < validSemesterIds.length - 1; i++) {
+                    const current = validSemesterIds[i];
+                    const next = validSemesterIds[i + 1];
+                    
+                    // Check for gaps (missing semesters)
+                    if (next - current > 1) {
+                        for (let missingId = current + 1; missingId < next; missingId++) {
+                            // Find the semester info for this ID
+                            const missingSemester = sortedSemesters.find(s => parseInt(s.semesterId) === missingId);
+                            
+                            if (missingSemester) {
+                                // Check if this is one of the consecutive empty semesters at the end
+                                const emptyMatch = emptySemesterIds.find(e => e.id === missingId && e.consecutive >= 4);
+                                
+                                // Only add to missing if it's not part of the four consecutive empty ones
+                                if (!emptyMatch) {
+                                    this.missingSemesters.push({
+                                        id: missingId,
+                                        name: `${missingSemester.semesterName} ${missingSemester.semesterYear}`
+                                    });
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+            
+            // Add missing semesters to the results object
+            results.missingSemesters = this.missingSemesters;
+            
+            return results;
+        } catch (error) {
+            console.error('Error fetching all semester results (legacy):', error);
             throw error;
         }
     }
