@@ -287,16 +287,18 @@ class ResultCard {
                     // Try to determine enrollment semester from student ID if possible
                     if (studentInfo && studentInfo.studentId) {
                         try {
-                            // Student IDs often encode enrollment information
-                            // Format is typically: semester-year-batch
-                            // e.g., 221-15-4919 (Spring 2021, batch 15)
-                            const idParts = studentInfo.studentId.split('-');
-                            if (idParts.length >= 2) {
-                                const semesterYearCode = idParts[0];
-                                // First digit is semester (1=Spring, 2=Summer, 3=Fall)
-                                const semesterCode = semesterYearCode.charAt(0);
+                            // Validate student ID format (XXX-YY-ZZZZ)
+                            const idRegex = /^(\d{3})-(\d{2})-(\d+)$/;
+                            const match = studentInfo.studentId.match(idRegex);
+                            
+                            if (match) {
+                                // Extract the parts from the ID
+                                const firstPart = match[1]; // First three digits
+                                
+                                // First digit is semester code (1=Spring, 2=Summer, 3=Fall)
+                                const semesterCode = firstPart.charAt(0);
                                 // Last two digits are the year (e.g., 22 for 2022)
-                                const yearCode = semesterYearCode.substring(1);
+                                const yearCode = firstPart.substring(1);
                                 
                                 let enrollmentSemester = "";
                                 
@@ -318,6 +320,8 @@ class ResultCard {
                                 if (enrollmentSemester) {
                                     studentInfo.enrollmentSession = enrollmentSemester;
                                 }
+                            } else {
+                                console.warn("Student ID does not match expected format (XXX-YY-ZZZZ):", studentInfo.studentId);
                             }
                         } catch (error) {
                             console.warn("Could not determine enrollment semester from ID:", error);

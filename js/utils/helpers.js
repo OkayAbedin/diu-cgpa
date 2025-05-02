@@ -29,8 +29,9 @@ class Helpers {
      * @returns {boolean} True if valid, false otherwise
      */
     static isValidStudentId(studentId) {
-        // Basic validation for DIU student ID format (e.g., 221-15-4919)
-        const regex = /^\d{3}-\d{2}-\d{4}$/;
+        // Validation for DIU student ID format (e.g., 221-15-4919)
+        // Format: 3 digits, hyphen, 2 digits, hyphen, any number of digits
+        const regex = /^\d{3}-\d{2}-\d+$/;
         return regex.test(studentId);
     }
 
