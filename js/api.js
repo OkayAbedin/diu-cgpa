@@ -21,11 +21,11 @@ class ApiService {
         
         this.missingSemesters = []; // Track missing semesters
         
-        // Default timeout in milliseconds (15 seconds)
-        this.timeout = 15000;
+        // Default timeout in milliseconds (30 seconds instead of 15)
+        this.timeout = 30000;
         
         // Maximum number of retries
-        this.maxRetries = 2;
+        this.maxRetries = 3;
         
         console.log(`API Service initialized with base URL: ${this.baseUrl}`);
     }
@@ -99,6 +99,17 @@ class ApiService {
      * @returns {string} Full URL
      */
     getFullUrl(endpoint) {
+        // Add timeout parameter for Netlify functions
+        const isProduction = window.location.hostname !== 'localhost' && 
+                          window.location.hostname !== '127.0.0.1';
+        
+        if (isProduction && this.baseUrl.includes('/.netlify/functions/')) {
+            // Add timeout parameter for Netlify functions
+            const separator = endpoint.includes('?') ? '&' : '?';
+            const timeoutInSeconds = Math.ceil(this.timeout / 1000);
+            return `${this.corsProxy}${this.baseUrl}${endpoint}${separator}timeout=${timeoutInSeconds}`;
+        }
+        
         return `${this.corsProxy}${this.baseUrl}${endpoint}`;
     }
 
@@ -117,9 +128,10 @@ class ApiService {
         // Set a timeout to abort the request
         const timeoutId = setTimeout(() => {
             controller.abort();
-        }, this.timeout);
+        }, this.timeout + 5000); // Add 5 seconds buffer to allow server-side timeout to happen first
         
         try {
+            console.log(`Fetching ${url} (timeout: ${this.timeout/1000}s)...`);
             const response = await fetch(url, { 
                 ...options, 
                 signal 
@@ -128,7 +140,31 @@ class ApiService {
             // Clear the timeout as the request completed
             clearTimeout(timeoutId);
             
-            return response;
+            // Validate the response content
+            const responseText = await response.text();
+            
+            // Check for empty response
+            if (!responseText || responseText.trim() === '') {
+                throw new Error('Empty response received from server');
+            }
+            
+            // Try to parse as JSON
+            try {
+                const responseData = JSON.parse(responseText);
+                
+                // Construct a new response with the parsed data
+                const newResponse = new Response(JSON.stringify(responseData), {
+                    status: response.status,
+                    statusText: response.statusText,
+                    headers: response.headers
+                });
+                
+                return newResponse;
+            } catch (parseError) {
+                // If JSON parsing fails, throw an error
+                console.error('Failed to parse response as JSON:', responseText);
+                throw new Error('Invalid JSON response from server');
+            }
         } catch (error) {
             // Clear the timeout as the request failed
             clearTimeout(timeoutId);
@@ -140,15 +176,43 @@ class ApiService {
                 // If we haven't reached max retries, try again
                 if (retryCount < this.maxRetries) {
                     console.log(`Retrying request (${retryCount + 1}/${this.maxRetries})...`);
+                    // Wait before retrying (exponential backoff)
+                    const backoffTime = Math.min(1000 * Math.pow(2, retryCount), 5000);
+                    await new Promise(resolve => setTimeout(resolve, backoffTime));
                     return this.fetchWithTimeout(url, options, retryCount + 1);
                 }
                 
                 throw new Error(`Request timed out after ${this.timeout / 1000} seconds and ${retryCount} retries`);
             }
             
-            // Handle other errors
+            // Handle empty response error
+            if (error.message === 'Empty response received from server') {
+                // If we haven't reached max retries, try again
+                if (retryCount < this.maxRetries) {
+                    console.log(`Empty response, retrying (${retryCount + 1}/${this.maxRetries})...`);
+                    // Add a small delay before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return this.fetchWithTimeout(url, options, retryCount + 1);
+                }
+            }
+            
+            // Handle invalid JSON error
+            if (error.message === 'Invalid JSON response from server') {
+                // If we haven't reached max retries, try again
+                if (retryCount < this.maxRetries) {
+                    console.log(`Invalid JSON, retrying (${retryCount + 1}/${this.maxRetries})...`);
+                    // Add a small delay before retrying
+                    await new Promise(resolve => setTimeout(resolve, 1000));
+                    return this.fetchWithTimeout(url, options, retryCount + 1);
+                }
+            }
+            
+            // Handle other network errors
             if (retryCount < this.maxRetries) {
                 console.log(`Request failed, retrying (${retryCount + 1}/${this.maxRetries})...`);
+                // Exponential backoff for other errors too
+                const backoffTime = Math.min(1000 * Math.pow(2, retryCount), 5000);
+                await new Promise(resolve => setTimeout(resolve, backoffTime));
                 return this.fetchWithTimeout(url, options, retryCount + 1);
             }
             
@@ -225,7 +289,16 @@ class ApiService {
                 throw new Error(`Failed to fetch results for semester ${semesterId}: ${response.status} ${response.statusText}`);
             }
             
-            return await response.json();
+            // Parse the response
+            const data = await response.json();
+            
+            // Validate the data
+            if (!data || !Array.isArray(data)) {
+                console.warn(`Received invalid data for semester ${semesterId}:`, data);
+                return [];
+            }
+            
+            return data;
         } catch (error) {
             console.error(`Error fetching semester ${semesterId} results:`, error);
             // Return empty array instead of throwing to handle gracefully

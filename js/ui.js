@@ -961,8 +961,13 @@ class UiController {
             resultsContainer.innerHTML = '<div class="gh-loading"><div class="gh-spinner"></div><p>Fetching data...</p></div>';
             Helpers.showElement(document.getElementById('advanced-results-container'));
             
-            // Get timeout value
-            const timeout = parseInt(this.advancedTimeout.value, 10) || 15;
+            // Get timeout value and validate it
+            let timeout = parseInt(this.advancedTimeout.value, 10) || 15;
+            // Ensure timeout is within reasonable limits
+            if (timeout < 5) timeout = 5;
+            if (timeout > 120) timeout = 120;
+            
+            console.log(`Setting API timeout to ${timeout} seconds`);
             
             // Set custom API options
             this.apiService.setTimeout(timeout);
@@ -1048,6 +1053,7 @@ class UiController {
                         <div class="gh-spinner"></div>
                         <p>Fetching data: ${completed}/${total} (${progress}%)</p>
                         <p>Current ID: ${currentId}</p>
+                        <p><small>Timeout setting: ${timeout} seconds per request</small></p>
                     </div>`;
                 }
             );
