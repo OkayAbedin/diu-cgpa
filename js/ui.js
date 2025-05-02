@@ -1286,8 +1286,43 @@ class UiController {
             return;
         }
         
-        // Create CSV content
-        let csvContent = 'Student ID,Name,Department,CGPA,Total Credits,Status\n';
+        // Create CSV header with student info and semester columns
+        let csvContent = 'Student ID,Name,Department,CGPA,Total Credits,Status';
+        
+        // First, determine how many semesters we have across all students to create proper headers
+        const allSemesters = new Set();
+        
+        // Find all unique semester names
+        Object.values(this.advancedFetchResults.results).forEach(data => {
+            if (data && data.results) {
+                // Process semester data to gather all semesters
+                const semesterResults = {};
+                
+                // Filter out missingSemesters key
+                Object.entries(data.results).forEach(([key, value]) => {
+                    if (key !== 'missingSemesters' && Array.isArray(value)) {
+                        // For each semester, check if we have semester info in the semesterList
+                        const semesterInfo = this.semesterList.find(s => s.semesterId === key);
+                        if (semesterInfo) {
+                            const semesterName = `${semesterInfo.semesterName} ${semesterInfo.semesterYear}`;
+                            allSemesters.add(semesterName);
+                        } else {
+                            // If not found in semesterList, use the key as semester name
+                            allSemesters.add(key);
+                        }
+                    }
+                });
+            }
+        });
+        
+        // Convert to array and sort alphabetically
+        const semesterNames = Array.from(allSemesters).sort();
+        
+        // Add semester GPA headers
+        semesterNames.forEach(semName => {
+            csvContent += `,${semName} GPA`;
+        });
+        csvContent += '\n';
         
         // Process each student result
         Object.entries(this.advancedFetchResults.results).forEach(([studentId, data]) => {
@@ -1300,9 +1335,36 @@ class UiController {
             let cgpa = 'N/A';
             let totalCredits = 0;
             
+            // Prepare an object to store each semester's GPA
+            const semesterGpas = {};
+            semesterNames.forEach(sem => {
+                semesterGpas[sem] = 'N/A'; // Default value
+            });
+            
             if (data.results) {
                 try {
-                    // Filter out missingSemesters key
+                    // Map semester IDs to semester names and calculate GPA for each
+                    Object.entries(data.results).forEach(([key, value]) => {
+                        if (key !== 'missingSemesters' && Array.isArray(value) && value.length > 0) {
+                            // Find semester info in the semesterList
+                            const semesterInfo = this.semesterList.find(s => s.semesterId === key);
+                            let semesterName = key; // Default to key
+                            
+                            if (semesterInfo) {
+                                semesterName = `${semesterInfo.semesterName} ${semesterInfo.semesterYear}`;
+                            }
+                            
+                            // Calculate semester GPA
+                            try {
+                                const semResult = this.calculator.calculateSemesterGpa(value);
+                                semesterGpas[semesterName] = semResult.gpa;
+                            } catch (error) {
+                                console.error(`Error calculating GPA for semester ${semesterName}:`, error);
+                            }
+                        }
+                    });
+                    
+                    // Calculate CGPA
                     const semesterResults = {};
                     Object.entries(data.results).forEach(([key, value]) => {
                         if (key !== 'missingSemesters' && Array.isArray(value)) {
@@ -1310,7 +1372,6 @@ class UiController {
                         }
                     });
                     
-                    // Calculate CGPA if we have semester results
                     if (Object.keys(semesterResults).length > 0) {
                         const result = this.calculator.calculateCgpa(semesterResults);
                         cgpa = result.cgpa;
@@ -1326,7 +1387,15 @@ class UiController {
             const escapedDepartment = department.includes(',') ? `"${department}"` : department;
             const status = this.advancedFetchResults.errors && this.advancedFetchResults.errors[studentId] ? 'Failed' : 'Success';
             
-            csvContent += `${studentId},${escapedName},${escapedDepartment},${cgpa},${totalCredits},${status}\n`;
+            // Start with basic student info
+            csvContent += `${studentId},${escapedName},${escapedDepartment},${cgpa},${totalCredits},${status}`;
+            
+            // Add semester GPAs
+            semesterNames.forEach(semName => {
+                csvContent += `,${semesterGpas[semName]}`;
+            });
+            
+            csvContent += '\n';
         });
         
         // Add error entries 
@@ -1334,7 +1403,14 @@ class UiController {
             Object.entries(this.advancedFetchResults.errors).forEach(([studentId, error]) => {
                 if (!this.advancedFetchResults.results[studentId]) {
                     // Only add if not already included in results
-                    csvContent += `${studentId},N/A,N/A,N/A,N/A,Failed\n`;
+                    csvContent += `${studentId},N/A,N/A,N/A,N/A,Failed`;
+                    
+                    // Add N/A for all semester columns
+                    semesterNames.forEach(() => {
+                        csvContent += ',N/A';
+                    });
+                    
+                    csvContent += '\n';
                 }
             });
         }
@@ -1823,26 +1899,17 @@ function initDirectTabNavigation() {
             // Remove active class from all buttons
             tabButtons.forEach(btn => btn.classList.remove('active'));
             
-            // Add active class to clicked button
+            // Add active class to the clicked button
             button.classList.add('active');
             
-            // Hide all tab panes
-            tabPanes.forEach(pane => pane.classList.remove('active'));
-            
-            // Show the target tab pane
-            const targetPane = document.getElementById(targetTabId);
-            if (targetPane) {
-                targetPane.classList.add('active');
-            } else {
-                console.error('Target pane not found:', targetTabId);
-            }
+            // Show the corresponding tab pane and hide others
+            tabPanes.forEach(pane => {
+                if (pane.id === targetTabId) {
+                    pane.classList.add('active');
+                } else {
+                    pane.classList.remove('active');
+                }
+            });
         });
     });
-    
-    // Set the first tab as active by default
-    const defaultTab = tabButtons[0];
-    if (defaultTab) {
-        console.log('Setting default tab:', defaultTab.getAttribute('data-tab'));
-        defaultTab.click();
-    }
 }

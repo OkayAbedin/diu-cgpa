@@ -281,8 +281,49 @@ class ResultCard {
                     logo.alt = "Daffodil International University";
                     logo.style.height = "20mm";
                     logo.style.marginBottom = "5mm";
+                    const logoSrc = logo.src;
                     logo.src = "assets/img/diu-logo.svg"; // Use the actual DIU logo from assets
-                    
+
+                    // Try to determine enrollment semester from student ID if possible
+                    if (studentInfo && studentInfo.studentId) {
+                        try {
+                            // Student IDs often encode enrollment information
+                            // Format is typically: semester-year-batch
+                            // e.g., 221-15-4919 (Spring 2021, batch 15)
+                            const idParts = studentInfo.studentId.split('-');
+                            if (idParts.length >= 2) {
+                                const semesterYearCode = idParts[0];
+                                // First digit is semester (1=Spring, 2=Summer, 3=Fall)
+                                const semesterCode = semesterYearCode.charAt(0);
+                                // Last two digits are the year (e.g., 22 for 2022)
+                                const yearCode = semesterYearCode.substring(1);
+                                
+                                let enrollmentSemester = "";
+                                
+                                // Convert semester code to name
+                                if (semesterCode === '1') {
+                                    enrollmentSemester = "Spring ";
+                                } else if (semesterCode === '2') {
+                                    enrollmentSemester = "Summer ";
+                                } else if (semesterCode === '3') {
+                                    enrollmentSemester = "Fall ";
+                                }
+                                
+                                // Add year (20xx format)
+                                if (yearCode && yearCode.length === 2) {
+                                    enrollmentSemester += "20" + yearCode;
+                                }
+                                
+                                // Set enrollment semester if we determined it
+                                if (enrollmentSemester) {
+                                    studentInfo.enrollmentSession = enrollmentSemester;
+                                }
+                            }
+                        } catch (error) {
+                            console.warn("Could not determine enrollment semester from ID:", error);
+                        }
+                    }
+
                     // Add university address
                     const address = previewWindow.document.createElement("div");
                     address.style.fontSize = "9pt";
