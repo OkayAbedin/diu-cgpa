@@ -2422,3 +2422,57 @@ textarea::placeholder {
         display: inline-block !important;
     }
 }
+
+/* Theme toggle button styling */
+.theme-toggle-btn {
+    border-radius: 50%;
+    width: 40px;
+    height: 40px;
+    padding: 0;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.3s ease;
+    background-color: transparent !important;
+    border: none;
+    box-shadow: none;
+    color: var(--color-text);
+    font-size: 20px; /* Larger icon */
+}
+
+.theme-toggle-btn:hover {
+    background-color: transparent !important;
+    transform: rotate(15deg);
+    color: var(--color-btn-primary-bg);
+}
+
+.theme-toggle-btn:active, .theme-toggle-btn:focus {
+    background-color: transparent !important;
+    box-shadow: none;
+}
+
+[data-theme="dark"] .theme-toggle-btn {
+    color: #ffd700; /* Gold color for sun icon in dark mode */
+}
+
+[data-theme="dark"] .theme-toggle-btn:hover {
+    background-color: transparent !important;
+}
+
+/* Make it consistent with other icons in the header nav */
+@media (max-width: 768px) {
+    .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 18px;
+    }
+}
+
+/* Make it consistent with other icons in the header nav */
+@media (max-width: 768px) {
+    .theme-toggle-btn {
+        width: 36px;
+        height: 36px;
+        font-size: 14px;
+    }
+}

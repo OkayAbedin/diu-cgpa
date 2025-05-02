@@ -10,10 +10,49 @@ function initNavigation() {
   const menuToggleBtn = document.getElementById('mobile-menu-toggle');
   const navMenu = document.querySelector('.gh-nav');
   
+  // Get dark mode toggle button
+  const darkModeToggle = document.getElementById('dark-mode-toggle');
+  
   // Create overlay for mobile menu
   let menuOverlay = document.createElement('div');
   menuOverlay.className = 'menu-overlay';
   document.body.appendChild(menuOverlay);
+  
+  // Check for saved theme preference or respect OS theme preference
+  function getThemePreference() {
+    const savedTheme = localStorage.getItem('theme');
+    if (savedTheme) {
+      return savedTheme;
+    }
+    return window.matchMedia('(prefers-color-scheme: dark)').matches ? 'dark' : 'light';
+  }
+  
+  // Set theme on page load
+  function applyTheme(theme) {
+    document.documentElement.setAttribute('data-theme', theme);
+    localStorage.setItem('theme', theme);
+    updateDarkModeButton(theme);
+  }
+  
+  // Update button text and icon based on current theme
+  function updateDarkModeButton(theme) {
+    if (!darkModeToggle) return;
+    
+    const icon = darkModeToggle.querySelector('i');
+    
+    if (theme === 'dark') {
+      icon.className = 'fas fa-sun';
+    } else {
+      icon.className = 'fas fa-moon';
+    }
+  }
+  
+  // Toggle the theme
+  function toggleTheme() {
+    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
+    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+    applyTheme(newTheme);
+  }
   
   // Function to toggle mobile menu
   function toggleMobileMenu() {
@@ -71,6 +110,11 @@ function initNavigation() {
   // Add click handler to overlay to close menu
   menuOverlay.addEventListener('click', closeMobileMenu);
   
+  // Add click handler to dark mode toggle
+  if (darkModeToggle) {
+    darkModeToggle.addEventListener('click', toggleTheme);
+  }
+  
   // Add click handlers to buttons
   navButtons.forEach(button => {
     button.addEventListener('click', function(e) {
@@ -82,6 +126,9 @@ function initNavigation() {
   
   // Set default tab (auto-calculator)
   setActiveTab('auto-calculator');
+  
+  // Apply saved theme on page load
+  applyTheme(getThemePreference());
 }
 
 // Run navigation setup when DOM is loaded
