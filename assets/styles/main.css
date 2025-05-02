@@ -484,6 +484,7 @@ textarea::placeholder {
     font-size: var(--font-size-xlarge);
     font-weight: 700;
     background: linear-gradient(90deg, var(--color-success), #4361ee);
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     margin-bottom: var(--spacing-xs);
@@ -1488,9 +1489,9 @@ textarea::placeholder {
 [data-theme="dark"] .gh-stats-box::before {
     background: linear-gradient(90deg, var(--color-chart-1), var(--color-chart-2));
 }
-
 [data-theme="dark"] .gh-stats-value {
     background: linear-gradient(90deg, var(--color-success), var(--color-chart-1));
+    background-clip: text;
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
 }
