@@ -121,7 +121,7 @@ class ResultCard {
     generatePdfTranscript(studentInfo, semesterData, cgpaData) {
         const htmlTemplate = this.createTranscriptHtml(studentInfo, semesterData, cgpaData);
         
-        // Options for html2pdf
+        // Options for html2pdf - exactly matched to design requirements
         const options = {
             margin: [10, 10],
             filename: `${studentInfo.studentId}_transcript.pdf`,
