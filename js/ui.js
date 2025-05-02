@@ -441,8 +441,8 @@ class UiController {
                     {
                         label: 'Semester GPA',
                         data: cgpaData,
-                        backgroundColor: 'rgba(46, 164, 79, 0.2)', // GitHub green with transparency
-                        borderColor: 'var(--color-success)', // GitHub green
+                        backgroundColor: 'rgba(56, 178, 172, 0.2)', // Updated color
+                        borderColor: 'var(--color-success)',
                         borderWidth: 2,
                         pointBackgroundColor: 'var(--color-success)',
                         pointRadius: 5,
@@ -452,8 +452,8 @@ class UiController {
                     {
                         label: 'Cumulative GPA',
                         data: cumulativeGpa,
-                        backgroundColor: 'rgba(3, 102, 214, 0.2)', // GitHub blue with transparency
-                        borderColor: 'var(--color-link)', // GitHub blue
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)', // Updated color
+                        borderColor: 'var(--color-link)',
                         borderWidth: 2,
                         pointBackgroundColor: 'var(--color-link)',
                         pointRadius: 5,
@@ -475,6 +475,7 @@ class UiController {
                         }
                     },
                     x: {
+                        reverse: true, // Reverse the X axis as requested
                         grid: {
                             color: 'rgba(0, 0, 0, 0.05)'
                         }
@@ -487,7 +488,19 @@ class UiController {
                         bodyColor: '#ffffff',
                         borderColor: 'rgba(255, 255, 255, 0.1)',
                         borderWidth: 1,
-                        padding: 10
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw} / 4.00`;
+                            }
+                        }
+                    },
+                    legend: {
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
                     }
                 }
             }
@@ -773,8 +786,8 @@ class UiController {
                     {
                         label: 'Semester GPA',
                         data: gpaData,
-                        backgroundColor: 'rgba(46, 164, 79, 0.2)', // GitHub green with transparency
-                        borderColor: 'var(--color-success)', // GitHub green
+                        backgroundColor: 'rgba(56, 178, 172, 0.2)', // Updated color
+                        borderColor: 'var(--color-success)',
                         borderWidth: 2,
                         pointBackgroundColor: 'var(--color-success)',
                         pointRadius: 5,
@@ -784,8 +797,8 @@ class UiController {
                     {
                         label: 'Cumulative GPA',
                         data: cumulativeGpa,
-                        backgroundColor: 'rgba(3, 102, 214, 0.2)', // GitHub blue with transparency
-                        borderColor: 'var(--color-link)', // GitHub blue
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)', // Updated color
+                        borderColor: 'var(--color-link)',
                         borderWidth: 2,
                         pointBackgroundColor: 'var(--color-link)',
                         pointRadius: 5,
@@ -799,6 +812,7 @@ class UiController {
                 maintainAspectRatio: false,
                 scales: {
                     y: {
+                        reverse: true, // Reverse the Y axis as requested
                         beginAtZero: false,
                         min: 0,
                         max: 4,
@@ -819,7 +833,19 @@ class UiController {
                         bodyColor: '#ffffff',
                         borderColor: 'rgba(255, 255, 255, 0.1)',
                         borderWidth: 1,
-                        padding: 10
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw} / 4.00`;
+                            }
+                        }
+                    },
+                    legend: {
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
                     }
                 }
             }

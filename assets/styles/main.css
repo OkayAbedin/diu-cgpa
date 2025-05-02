@@ -1,4 +1,4 @@
-/* Modern UI styles for DIU CGPA Calculator */
+/* Modern Dashboard UI styles for DIU CGPA Calculator */
 :root {
     /* Colors - Modern palette (Light mode) */
     --color-bg: #ffffff;
@@ -27,10 +27,14 @@
     --color-success: #38b2ac;
     --color-chart-1: #4361ee;
     --color-chart-2: #38b2ac;
-    --main-bg: #f8fafc;
+    --main-bg: #f3f4f9;
     --header-gradient-start: #1a1c2c;
     --header-gradient-end: #293245;
     --header-icon-color: #6dd5ed;
+    --sidebar-width: 260px;
+    --sidebar-collapsed-width: 70px;
+    --dash-header-height: 60px;
+    --dash-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
     
     /* Typography */
     --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
@@ -83,7 +87,7 @@
     --color-success: #38b2ac;
     --color-chart-1: #63b3ed;
     --color-chart-2: #4fd1c5;
-    --main-bg: #0f1117;
+    --main-bg: #0d1117;
     --header-gradient-start: #0f1117;
     --header-gradient-end: #1a1c2c;
     --header-icon-color: #4fd1c5;
@@ -109,22 +113,26 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
-/* App container */
+/* Dashboard Layout */
 .app-container {
     display: flex;
     flex-direction: column;
     min-height: 100vh;
+    width: 100%;
 }
 
-/* Modern header */
+/* Dashboard Header */
 .gh-header {
     background: linear-gradient(120deg, var(--header-gradient-start), var(--header-gradient-end));
     color: white;
-    padding: var(--spacing-md) var(--spacing-lg);
+    padding: 0 var(--spacing-lg);
     position: sticky;
     top: 0;
     z-index: 100;
     box-shadow: var(--shadow-medium);
+    height: var(--dash-header-height);
+    display: flex;
+    align-items: center;
 }
 
 .gh-header-inner {
@@ -154,6 +162,11 @@ body {
     letter-spacing: 0.5px;
 }
 
+.gh-nav {
+    display: flex;
+    justify-content: center;
+}
+
 .gh-nav ul {
     display: flex;
     list-style: none;
@@ -164,7 +177,7 @@ body {
 .gh-nav li {
     display: flex;
     align-items: center;
-    margin-left: var(--spacing-md);
+    margin: 0 var(--spacing-sm);
     padding: var(--spacing-sm) var(--spacing-md);
     border-radius: var(--border-radius-medium);
     cursor: pointer;
@@ -188,17 +201,16 @@ body {
     color: var(--header-icon-color);
 }
 
-/* Main content area */
+/* Main Dashboard content area */
 .gh-main {
     flex: 1;
-    padding: var(--spacing-lg) 0;
+    padding: var(--spacing-lg);
     background-color: var(--main-bg);
 }
 
 .gh-container {
     max-width: 1280px;
     margin: 0 auto;
-    padding: 0 var(--spacing-lg);
 }
 
 /* Content header */
@@ -210,7 +222,7 @@ body {
     font-size: var(--font-size-large);
     font-weight: 700;
     margin-bottom: var(--spacing-xs);
-    color: #1a1c2c;
+    color: var(--color-text);
     position: relative;
     display: inline-block;
 }
@@ -232,19 +244,19 @@ body {
     font-size: var(--font-size-normal);
 }
 
-/* Box component - Modern card style */
+/* Dashboard Cards - modern styling */
 .gh-box {
     background-color: var(--color-box-bg);
-    border: 1px solid var(--color-box-border);
     border-radius: var(--border-radius-medium);
     padding: var(--spacing-lg);
     margin-bottom: var(--spacing-lg);
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-small);
     transition: var(--transition-default);
+    border: none;
 }
 
 .gh-box:hover {
-    box-shadow: var(--shadow-large);
+    box-shadow: var(--shadow-medium);
     transform: translateY(-2px);
 }
 
@@ -439,6 +451,14 @@ textarea::placeholder {
     to { transform: rotate(360deg); }
 }
 
+/* Dashboard Grid Layout */
+.gh-dashboard-grid {
+    display: grid;
+    grid-template-columns: repeat(12, 1fr);
+    gap: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+}
+
 /* Stats and Charts with modern styling */
 .gh-stats-container {
     display: grid;
@@ -449,10 +469,9 @@ textarea::placeholder {
 
 .gh-stats-box {
     background-color: var(--color-box-bg);
-    border: 1px solid var(--color-box-border);
     border-radius: var(--border-radius-medium);
     padding: var(--spacing-lg);
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-small);
     transition: var(--transition-default);
     position: relative;
     overflow: hidden;
@@ -460,7 +479,7 @@ textarea::placeholder {
 
 .gh-stats-box:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-large);
+    box-shadow: var(--shadow-medium);
 }
 
 .gh-stats-box::before {
@@ -497,21 +516,20 @@ textarea::placeholder {
 
 .gh-chart-box {
     background-color: var(--color-box-bg);
-    border: 1px solid var(--color-box-border);
     border-radius: var(--border-radius-medium);
     overflow: hidden;
-    box-shadow: var(--shadow-medium);
+    box-shadow: var(--shadow-small);
     transition: var(--transition-default);
 }
 
 .gh-chart-box:hover {
     transform: translateY(-5px);
-    box-shadow: var(--shadow-large);
+    box-shadow: var(--shadow-medium);
 }
 
 .gh-chart-header {
     background-color: var(--color-box-header);
-    border-bottom: 1px solid var(--color-box-border);
+    border-bottom: 1px solid var(--color-border);
     padding: var(--spacing-md);
 }
 
@@ -531,8 +549,8 @@ textarea::placeholder {
     display: flex;
     padding: var(--spacing-md);
     margin-bottom: var(--spacing-lg);
-    border: 1px solid;
     border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
 }
 
 .gh-alert-icon {
@@ -543,7 +561,7 @@ textarea::placeholder {
 
 .gh-alert-error {
     background-color: var(--color-alert-error-bg);
-    border-color: var(--color-alert-error-border);
+    border-left: 4px solid var(--color-btn-danger-bg);
 }
 
 .gh-alert-error .gh-alert-icon {
@@ -552,7 +570,7 @@ textarea::placeholder {
 
 .gh-alert-warning {
     background-color: var(--color-alert-warning-bg);
-    border-color: var(--color-alert-warning-border);
+    border-left: 4px solid var(--color-alert-warning-border);
 }
 
 /* Snackbar style notification */
@@ -560,7 +578,7 @@ textarea::placeholder {
     visibility: hidden;
     min-width: 250px;
     max-width: 90%;
-    background-color: var(--color-alert-warning-bg);
+    background-color: var(--color-box-bg);
     color: var(--color-text);
     text-align: left;
     border-radius: var(--border-radius-medium);
@@ -604,10 +622,16 @@ textarea::placeholder {
 
 /* Semester list & courses */
 .gh-semester {
-    border: 1px solid var(--color-box-border);
+    background-color: var(--color-box-bg);
     border-radius: var(--border-radius-medium);
     margin-bottom: var(--spacing-md);
     overflow: hidden;
+    box-shadow: var(--shadow-small);
+    transition: var(--transition-default);
+}
+
+.gh-semester:hover {
+    box-shadow: var(--shadow-medium);
 }
 
 .gh-semester-header {
@@ -616,7 +640,7 @@ textarea::placeholder {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-box-border);
+    border-bottom: 1px solid var(--color-border);
 }
 
 .gh-semester-header h4 {
@@ -652,7 +676,6 @@ textarea::placeholder {
 /* Result card - modern styling */
 .gh-result-card {
     background-color: var(--color-box-bg);
-    border: 1px solid var(--color-box-border);
     border-radius: var(--border-radius-medium);
     margin-bottom: var(--spacing-md);
     overflow: hidden;
@@ -680,7 +703,7 @@ textarea::placeholder {
 }
 
 .gh-result-card.open .gh-result-card-header {
-    border-bottom-color: var(--color-box-border);
+    border-bottom-color: var(--color-border);
 }
 
 .gh-result-title {
@@ -829,7 +852,7 @@ textarea::placeholder {
 
 .gh-version {
     font-size: 12px;
-    color: var (--color-text-secondary);
+    color: var(--color-text-secondary);
     margin-top: 8px;
 }
 
@@ -838,11 +861,30 @@ textarea::placeholder {
     display: none !important;
 }
 
+/* Responsive Dashboard Layout */
+@media (max-width: 1200px) {
+    .gh-dashboard-grid {
+        grid-template-columns: repeat(6, 1fr);
+    }
+}
+
+@media (max-width: 992px) {
+    .gh-stats-container {
+        grid-template-columns: 1fr;
+    }
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
     .gh-header-inner {
         flex-direction: column;
         align-items: flex-start;
+        padding: var(--spacing-sm) 0;
+    }
+    
+    .gh-header {
+        height: auto;
+        padding: var(--spacing-sm) var(--spacing-md);
     }
     
     .gh-nav {
@@ -868,12 +910,12 @@ textarea::placeholder {
         margin-right: 0;
     }
     
-    .gh-input-group {
-        flex-direction: column;
+    .gh-dashboard-grid {
+        grid-template-columns: 1fr;
     }
     
-    .gh-stats-container {
-        grid-template-columns: 1fr;
+    .gh-input-group {
+        flex-direction: column;
     }
     
     .gh-course-inputs {
@@ -896,6 +938,35 @@ textarea::placeholder {
     
     .gh-modal-content {
         width: 95%;
+    }
+    
+    .gh-main {
+        padding: var(--spacing-md) var(--spacing-sm);
+    }
+}
+
+@media (max-width: 576px) {
+    .gh-box, 
+    .gh-stats-box, 
+    .gh-chart-box, 
+    .gh-result-card {
+        padding: var(--spacing-md);
+    }
+    
+    .gh-content-header h2 {
+        font-size: var(--font-size-medium);
+    }
+    
+    .gh-nav li i {
+        margin-right: 0;
+    }
+    
+    .gh-nav li span {
+        display: none;
+    }
+    
+    .gh-nav li {
+        padding: var(--spacing-xs);
     }
 }
 
@@ -922,11 +993,11 @@ textarea::placeholder {
 }
 
 .gh-modal-content {
-    background-color: var(--color-bg-canvas);
-    border-radius: 6px;
+    background-color: var(--color-box-bg);
+    border-radius: var(--border-radius-medium);
     width: 90%;
     max-width: 500px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+    box-shadow: var(--shadow-large);
     overflow: hidden;
     transform: translateY(-20px);
     transition: transform 0.3s ease;
@@ -938,7 +1009,7 @@ textarea::placeholder {
 
 .gh-modal-header {
     padding: 16px 24px;
-    border-bottom: 1px solid var(--color-border-primary);
+    border-bottom: 1px solid var(--color-border);
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -955,7 +1026,7 @@ textarea::placeholder {
     border: none;
     font-size: 20px;
     cursor: pointer;
-    color: var(--color-text-tertiary);
+    color: var(--color-text-secondary);
 }
 
 .gh-modal-body {
@@ -964,7 +1035,7 @@ textarea::placeholder {
 
 .gh-modal-footer {
     padding: 16px 24px;
-    border-top: 1px solid var(--color-border-primary);
+    border-top: 1px solid var(--color-border);
     display: flex;
     justify-content: flex-end;
     gap: 8px;
@@ -981,188 +1052,7 @@ textarea::placeholder {
     color: var(--color-text-secondary);
 }
 
-/* Timeout Modal Styling */
-.gh-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    overflow: auto;
-    background-color: rgba(0, 0, 0, 0.4);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.gh-modal.show {
-    display: block;
-    opacity: 1;
-}
-
-.gh-modal-content {
-    background-color: var(--color-bg-default);
-    margin: 15% auto;
-    padding: 0;
-    border: 1px solid var(--color-border-default);
-    border-radius: 6px;
-    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-    width: 80%;
-    max-width: 500px;
-    transition: transform 0.3s ease;
-    transform: translateY(-20px);
-}
-
-.gh-modal.show .gh-modal-content {
-    transform: translateY(0);
-}
-
-.gh-modal-header {
-    padding: 16px;
-    border-bottom: 1px solid var(--color-border-default);
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.gh-modal-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.gh-modal-close {
-    background: transparent;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--color-fg-muted);
-}
-
-.gh-modal-body {
-    padding: 16px;
-}
-
-.gh-modal-footer {
-    padding: 16px;
-    border-top: 1px solid var(--color-border-default);
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-}
-
-.loading-timeout {
-    margin-top: 8px;
-    font-size: 14px;
-    color: var(--color-fg-muted);
-}
-
-/* Timeout settings button */
-.timeout-settings-btn {
-    margin-left: 8px;
-    font-size: 14px;
-    color: var(--color-fg-muted);
-    cursor: pointer;
-}
-
-.timeout-settings-btn:hover {
-    color: var(--color-accent-fg);
-}
-
-/* Timeout Dialog Modal */
-.gh-modal {
-    display: none;
-    position: fixed;
-    z-index: 1000;
-    left: 0;
-    top: 0;
-    width: 100%;
-    height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: 0;
-    transition: opacity 0.3s ease;
-}
-
-.gh-modal.show {
-    display: block;
-    opacity: 1;
-}
-
-.gh-modal-content {
-    background-color: var(--color-bg-default);
-    margin: 10% auto;
-    padding: 0;
-    width: 90%;
-    max-width: 500px;
-    border-radius: 6px;
-    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
-    animation: modalSlideIn 0.3s ease;
-}
-
-@keyframes modalSlideIn {
-    from {
-        transform: translateY(-20px);
-        opacity: 0;
-    }
-    to {
-        transform: translateY(0);
-        opacity: 1;
-    }
-}
-
-.gh-modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 16px 20px;
-    border-bottom: 1px solid var(--color-border-secondary);
-}
-
-.gh-modal-header h3 {
-    margin: 0;
-    font-size: 18px;
-    font-weight: 600;
-}
-
-.gh-modal-close {
-    background: none;
-    border: none;
-    font-size: 24px;
-    cursor: pointer;
-    color: var(--color-text-secondary);
-}
-
-.gh-modal-body {
-    padding: 20px;
-}
-
-.gh-modal-footer {
-    display: flex;
-    justify-content: flex-end;
-    padding: 16px 20px;
-    border-top: 1px solid var(--color-border-secondary);
-    gap: 10px;
-}
-
-.gh-form-group {
-    margin-bottom: 16px;
-}
-
-.gh-form-group label {
-    display: block;
-    margin-bottom: 8px;
-    font-weight: 500;
-}
-
-.gh-form-group small {
-    display: block;
-    margin-top: 4px;
-    color: var(--color-text-secondary);
-    font-size: 12px;
-}
-
-/* Advanced Fetch Styles */
+/* Advanced fetch Styles */
 .fetch-form-section {
     margin-bottom: var(--spacing-md);
 }
@@ -1221,13 +1111,19 @@ textarea::placeholder {
 /* Advanced results styling */
 .advanced-result-item {
     background-color: var(--color-box-bg);
-    border: 1px solid var(--color-box-border);
     border-radius: var(--border-radius-medium);
     margin-bottom: var(--spacing-md);
     padding: var(--spacing-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
+    box-shadow: var(--shadow-small);
+    transition: var(--transition-default);
+}
+
+.advanced-result-item:hover {
+    box-shadow: var(--shadow-medium);
+    transform: translateY(-2px);
 }
 
 .advanced-result-info {
@@ -1286,15 +1182,16 @@ textarea::placeholder {
     max-width: 800px;
     margin: 0 auto;
     padding: 20px;
-    font-family: 'Inter', Arial, sans-serif;
-    color: #2d3748;
+    font-family: var(--font-family);
+    color: var(--color-text);
+    background-color: var(--color-bg);
 }
 
 .transcript-header {
     display: flex;
     align-items: center;
     margin-bottom: 30px;
-    border-bottom: 2px solid #4361ee;
+    border-bottom: 2px solid var(--color-link);
     padding-bottom: 20px;
 }
 
@@ -1316,7 +1213,7 @@ textarea::placeholder {
 .transcript-title h2 {
     margin: 0;
     font-size: 24px;
-    color: #4361ee;
+    color: var(--color-link);
 }
 
 .transcript-title h3 {
@@ -1327,15 +1224,15 @@ textarea::placeholder {
 .transcript-title p {
     margin: 5px 0;
     font-size: 14px;
-    color: #718096;
+    color: var(--color-text-secondary);
 }
 
 .transcript-student-info {
     margin-bottom: 30px;
     padding: 15px;
-    background-color: #f7fafc;
-    border-radius: 6px;
-    border: 1px solid #e2e8f0;
+    background-color: var(--color-box-header);
+    border-radius: var(--border-radius-medium);
+    border: 1px solid var(--color-border);
 }
 
 .transcript-student-info table {
@@ -1361,18 +1258,18 @@ textarea::placeholder {
 .transcript-summary-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
 }
 
 .transcript-summary-table th,
 .transcript-summary-table td {
     text-align: center;
     padding: 12px;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var(--color-border);
 }
 
 .transcript-summary-table th {
-    background-color: #f7fafc;
+    background-color: var(--color-box-header);
     font-weight: 600;
 }
 
@@ -1385,11 +1282,11 @@ textarea::placeholder {
 }
 
 .transcript-semester-header {
-    background-color: #f7fafc;
+    background-color: var(--color-box-header);
     padding: 10px 15px;
-    border: 1px solid #e2e8f0;
-    border-top-left-radius: 6px;
-    border-top-right-radius: 6px;
+    border: 1px solid var(--color-border);
+    border-top-left-radius: var(--border-radius-small);
+    border-top-right-radius: var(--border-radius-small);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -1414,28 +1311,28 @@ textarea::placeholder {
 .transcript-semester-table {
     width: 100%;
     border-collapse: collapse;
-    border: 1px solid #e2e8f0;
+    border: 1px solid var (--color-border);
     border-top: none;
 }
 
 .transcript-semester-table th,
 .transcript-semester-table td {
     padding: 10px;
-    border-bottom: 1px solid #e2e8f0;
+    border-bottom: 1px solid var(--color-border);
     text-align: left;
 }
 
 .transcript-semester-table th {
     font-weight: 600;
-    background-color: #fafbfc;
+    background-color: var(--color-box-bg);
 }
 
 .transcript-footer {
     margin-top: 40px;
     text-align: center;
     font-size: 12px;
-    color: #718096;
-    border-top: 1px solid #e2e8f0;
+    color: var(--color-text-secondary);
+    border-top: 1px solid var(--color-border);
     padding-top: 20px;
 }
 
@@ -1489,6 +1386,7 @@ textarea::placeholder {
 [data-theme="dark"] .gh-stats-box::before {
     background: linear-gradient(90deg, var(--color-chart-1), var(--color-chart-2));
 }
+
 [data-theme="dark"] .gh-stats-value {
     background: linear-gradient(90deg, var(--color-success), var(--color-chart-1));
     background-clip: text;
