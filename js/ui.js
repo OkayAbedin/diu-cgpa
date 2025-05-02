@@ -1393,7 +1393,25 @@ class UiController {
             return;
         }
         
-        // Create results summary
+        // Check if we're displaying a single student (for detailed view)
+        const isSingleStudent = Object.keys(results.results).length === 1;
+        
+        if (isSingleStudent) {
+            // Get the single student data
+            const studentId = Object.keys(results.results)[0];
+            const data = results.results[studentId];
+            
+            if (!data || !data.studentInfo) {
+                resultsContainer.innerHTML = '<div class="gh-alert gh-alert-warning">No results found for student</div>';
+                return;
+            }
+            
+            // Display detailed results for single student similar to fetch CGPA page
+            this.displaySingleStudentDetailedResults(studentId, data, resultsContainer);
+            return;
+        }
+        
+        // Create results summary for multiple students
         const totalStudents = Object.keys(results.results).length;
         const totalErrors = Object.keys(results.errors || {}).length;
         const successCount = totalStudents - totalErrors;
@@ -1714,6 +1732,159 @@ class UiController {
                 </tr>
             `;
         }).join('');
+    }
+
+    /**
+     * Display detailed results for a single student in advanced fetch
+     * @param {string} studentId - Student ID
+     * @param {Object} data - Student data object
+     * @param {HTMLElement} container - Container element for results
+     */
+    displaySingleStudentDetailedResults(studentId, data, container) {
+        // Extract student info
+        const studentInfo = data.studentInfo || {};
+        const name = studentInfo.name || studentInfo.studentName || 'Unknown';
+        const department = studentInfo.department || studentInfo.departmentName || 'Unknown';
+        const program = studentInfo.program || studentInfo.programName || 'Unknown';
+        const batch = studentInfo.batch || studentInfo.batchNo || 'Unknown';
+        
+        // Filter out missingSemesters key and prepare semester results
+        const semesterResults = {};
+        let semesterCount = 0;
+        
+        if (data.results) {
+            Object.entries(data.results).forEach(([key, value]) => {
+                if (key !== 'missingSemesters' && Array.isArray(value)) {
+                    semesterResults[key] = value;
+                    semesterCount++;
+                }
+            });
+        }
+        
+        // Calculate CGPA if we have semester results
+        let cgpa = 'N/A';
+        let totalCredits = 0;
+        
+        if (Object.keys(semesterResults).length > 0) {
+            try {
+                const result = this.calculator.calculateCgpa(semesterResults);
+                cgpa = result.cgpa;
+                totalCredits = result.totalCredits;
+            } catch (error) {
+                console.error(`Error calculating CGPA for ${studentId}:`, error);
+            }
+        }
+        
+        // Create student info card
+        const studentInfoHtml = `
+            <div class="gh-box" id="advanced-student-info">
+                <div class="gh-student-info">
+                    <div class="gh-student-header">
+                        <h3>${name}</h3>
+                        <div class="gh-student-id">${studentId}</div>
+                    </div>
+                    <div class="gh-student-details">
+                        <div class="gh-student-detail-item">
+                            <span class="gh-detail-label">Department:</span>
+                            <span class="gh-detail-value">${department}</span>
+                        </div>
+                        <div class="gh-student-detail-item">
+                            <span class="gh-detail-label">Program:</span>
+                            <span class="gh-detail-value">${program}</span>
+                        </div>
+                        <div class="gh-student-detail-item">
+                            <span class="gh-detail-label">Batch:</span>
+                            <span class="gh-detail-value">${batch}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Create CGPA summary card
+        const cgpaSummaryHtml = `
+            <div class="gh-box" id="advanced-cgpa-summary">
+                <div class="gh-stats-container" style="grid-template-columns: 1fr 1fr 1fr;">
+                    <div class="gh-stats-box">
+                        <div class="gh-stats-value" style="color: var(--color-link);">${cgpa}</div>
+                        <div class="gh-stats-label">CGPA</div>
+                    </div>
+                    <div class="gh-stats-box">
+                        <div class="gh-stats-value">${totalCredits}</div>
+                        <div class="gh-stats-label">Total Credits</div>
+                    </div>
+                    <div class="gh-stats-box">
+                        <div class="gh-stats-value">${semesterCount}</div>
+                        <div class="gh-stats-label">Semesters</div>
+                    </div>
+                </div>
+            </div>
+        `;
+        
+        // Process semester data
+        let semesterDataHtml = '<div class="gh-section-title"><h3>Semester Results</h3></div>';
+        
+        if (semesterCount === 0) {
+            semesterDataHtml += '<div class="gh-alert gh-alert-warning">No semester results found</div>';
+        } else {
+            try {
+                // Process the data using the calculator
+                const semesterData = this.calculator.processSemesterData(
+                    semesterResults,
+                    this.semesterList
+                );
+                
+                // Sort semesters in reverse order (newest first)
+                const sortedSemesters = [...semesterData].sort((a, b) => 
+                    (b.year - a.year) || (b.term - a.term)
+                );
+                
+                // Generate semester cards similar to the main CGPA page
+                semesterDataHtml += `<div id="advanced-semester-results">`;
+                
+                // Use the ResultCard component to render each semester with forceOpen=true
+                sortedSemesters.forEach((semester, index) => {
+                    semesterDataHtml += ResultCard.render(semester, index, true);
+                });
+                
+                semesterDataHtml += `</div>`;
+                
+            } catch (error) {
+                console.error(`Error processing semester data for ${studentId}:`, error);
+                semesterDataHtml += '<div class="gh-alert gh-alert-error">Error processing semester data</div>';
+            }
+        }
+        
+        // Check for missing semesters
+        let missingSemestersHtml = '';
+        if (data.missingSemesters && data.missingSemesters.length > 0) {
+            const semesterNames = data.missingSemesters.map(sem => sem.name).join(', ');
+            missingSemestersHtml = `
+                <div class="gh-alert gh-alert-warning">
+                    <div class="gh-alert-content">
+                        <p><strong>Missing Semester Data:</strong> ${semesterNames}</p>
+                        <p>CGPA calculation may be incomplete. This could be due to server issues or missing data.</p>
+                    </div>
+                </div>
+            `;
+        }
+        
+        // Combine all HTML and update the container
+        container.innerHTML = studentInfoHtml + cgpaSummaryHtml + missingSemestersHtml + semesterDataHtml;
+        
+        // Add event delegation for result card toggling
+        container.addEventListener('click', (e) => {
+            const header = e.target.closest('.gh-result-card-header');
+            if (header) {
+                const card = header.closest('.gh-result-card');
+                if (card) {
+                    card.classList.toggle('open');
+                }
+            }
+        });
+        
+        // Show export button
+        Helpers.showElement(document.getElementById('export-results-btn'));
     }
 }
 

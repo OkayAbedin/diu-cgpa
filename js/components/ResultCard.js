@@ -8,9 +8,10 @@ class ResultCard {
      * Render a single semester result card
      * @param {Object} semester - Semester data object
      * @param {number} index - Index for unique ID generation
+     * @param {boolean} forceOpen - Flag to force the card to be open
      * @returns {string} HTML string for a semester result card
      */
-    static render(semester, index) {
+    static render(semester, index, forceOpen = false) {
         if (!semester || !semester.courses || semester.courses.length === 0) {
             return '';
         }
@@ -26,8 +27,11 @@ class ResultCard {
         const headerId = `semester-header-${index}`;
         const collapseId = `semester-collapse-${index}`;
         
+        // Add open class if forceOpen is true
+        const openClass = forceOpen ? 'open' : '';
+        
         return `
-            <div class="gh-result-card" id="${cardId}">
+            <div class="gh-result-card ${openClass}" id="${cardId}">
                 <div class="gh-result-card-header" id="${headerId}">
                     <div class="gh-result-title">${name}</div>
                     <div class="gh-result-stats">
