@@ -185,7 +185,7 @@ body {
     font-weight: 500;
     border-radius: 6px;
     color: var(--color-text);
-    background-color: #e9ecef;
+    background-color: #e9ecef; /* Gray background for non-active buttons */
     border: none;
     transition: all 0.2s ease;
     text-decoration: none; /* Remove underline */
@@ -215,12 +215,16 @@ body {
 
 /* Add active state for tab navigation */
 .gh-nav .gh-btn.active {
+    background-color: #0d6efd; /* Blue background for active button */
+    color: white;
     box-shadow: 0 0 0 2px rgba(13, 110, 253, 0.3);
     font-weight: 600;
 }
 
+/* Override any previous styling for active primary buttons */
 .gh-nav .gh-btn-primary.active {
-    background-color: #0a58ca;
+    background-color: #0d6efd;
+    color: white;
 }
 
 /* Dark mode header adjustments */
@@ -269,12 +273,98 @@ body {
         margin-top: 15px;
         width: 100%;
         overflow-x: auto;
+        -webkit-overflow-scrolling: touch; /* Smooth scrolling on iOS */
+        scrollbar-width: none; /* Hide scrollbar on Firefox */
+    }
+    
+    .gh-nav::-webkit-scrollbar {
+        display: none; /* Hide scrollbar on Chrome/Safari */
     }
     
     .gh-nav ul {
         display: flex;
+        width: max-content; /* Allow to expand beyond container width */
+        padding: 5px 0;
+        gap: 8px;
+    }
+    
+    .gh-nav li {
+        flex-shrink: 0; /* Prevent buttons from shrinking */
+    }
+    
+    /* Smaller padding and font size for mobile buttons */
+    .gh-nav .gh-btn {
+        padding: 8px 12px;
+        font-size: 13px;
+        white-space: nowrap;
+    }
+}
+
+/* Improved mobile navigation - Break buttons into multiple rows */
+@media (max-width: 768px) {
+    .gh-header-inner {
+        flex-direction: column;
+        align-items: center;
+        padding: 10px 0;
+    }
+    
+    .gh-header {
+        height: auto;
+        padding: 10px var(--spacing-md);
+    }
+    
+    .gh-nav {
+        margin-top: 15px;
         width: 100%;
-        padding-bottom: 5px;
+    }
+    
+    .gh-nav ul {
+        display: flex;
+        flex-wrap: wrap;
+        justify-content: center;
+        padding: 5px 0;
+        gap: 8px;
+        width: 100%;
+    }
+    
+    /* Create 2-3 rows of buttons */
+    .gh-nav li {
+        flex: 0 0 calc(50% - 8px); /* Two buttons per row with gap consideration */
+        max-width: calc(50% - 8px);
+        margin-bottom: 8px;
+    }
+    
+    /* Make buttons fill their container */
+    .gh-nav .gh-btn {
+        width: 100%;
+        padding: 8px 12px;
+        font-size: 13px;
+        justify-content: center;
+    }
+
+    /* Make the Fork on Github button full width */
+    .gh-nav li:last-child {
+        flex: 0 0 100%;
+        max-width: 100%;
+    }
+}
+
+/* Extra small devices */
+@media (max-width: 576px) {
+    .gh-nav .gh-btn {
+        padding: 6px 10px;
+        font-size: 12px;
+    }
+    
+    /* 3 buttons on larger phones, 2 on smaller */
+    .gh-nav li {
+        flex: 0 0 calc(50% - 8px);
+        max-width: calc(50% - 8px);
+    }
+    
+    /* Ensure icon and text are properly aligned */
+    .gh-nav .gh-btn i {
+        margin-right: 4px;
     }
 }
 
@@ -282,6 +372,11 @@ body {
     .gh-nav .gh-btn {
         padding: 6px 10px;
         font-size: 12px;
+    }
+    
+    /* Add space for the GitHub icon in the fork button */
+    .gh-nav .fork-btn i {
+        margin-right: 4px;
     }
 }
 
@@ -1945,7 +2040,7 @@ textarea::placeholder {
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, #614385, #516395);
-    border-radius: var(--border-radius-medium);
+    border-radius: var (--border-radius-medium);
     padding: var(--spacing-lg);
     margin-bottom: var (--spacing-lg);
     position: relative;

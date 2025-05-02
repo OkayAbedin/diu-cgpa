@@ -10,10 +10,13 @@ function initNavigation() {
   function setActiveTab(tabId) {
     // Update buttons
     navButtons.forEach(button => {
+      // First, reset all buttons to default gray style
+      button.classList.remove('active');
+      button.classList.remove('gh-btn-primary');
+      
+      // Then, add active class to the selected button
       if (button.getAttribute('data-tab') === tabId) {
         button.classList.add('active');
-      } else {
-        button.classList.remove('active');
       }
     });
     
