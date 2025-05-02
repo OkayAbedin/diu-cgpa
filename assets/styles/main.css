@@ -1489,6 +1489,7 @@ textarea::placeholder {
     margin-bottom: var(--spacing-lg);
     overflow: hidden;
     box-shadow: var(--shadow-small);
+    transition: var(--transition-default);
 }
 
 .semester-header {
@@ -1528,7 +1529,6 @@ textarea::placeholder {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: var(--spacing-md);
 }
 
 .semester-info h3 {
@@ -1665,4 +1665,123 @@ textarea::placeholder {
         display: block;
         overflow-x: auto;
     }
+}
+
+/* Modern Fetch CGPA Header styling */
+.fetch-cgpa-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: linear-gradient(135deg, var(--color-btn-primary-bg), #6dd5ed);
+    border-radius: var(--border-radius-medium);
+    padding: var(--spacing-lg);
+    margin-bottom: var(--spacing-lg);
+    position: relative;
+    overflow: hidden;
+    box-shadow: var(--shadow-medium);
+    color: white;
+}
+
+.fetch-cgpa-header::before {
+    content: '';
+    position: absolute;
+    top: -50%;
+    right: -50%;
+    width: 100%;
+    height: 200%;
+    background: rgba(255, 255, 255, 0.1);
+    transform: rotate(30deg);
+    z-index: 0;
+}
+
+.fetch-header-content {
+    z-index: 1;
+    flex: 1;
+}
+
+.fetch-cgpa-header h2 {
+    color: white;
+    margin-bottom: var(--spacing-sm);
+    font-weight: 700;
+    font-size: 28px;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.fetch-cgpa-header h2::after {
+    display: none;
+}
+
+.fetch-cgpa-header .gh-desc {
+    color: rgba(255, 255, 255, 0.9);
+    font-size: 16px;
+    margin-bottom: 0;
+    max-width: 80%;
+}
+
+.fetch-header-icon {
+    font-size: 48px;
+    color: rgba(255, 255, 255, 0.25);
+    margin-right: var(--spacing-md);
+    z-index: 1;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .fetch-cgpa-header {
+    background: linear-gradient(135deg, #1a365d, #2b6cb0);
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .fetch-cgpa-header {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+    
+    .fetch-header-icon {
+        position: absolute;
+        top: var(--spacing-md);
+        right: var(--spacing-md);
+        font-size: 36px;
+        margin-right: 0;
+    }
+    
+    .fetch-cgpa-header .gh-desc {
+        max-width: 100%;
+        margin-right: 40px;
+    }
+}
+
+/* Enhancements for student ID input field */
+#student-id {
+    border: 2px solid transparent;
+    background-color: rgba(255, 255, 255, 0.9);
+    transition: all 0.3s ease;
+    font-size: 16px;
+    height: 50px;
+    padding-left: var(--spacing-md);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+#student-id:focus {
+    border-color: var(--color-btn-primary-bg);
+    background-color: white;
+    box-shadow: 0 0 0 4px rgba(67, 97, 238, 0.2);
+}
+
+#calculate-btn {
+    height: 50px;
+    font-weight: 600;
+    font-size: 16px;
+    padding-left: var(--spacing-lg);
+    padding-right: var(--spacing-lg);
+    background: linear-gradient(to right, #4361ee, #06d6a0);
+    border: none;
+    border-radius: var(--border-radius-medium);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+#calculate-btn:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 10px 20px rgba(67, 97, 238, 0.3);
 }
