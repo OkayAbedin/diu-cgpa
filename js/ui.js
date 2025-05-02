@@ -81,6 +81,21 @@ class UiController {
      */
     async init() {
         this.bindEvents();
+        
+        // Initialize event listeners for the default semester's grade dropdown
+        const initialGradeSelect = this.manualSemesterList.querySelector('.course-grade');
+        const initialCustomGradeContainer = this.manualSemesterList.querySelector('.custom-grade-container');
+        
+        if (initialGradeSelect && initialCustomGradeContainer) {
+            initialGradeSelect.addEventListener('change', (e) => {
+                if (e.target.value === 'custom') {
+                    initialCustomGradeContainer.style.display = 'block';
+                } else {
+                    initialCustomGradeContainer.style.display = 'none';
+                }
+            });
+        }
+        
         try {
             await this.loadSemesterList();
         } catch (error) {
@@ -588,7 +603,7 @@ class UiController {
                             <input type="text" class="gh-form-control course-name" placeholder="Course Name (optional)">
                             <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0" step="0.5">
                             <select class="gh-form-select course-grade">
-                                <option value="">Grade</option>
+                                <option value="custom" selected>Custom Grade</option>
                                 <option value="4.00">A+ (4.00)</option>
                                 <option value="3.75">A (3.75)</option>
                                 <option value="3.50">A- (3.50)</option>
@@ -600,6 +615,9 @@ class UiController {
                                 <option value="2.00">D (2.00)</option>
                                 <option value="0.00">F (0.00)</option>
                             </select>
+                            <div class="custom-grade-container" style="display: block;">
+                                <input type="number" class="gh-form-control custom-grade-input" placeholder="Custom Grade Point" min="0" max="4" step="0.5" value="4.00">
+                            </div>
                             <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn">
                                 <i class="fas fa-times"></i>
                             </button>
@@ -614,6 +632,19 @@ class UiController {
         `;
         
         this.manualSemesterList.insertAdjacentHTML('beforeend', semesterHtml);
+        
+        // Add event listener for the custom grade option
+        const newSemester = this.manualSemesterList.lastElementChild;
+        const gradeSelect = newSemester.querySelector('.course-grade');
+        const customGradeContainer = newSemester.querySelector('.custom-grade-container');
+        
+        gradeSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                customGradeContainer.style.display = 'block';
+            } else {
+                customGradeContainer.style.display = 'none';
+            }
+        });
     }
     
     /**
@@ -630,7 +661,7 @@ class UiController {
                     <input type="text" class="gh-form-control course-name" placeholder="Course Name (optional)">
                     <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0" step="0.5">
                     <select class="gh-form-select course-grade">
-                        <option value="">Grade</option>
+                        <option value="custom" selected>Custom Grade</option>
                         <option value="4.00">A+ (4.00)</option>
                         <option value="3.75">A (3.75)</option>
                         <option value="3.50">A- (3.50)</option>
@@ -642,6 +673,9 @@ class UiController {
                         <option value="2.00">D (2.00)</option>
                         <option value="0.00">F (0.00)</option>
                     </select>
+                    <div class="custom-grade-container" style="display: block;">
+                        <input type="number" class="gh-form-control custom-grade-input" placeholder="Custom Grade Point" min="0" max="4" step="0.01" value="3.50">
+                    </div>
                     <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn">
                         <i class="fas fa-times"></i>
                     </button>
@@ -650,6 +684,19 @@ class UiController {
         `;
         
         coursesContainer.insertAdjacentHTML('beforeend', courseHtml);
+        
+        // Add event listener for the custom grade option
+        const newCourse = coursesContainer.lastElementChild;
+        const gradeSelect = newCourse.querySelector('.course-grade');
+        const customGradeContainer = newCourse.querySelector('.custom-grade-container');
+        
+        gradeSelect.addEventListener('change', (e) => {
+            if (e.target.value === 'custom') {
+                customGradeContainer.style.display = 'block';
+            } else {
+                customGradeContainer.style.display = 'none';
+            }
+        });
     }
     
     /**
@@ -694,10 +741,21 @@ class UiController {
                 
                 // Only add if credit and grade are filled
                 if (creditInput.value && gradeSelect.value) {
+                    // Check if custom grade is selected and use that value instead
+                    let gradeValue;
+                    if (gradeSelect.value === 'custom') {
+                        const customGradeInput = row.querySelector('.custom-grade-input');
+                        gradeValue = customGradeInput.value ? parseFloat(customGradeInput.value) : 0;
+                        // Ensure the grade is within valid range (0-4)
+                        gradeValue = Math.min(Math.max(gradeValue, 0), 4);
+                    } else {
+                        gradeValue = parseFloat(gradeSelect.value);
+                    }
+                    
                     courses.push({
                         name: nameInput.value || 'Untitled Course',
                         credit: parseFloat(creditInput.value),
-                        grade: parseFloat(gradeSelect.value)
+                        grade: gradeValue
                     });
                 }
             });
@@ -864,6 +922,8 @@ class UiController {
         // Reset any previous validation styling
         courseCredits.forEach(input => input.classList.remove('is-invalid'));
         courseGrades.forEach(select => select.classList.remove('is-invalid'));
+        const customGradeInputs = document.querySelectorAll('.custom-grade-input');
+        customGradeInputs.forEach(input => input.classList.remove('is-invalid'));
         
         // Check each pair of inputs (credit and grade)
         for (let i = 0; i < courseCredits.length; i++) {
@@ -875,6 +935,18 @@ class UiController {
                 if (!credit) courseCredits[i].classList.add('is-invalid');
                 if (!grade) courseGrades[i].classList.add('is-invalid');
                 isValid = false;
+            }
+            
+            // Check for custom grade
+            if (grade === 'custom') {
+                const customGradeContainer = courseGrades[i].parentElement.querySelector('.custom-grade-container');
+                if (customGradeContainer) {
+                    const customGradeInput = customGradeContainer.querySelector('.custom-grade-input');
+                    if (customGradeInput && (!customGradeInput.value || parseFloat(customGradeInput.value) < 0 || parseFloat(customGradeInput.value) > 4)) {
+                        customGradeInput.classList.add('is-invalid');
+                        isValid = false;
+                    }
+                }
             }
         }
         
