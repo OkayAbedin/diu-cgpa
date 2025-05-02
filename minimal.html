@@ -19,6 +19,22 @@
         .tab-pane.active {
             display: block !important;
         }
+        
+        /* Responsive navigation styles */
+        @media (max-width: 768px) {
+            .gh-nav .btn-text {
+                display: none;
+            }
+            
+            .gh-nav .gh-btn {
+                padding: 8px 12px;
+                font-size: 16px;
+            }
+            
+            .gh-nav ul {
+                gap: 5px;
+            }
+        }
     </style>
 </head>
 <body>
@@ -32,19 +48,29 @@
                 <nav class="gh-nav">
                     <ul>
                         <li>
-                            <a href="#" class="gh-btn gh-btn-primary tab-link" data-tab="auto-calculator">Fetch CGPA</a>
+                            <a href="#" class="gh-btn" data-tab="auto-calculator">
+                                <i class="fas fa-search"></i> <span class="btn-text">Fetch CGPA</span>
+                            </a>
                         </li>
                         <li>
-                            <a href="#" class="gh-btn tab-link" data-tab="manual-calculator">Calculate CGPA</a>
+                            <a href="#" class="gh-btn" data-tab="manual-calculator">
+                                <i class="fas fa-calculator"></i> <span class="btn-text">Calculate CGPA</span>
+                            </a>
                         </li>
                         <li>
-                            <a href="#" class="gh-btn tab-link" data-tab="advanced-fetch">Advanced Fetch</a>
+                            <a href="#" class="gh-btn" data-tab="advanced-fetch">
+                                <i class="fas fa-cogs"></i> <span class="btn-text">Advanced Fetch</span>
+                            </a>
                         </li>
                         <li>
-                            <a href="#" class="gh-btn tab-link" data-tab="about">About</a>
+                            <a href="#" class="gh-btn" data-tab="about">
+                                <i class="fas fa-info-circle"></i> <span class="btn-text">About</span>
+                            </a>
                         </li>
                         <li>
-                            <a href="https://github.com/okayabedin/diu-cgpa" target="_blank" class="gh-btn fork-btn">Fork on Github</a>
+                            <a href="https://github.com/okayabedin/diu-cgpa" target="_blank" class="gh-btn fork-btn">
+                                <i class="fab fa-github"></i> <span class="btn-text">Fork on Github</span>
+                            </a>
                         </li>
                     </ul>
                 </nav>

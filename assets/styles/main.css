@@ -2030,7 +2030,7 @@ textarea::placeholder {
 .manual-header-icon {
     font-size: 48px;
     color: rgba(255, 255, 255, 0.25);
-    margin-right: var(--spacing-md);
+    margin-right: var (--spacing-md);
     z-index: 1;
 }
 
@@ -2225,4 +2225,54 @@ textarea::placeholder {
 #advanced-fetch-btn:hover {
     transform: translateY(-3px);
     box-shadow: 0 10px 20px rgba(97, 67, 133, 0.3);
+}
+
+/* Responsive navigation for mobile devices with icon-only view */
+@media (max-width: 768px) {
+    .gh-nav .btn-text {
+        display: none;
+    }
+    
+    .gh-nav .gh-btn {
+        padding: 8px 12px;
+        font-size: 16px;
+    }
+    
+    .gh-nav ul {
+        gap: 5px;
+        display: flex;
+        flex-wrap: nowrap;
+        overflow-x: auto;
+        scrollbar-width: none; /* Hide scrollbar Firefox */
+        -ms-overflow-style: none; /* Hide scrollbar IE and Edge */
+        justify-content: flex-start;
+        width: 100%;
+        padding-bottom: 5px; /* Space for scrolling */
+    }
+    
+    .gh-nav ul::-webkit-scrollbar {
+        display: none; /* Hide scrollbar Chrome, Safari, Opera */
+    }
+    
+    .gh-nav li {
+        flex: 0 0 auto; /* Don't grow, don't shrink, and auto width */
+        max-width: none;
+        margin-bottom: 0;
+    }
+    
+    .gh-nav .gh-btn i {
+        margin-right: 0;
+    }
+    
+    /* Override any flex-direction column settings */
+    .gh-header-inner {
+        flex-direction: row;
+        align-items: center;
+    }
+    
+    /* Ensure Fork on Github button doesn't take full width */
+    .gh-nav li:last-child {
+        flex: 0 0 auto;
+        max-width: none;
+    }
 }
