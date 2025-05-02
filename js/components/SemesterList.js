@@ -1,5 +1,5 @@
 /**
- * SemesterList Component for DIU CGPA Calculator
+ * SemesterList Component for DIU CGPA
  * Displays a list of semester results in GitHub-style UI
  */
 

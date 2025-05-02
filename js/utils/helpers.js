@@ -1,5 +1,5 @@
 /**
- * Helper functions for DIU CGPA Calculator
+ * Helper functions for DIU CGPA
  */
 
 class Helpers {

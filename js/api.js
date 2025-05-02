@@ -1,5 +1,5 @@
 /**
- * API Service for DIU CGPA Calculator
+ * API Service for DIU CGPA
  * Handles all API requests to the DIU server
  */
 

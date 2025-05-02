@@ -1,5 +1,5 @@
 /**
- * UI Controller for DIU CGPA Calculator
+ * UI Controller for DIU CGPA
  * Handles user interactions and orchestrates the application flow
  */
 
@@ -1607,212 +1607,29 @@ class UiController {
         }
         
         try {
-            // Get the template
-            const template = document.getElementById('transcript-template');
-            if (!template) {
-                alert('Transcript template not found.');
-                return;
-            }
-            
-            // Clone the template to avoid modifying the original
-            const transcriptContainer = template.cloneNode(true);
-            transcriptContainer.style.display = 'block';
-            
-            // Get references to elements in the cloned template
-            const studentInfoSection = transcriptContainer.querySelector('#pdf-student-info');
-            const semesterResultsSection = transcriptContainer.querySelector('#pdf-semester-results');
-            const cgpaElement = transcriptContainer.querySelector('#pdf-cgpa');
-            const creditsElement = transcriptContainer.querySelector('#pdf-credits');
-            const dateElement = transcriptContainer.querySelector('#pdf-date');
-            const generationDateElement = transcriptContainer.querySelector('#pdf-generation-date');
-            
-            // Format current date for the transcript
-            const currentDate = new Date();
-            const formattedDate = currentDate.toLocaleDateString('en-US', {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric'
-            });
-            
-            // Set issue date
-            dateElement.textContent = formattedDate;
-            generationDateElement.textContent = formattedDate;
-            
-            // Populate student info section
-            studentInfoSection.innerHTML = this.generateStudentInfoHTML();
-            
-            // Calculate CGPA and total credits
-            const { cgpa, totalCredits } = this.calculator.calculateCgpa(this.semesterResults);
-            
-            // Set CGPA and total credits
-            cgpaElement.textContent = cgpa;
-            creditsElement.textContent = totalCredits;
-            
             // Process semester data
             const semesterData = this.calculator.processSemesterData(
-                this.semesterResults,
+                this.semesterResults, 
                 this.semesterList
             );
             
-            // Sort semesters chronologically (oldest first for transcript)
-            const sortedSemesters = [...semesterData].sort((a, b) => {
-                // Extract year and term from semester name if possible
-                const yearA = a.name.match(/\d{4}/);
-                const yearB = b.name.match(/\d{4}/);
-                
-                if (yearA && yearB) {
-                    return parseInt(yearA[0]) - parseInt(yearB[0]);
-                }
-                
-                // Fallback to ID comparison if year extraction fails
-                return a.id.localeCompare(b.id);
-            });
+            // Calculate CGPA and total credits
+            const cgpaData = this.calculator.calculateCgpa(this.semesterResults);
             
-            // Generate semester results HTML
-            semesterResultsSection.innerHTML = this.generateSemesterResultsHTML(sortedSemesters);
+            // Create a new instance of ResultCard if window.resultCard doesn't exist
+            const resultCardInstance = window.resultCard || new ResultCard();
             
-            // Generate PDF with proper file name
-            const studentId = this.studentInfo.id || this.studentInfo.studentId || 'unknown';
-            const studentName = (this.studentInfo.name || this.studentInfo.studentName || 'Student').replace(/\s+/g, '_');
-            const fileName = `${studentId}_${studentName}_Transcript.pdf`;
+            // Generate PDF using the ResultCard's generatePdfTranscript method
+            resultCardInstance.generatePdfTranscript(this.studentInfo, semesterData, cgpaData);
             
-            // Define PDF options
-            const options = {
-                margin: [10, 10, 10, 10],
-                filename: fileName,
-                image: { type: 'jpeg', quality: 0.98 },
-                html2canvas: { scale: 2, useCORS: true },
-                jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-            };
+            console.log('PDF generation initiated');
             
-            // Generate PDF using html2pdf
-            html2pdf()
-                .from(transcriptContainer)
-                .set(options)
-                .save()
-                .then(() => {
-                    console.log('PDF generated successfully');
-                    // Remove the cloned template from the DOM after PDF generation
-                    if (transcriptContainer.parentNode) {
-                        transcriptContainer.parentNode.removeChild(transcriptContainer);
-                    }
-                })
-                .catch(error => {
-                    console.error('Error generating PDF:', error);
-                    alert('Failed to generate PDF. Please try again.');
-                });
         } catch (error) {
             console.error('Error generating transcript PDF:', error);
             alert('An error occurred while generating the transcript. Please try again.');
         }
     }
     
-    /**
-     * Generate HTML for student info section of transcript
-     * @returns {string} HTML string for student info
-     */
-    generateStudentInfoHTML() {
-        if (!this.studentInfo) return '<p>No student information available</p>';
-        
-        const studentName = this.studentInfo.name || this.studentInfo.studentName || 'Unknown';
-        const studentId = this.studentInfo.id || this.studentInfo.studentId || 'Unknown';
-        const program = this.studentInfo.program || this.studentInfo.programName || 'Unknown';
-        const department = this.studentInfo.department || this.studentInfo.departmentName || 'Unknown';
-        const batch = this.studentInfo.batch || this.studentInfo.batchNo || 'Unknown';
-        
-        return `
-            <table>
-                <tr>
-                    <th>Student Name</th>
-                    <td>${studentName}</td>
-                    <th>ID</th>
-                    <td>${studentId}</td>
-                </tr>
-                <tr>
-                    <th>Program</th>
-                    <td>${program}</td>
-                    <th>Department</th>
-                    <td>${department}</td>
-                </tr>
-                <tr>
-                    <th>Batch</th>
-                    <td colspan="3">${batch}</td>
-                </tr>
-            </table>
-        `;
-    }
-    
-    /**
-     * Generate HTML for semester results section of transcript
-     * @param {Array} semesterData - Array of processed semester data
-     * @returns {string} HTML string for semester results
-     */
-    generateSemesterResultsHTML(semesterData) {
-        if (!semesterData || semesterData.length === 0) {
-            return '<p>No semester data available</p>';
-        }
-        
-        return semesterData.map(semester => {
-            // Skip semesters with no courses
-            if (!semester.courses || semester.courses.length === 0) return '';
-            
-            return `
-                <div class="transcript-semester">
-                    <div class="transcript-semester-header">
-                        <h4>${semester.name}</h4>
-                        <div class="transcript-semester-stats">
-                            <span>GPA: ${semester.gpa}</span>
-                            <span>Credits: ${semester.totalCredits}</span>
-                        </div>
-                    </div>
-                    <table class="transcript-semester-table">
-                        <thead>
-                            <tr>
-                                <th>Course Code</th>
-                                <th>Course Title</th>
-                                <th>Credit</th>
-                                <th>Grade</th>
-                                <th>Point</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            ${this.generateCourseRowsHTML(semester.courses)}
-                        </tbody>
-                    </table>
-                </div>
-            `;
-        }).join('');
-    }
-    
-    /**
-     * Generate HTML for course rows in a semester
-     * @param {Array} courses - Array of course objects
-     * @returns {string} HTML string for course rows
-     */
-    generateCourseRowsHTML(courses) {
-        if (!courses || courses.length === 0) {
-            return '<tr><td colspan="5">No courses found</td></tr>';
-        }
-        
-        return courses.map(course => {
-            const code = course.customCourseId || '-';
-            const title = course.courseName || course.courseTitle || 'Unknown Course';
-            const credit = course.totalCredit || 0;
-            const grade = course.gradeLetter || '-';
-            const point = course.pointEquivalent || 0;
-            
-            return `
-                <tr>
-                    <td>${code}</td>
-                    <td>${title}</td>
-                    <td>${credit}</td>
-                    <td>${grade}</td>
-                    <td>${point}</td>
-                </tr>
-            `;
-        }).join('');
-    }
-
     /**
      * Display detailed results for a single student in advanced fetch
      * @param {string} studentId - Student ID

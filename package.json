@@ -1,7 +1,7 @@
 {
-  "name": "diu-cgpa-calculator",
+  "name": "diu-cgpa",
   "version": "1.0.0",
-  "description": "DIU CGPA Calculator helps students calculate their Cumulative Grade Point Average (CGPA) easily and accurately",
+  "description": "DIU CGPA helps students calculate their Cumulative Grade Point Average (CGPA) easily and accurately",
   "main": "index.html",
   "scripts": {
     "start": "serve .",

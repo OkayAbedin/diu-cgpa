@@ -1,5 +1,5 @@
 /**
- * Calculator Service for DIU CGPA Calculator
+ * Calculator Service for DIU CGPA
  * Handles all GPA and CGPA calculations
  */
 

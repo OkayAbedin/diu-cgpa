@@ -1,5 +1,5 @@
 /**
- * Iterator design pattern implementation for DIU CGPA Calculator
+ * Iterator design pattern implementation for DIU CGPA
  * Provides a way to access elements of collections without exposing underlying representation
  */
 

@@ -1,5 +1,5 @@
 /**
- * StudentInfo Component for DIU CGPA Calculator
+ * StudentInfo Component for DIU CGPA
  * Displays student information in modern UI with circular CGPA display
  */
 
