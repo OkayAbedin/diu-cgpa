@@ -396,14 +396,21 @@ class UiController {
         
         // Calculate and display CGPA
         const { cgpa, totalCredits } = this.calculator.calculateCgpa(this.semesterResults);
-        this.totalCgpaElement.innerHTML = `<strong>${cgpa}</strong>`;
-        this.totalCreditsElement.innerHTML = `Total Credits: <strong>${totalCredits}</strong>`;
+        
+        // Update the circular CGPA display
+        const cgpaValueElement = document.querySelector('.cgpa-value');
+        if (cgpaValueElement) {
+            cgpaValueElement.textContent = cgpa;
+        }
         
         // Process semester data
         const semesterData = this.calculator.processSemesterData(
             this.semesterResults, 
             this.semesterList
         );
+        
+        // Update the stats in the student info section
+        StudentInfo.updateStats(semesterData.length, totalCredits);
         
         // Display semester results
         this.semesterResultsSection.innerHTML = SemesterList.render(semesterData);

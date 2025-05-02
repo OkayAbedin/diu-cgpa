@@ -82,27 +82,20 @@
                         <section id="student-info" class="gh-box hidden"></section>
                         
                         <section id="results-container" class="hidden">
-                            <div class="gh-stats-container">
-                                <div class="gh-stats-box" id="cgpa-summary">
-                                    <h3>CGPA Summary</h3>
-                                    <div class="gh-stats-value" id="total-cgpa"></div>
-                                    <div class="gh-stats-label" id="total-credits"></div>
-                                </div>
-                                <div class="gh-chart-box">
-                                    <div class="gh-chart-header">
-                                        <h3>CGPA Progress</h3>
-                                    </div>
-                                    <div class="gh-chart-body">
-                                        <canvas id="cgpa-chart"></canvas>
-                                    </div>
-                                </div>
-                            </div>
                             <div class="gh-section-title">
                                 <h3>Semester Results</h3>
                                 <div class="gh-section-actions">
                                     <button id="save-pdf-btn" class="gh-btn gh-btn-sm gh-btn-secondary">
                                         <i class="fas fa-file-pdf"></i> Save as PDF
                                     </button>
+                                </div>
+                            </div>
+                            <!-- Hidden elements to maintain JavaScript functionality -->
+                            <div style="display: none;">
+                                <div id="total-cgpa"></div>
+                                <div id="total-credits"></div>
+                                <div class="gh-chart-body">
+                                    <canvas id="cgpa-chart"></canvas>
                                 </div>
                             </div>
                             <div id="semester-results" class="gh-list"></div>

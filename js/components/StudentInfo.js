@@ -1,6 +1,6 @@
 /**
  * StudentInfo Component for DIU CGPA Calculator
- * Displays student information in GitHub-style UI
+ * Displays student information in modern UI with circular CGPA display
  */
 
 class StudentInfo {
@@ -22,29 +22,44 @@ class StudentInfo {
         const batch = studentInfo.batch || studentInfo.batchName || studentInfo.batchNo || 'Unknown Batch';
         const status = studentInfo.status || studentInfo.studentStatus || '';
         
+        // Get CGPA from student info if available, otherwise it will be filled in later
+        const cgpa = studentInfo.cgpa || '0.00';
+        
         return `
-            <div class="gh-student-info">
-                <div class="gh-student-header">
-                    <div class="gh-student-avatar">
-                        <i class="fas fa-user-graduate"></i>
+            <div class="student-info-container">
+                <div class="cgpa-display">
+                    <div class="cgpa-circle">
+                        <div class="cgpa-value">${cgpa}</div>
                     </div>
-                    <div class="gh-student-details">
-                        <h3>${studentName}</h3>
-                        <div class="gh-student-meta">
-                            <span class="gh-meta-item">
-                                <i class="fas fa-id-card"></i> ${studentId}
-                            </span>
-                            <span class="gh-meta-item">
-                                <i class="fas fa-graduation-cap"></i> ${program}
-                            </span>
-                            <span class="gh-meta-item">
-                                <i class="fas fa-building"></i> ${department}
-                            </span>
-                            <span class="gh-meta-item">
-                                <i class="fas fa-users"></i> ${batch}
-                            </span>
-                            ${this.renderStatus(status)}
-                        </div>
+                </div>
+                <div class="student-details">
+                    <h2 class="student-name">${studentName}</h2>
+                    <p class="student-id">${studentId}</p>
+                </div>
+                <div class="student-stats">
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-semesters">-</div>
+                        <div class="stat-label">Semesters</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${batch}</div>
+                        <div class="stat-label">Batch</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="total-credits">-</div>
+                        <div class="stat-label">Credits</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${department}</div>
+                        <div class="stat-label">Department</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">FSIT</div>
+                        <div class="stat-label">Faculty</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">DSC</div>
+                        <div class="stat-label">Campus</div>
                     </div>
                 </div>
             </div>
@@ -52,40 +67,16 @@ class StudentInfo {
     }
     
     /**
-     * Render student status badge
-     * @param {string} status - Student status
-     * @returns {string} HTML string for status badge
+     * Update stats in the student info section
+     * @param {number} semesters - Number of semesters
+     * @param {number} credits - Total credits
      */
-    static renderStatus(status) {
-        if (!status) return '';
+    static updateStats(semesters, credits) {
+        const semestersElement = document.getElementById('total-semesters');
+        const creditsElement = document.getElementById('total-credits');
         
-        let badgeClass = 'gh-badge';
-        let icon = 'fa-info-circle';
-        
-        switch (status.toLowerCase()) {
-            case 'active':
-                badgeClass += ' gh-badge-primary';
-                icon = 'fa-check-circle';
-                break;
-            case 'graduated':
-                badgeClass += ' gh-badge-success';
-                icon = 'fa-graduation-cap';
-                break;
-            case 'inactive':
-                badgeClass += ' gh-badge-danger';
-                icon = 'fa-exclamation-circle';
-                break;
-            default:
-                badgeClass += ' gh-badge-secondary';
-        }
-        
-        return `
-            <span class="gh-meta-item gh-meta-status">
-                <span class="${badgeClass}">
-                    <i class="fas ${icon}"></i> ${status}
-                </span>
-            </span>
-        `;
+        if (semestersElement) semestersElement.textContent = semesters;
+        if (creditsElement) creditsElement.textContent = credits;
     }
 }
 

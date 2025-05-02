@@ -1,6 +1,6 @@
 /**
  * ResultCard Component for DIU CGPA Calculator
- * Displays a single semester's results in GitHub-style UI
+ * Displays a single semester's results in clean table format
  */
 
 class ResultCard {
@@ -31,16 +31,16 @@ class ResultCard {
         const openClass = forceOpen ? 'open' : '';
         
         return `
-            <div class="gh-result-card ${openClass}" id="${cardId}">
-                <div class="gh-result-card-header" id="${headerId}">
-                    <div class="gh-result-title">${name}</div>
-                    <div class="gh-result-stats">
-                        <span class="gh-badge gh-badge-primary">GPA: ${gpa}</span>
-                        <span class="gh-badge gh-badge-secondary">Credits: ${totalCredits}</span>
+            <div class="semester-card ${openClass}" id="${cardId}">
+                <div class="semester-header" id="${headerId}">
+                    <div class="semester-title">${name}</div>
+                    <div style="display: inline-block; border: 2px solid #4CAF50; border-radius: 5px; padding: 5px 10px;">
+                        <span style="font-weight: bold;">GPA: ${gpa}</span>
+                        <span style="margin-left: 10px;">Credits: ${totalCredits}</span>
                     </div>
                 </div>
-                <div class="gh-result-card-body" id="${collapseId}">
-                    <table class="gh-table">
+                <div class="semester-content" id="${collapseId}">
+                    <table class="results-table">
                         <thead>
                             <tr>
                                 <th>Course Code</th>
@@ -110,28 +110,6 @@ class ResultCard {
         if (numGrade >= 2.00) return 'grade-c';
         if (numGrade > 0) return 'grade-d';
         return 'grade-f';
-    }
-    
-    /**
-     * Format grade for display
-     * @param {string|number} grade - Grade value
-     * @returns {string} Formatted grade with letter equivalent
-     */
-    static formatGrade(grade) {
-        const numGrade = parseFloat(grade);
-        
-        if (numGrade === 4.00) return 'A+ (4.00)';
-        if (numGrade === 3.75) return 'A (3.75)';
-        if (numGrade === 3.50) return 'A- (3.50)';
-        if (numGrade === 3.25) return 'B+ (3.25)';
-        if (numGrade === 3.00) return 'B (3.00)';
-        if (numGrade === 2.75) return 'B- (2.75)';
-        if (numGrade === 2.50) return 'C+ (2.50)';
-        if (numGrade === 2.25) return 'C (2.25)';
-        if (numGrade === 2.00) return 'D (2.00)';
-        if (numGrade === 0.00) return 'F (0.00)';
-        
-        return grade;
     }
 }
 
