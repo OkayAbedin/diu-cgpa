@@ -217,8 +217,8 @@ img {
     font-weight: 500;
     border-radius: 6px;
     color: var(--color-text);
-    background-color: #e9ecef; /* Gray background for non-active buttons */
-    border: none;
+    background-color: #ffffff; /* Gray background for non-active buttons */
+    border: 1px solid #ced4da;
     transition: all 0.2s ease;
     text-decoration: none; /* Remove underline */
     cursor: pointer;
@@ -226,7 +226,7 @@ img {
 
 .gh-nav .gh-btn:hover {
     background-color: #dee2e6;
-    transform: translateY(-2px);
+    transform: translateY(-5px);
     text-decoration: none; /* Ensure no underline on hover */
 }
 
@@ -2615,6 +2615,8 @@ textarea::placeholder {
 .theme-toggle-btn:active, .theme-toggle-btn:focus {
     background-color: transparent !important;
     box-shadow: none;
+    border: none;
+    outline: none;
 }
 
 [data-theme="dark"] .theme-toggle-btn {
