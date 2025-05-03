@@ -803,6 +803,8 @@ textarea::placeholder {
     border-left: 4px solid #f9c513;
     display: flex;
     align-items: flex-start;
+    transition: visibility 0s linear 0.5s, opacity 0.5s linear;
+    opacity: 0;
 }
 
 .gh-snackbar-icon {
@@ -816,9 +818,58 @@ textarea::placeholder {
     font-weight: 600;
 }
 
+.gh-snackbar-content {
+    flex: 1;
+}
+
 .gh-snackbar.show {
     visibility: visible;
-    animation: fadein 0.5s, fadeout 0.5s 5s;
+    opacity: 1;
+    transition-delay: 0s;
+}
+
+.gh-snackbar-close {
+    color: var(--color-text-secondary);
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    padding: 0 var(--spacing-sm);
+    font-size: 16px;
+    align-self: flex-start;
+    transition: color 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-left: var(--spacing-sm);
+}
+
+.gh-snackbar-close:hover {
+    color: var(--color-text);
+}
+
+/* Different types of snackbars */
+.gh-snackbar.warning {
+    border-left-color: var(--color-alert-warning-border);
+}
+
+.gh-snackbar.warning .gh-snackbar-icon {
+    color: var(--color-alert-warning-border);
+}
+
+.gh-snackbar.error {
+    border-left-color: var(--color-btn-danger-bg);
+}
+
+.gh-snackbar.error .gh-snackbar-icon {
+    color: var(--color-btn-danger-bg);
+}
+
+.gh-snackbar.success {
+    border-left-color: var(--color-success);
+}
+
+.gh-snackbar.success .gh-snackbar-icon {
+    color: var(--color-success);
 }
 
 @keyframes fadein {

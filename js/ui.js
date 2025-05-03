@@ -319,6 +319,22 @@ class UiController {
                 await this.loadSemesterList();
             }
             
+            // Record start time for performance monitoring
+            const apiStartTime = performance.now();
+            // Set up slow response detection
+            const slowResponseThreshold = 5000; // 5 seconds
+            let slowResponseDetected = false;
+            
+            // Set up interval to check if API is responding slowly
+            const slowCheckInterval = setInterval(() => {
+                const currentTime = performance.now();
+                const elapsedTime = (currentTime - apiStartTime) / 1000;
+                if (elapsedTime > slowResponseThreshold / 1000 && !slowResponseDetected) {
+                    slowResponseDetected = true;
+                    this.showSlowApiWarning(elapsedTime);
+                }
+            }, 1000);
+            
             // Load student info
             try {
                 this.studentInfo = await this.apiService.getStudentInfo(studentId);
@@ -342,6 +358,9 @@ class UiController {
                 console.error('Error loading semester results:', error);
                 throw new Error('Failed to load semester results. The student ID may be incorrect or there might be a connection issue.');
             }
+            
+            // Clear slow response check interval
+            clearInterval(slowCheckInterval);
             
             // Process and display results
             this.displayResults();
@@ -551,7 +570,7 @@ class UiController {
         if (!snackbar) {
             snackbar = document.createElement('div');
             snackbar.id = 'missing-semesters-snackbar';
-            snackbar.className = 'gh-snackbar';
+            snackbar.className = 'gh-snackbar warning';
             document.body.appendChild(snackbar);
         }
         
@@ -566,15 +585,21 @@ class UiController {
                 <p>Some semester results appear to be missing: <strong>${semesterNames}</strong></p>
                 <p>Your CGPA calculation may be incomplete. This could be due to server issues or missing data.</p>
             </div>
+            <button class="gh-snackbar-close" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
         `;
         
-        // Show the snackbar and set it to hide after 6 seconds
-        snackbar.classList.add('show');
+        // Add event listener to close button
+        const closeButton = snackbar.querySelector('.gh-snackbar-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                snackbar.classList.remove('show');
+            });
+        }
         
-        // Remove the show class after 6 seconds (animation duration + display time)
-        setTimeout(() => {
-            snackbar.classList.remove('show');
-        }, 6000);
+        // Show the snackbar
+        snackbar.classList.add('show');
     }
     
     /**
@@ -1061,6 +1086,20 @@ class UiController {
             // Create a global variable to track the start time
             window.fetchStartTime = performance.now();
             
+            // Set up slow response detection
+            const slowResponseThreshold = 5000; // 5 seconds
+            let slowResponseDetected = false;
+            
+            // Set up interval to check if API is responding slowly
+            const slowCheckInterval = setInterval(() => {
+                const currentTime = performance.now();
+                const elapsedTime = (currentTime - window.fetchStartTime) / 1000;
+                if (elapsedTime > slowResponseThreshold / 1000 && !slowResponseDetected) {
+                    slowResponseDetected = true;
+                    this.showSlowApiWarning(elapsedTime);
+                }
+            }, 1000);
+            
             // Create and append the timer display
             const timerDisplay = document.createElement('div');
             timerDisplay.id = 'advanced-fetch-timer';
@@ -1173,6 +1212,9 @@ class UiController {
                     resultsContainer.appendChild(newTimerDisplay);
                 }
             );
+            
+            // Clear slow response check interval
+            clearInterval(slowCheckInterval);
             
             // Store results for export
             this.advancedFetchResults = results;
@@ -1912,6 +1954,47 @@ class UiController {
         
         // Show export button
         Helpers.showElement(document.getElementById('export-results-btn'));
+    }
+
+    /**
+     * Show warning for slow API response
+     * @param {number} elapsedTime - Time elapsed in seconds
+     */
+    showSlowApiWarning(elapsedTime) {
+        // Create snackbar if it doesn't exist
+        let snackbar = document.getElementById('slow-api-snackbar');
+        if (!snackbar) {
+            snackbar = document.createElement('div');
+            snackbar.id = 'slow-api-snackbar';
+            snackbar.className = 'gh-snackbar warning';
+            document.body.appendChild(snackbar);
+        }
+        
+        // Create warning message
+        snackbar.innerHTML = `
+            <div class="gh-snackbar-icon">
+                <i class="fas fa-exclamation-triangle"></i>
+            </div>
+            <div class="gh-snackbar-content">
+                <h4>Slow Server Response</h4>
+                <p>The server is responding slowly (${elapsedTime.toFixed(1)}s). This might be due to network issues or server load.</p>
+                <p>Please be patient while we fetch your results.</p>
+            </div>
+            <button class="gh-snackbar-close" title="Close">
+                <i class="fas fa-times"></i>
+            </button>
+        `;
+        
+        // Add event listener to close button
+        const closeButton = snackbar.querySelector('.gh-snackbar-close');
+        if (closeButton) {
+            closeButton.addEventListener('click', () => {
+                snackbar.classList.remove('show');
+            });
+        }
+        
+        // Show the snackbar
+        snackbar.classList.add('show');
     }
 }
 
