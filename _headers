@@ -1,0 +1,10 @@
+/sitemap.xml
+  Content-Type: application/xml
+  X-Content-Type-Options: nosniff
+  Access-Control-Allow-Origin: *
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: DENY
+  X-XSS-Protection: 1; mode=block
+  Referrer-Policy: strict-origin-when-cross-origin
