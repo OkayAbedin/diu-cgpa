@@ -1,4 +1,4 @@
-# DIU CGPA
+# DIU CGPA Calculator
 
 A modern web application designed specifically for Daffodil International University students to track, calculate, and analyze their academic performance.
 
