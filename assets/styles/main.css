@@ -1687,12 +1687,14 @@ textarea::placeholder {
     width: 180px;
     height: 180px;
     border-radius: 50%;
-    background: linear-gradient(to right, #0056b3, #007bff);
     display: flex;
     align-items: center;
     justify-content: center;
     position: relative;
     box-shadow: 0 0 20px rgba(0, 123, 255, 0.3);
+    /* Default variables for dynamic styling */
+    --cgpa-percentage: 0%;
+    --cgpa-color: #007bff;
 }
 
 .cgpa-circle::before {
@@ -1702,14 +1704,15 @@ textarea::placeholder {
     height: 160px;
     border-radius: 50%;
     background-color: var(--color-box-bg);
+    z-index: 1;
 }
 
 .cgpa-value {
     position: relative;
     font-size: 48px;
     font-weight: 700;
-    color: #007bff;
-    z-index: 1;
+    color: var(--cgpa-color);
+    z-index: 2;
 }
 
 .student-details {

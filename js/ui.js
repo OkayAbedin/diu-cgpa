@@ -420,6 +420,9 @@ class UiController {
         const cgpaValueElement = document.querySelector('.cgpa-value');
         if (cgpaValueElement) {
             cgpaValueElement.textContent = cgpa;
+            
+            // Update the circular display to reflect the CGPA value
+            this.updateCircularCgpaDisplay(parseFloat(cgpa));
         }
         
         // Process semester data
@@ -441,111 +444,48 @@ class UiController {
     }
     
     /**
-     * Create CGPA chart using Chart.js
-     * @param {Array} semesterData - Array of semester data objects
+     * Update the circular CGPA display based on CGPA value
+     * @param {number} cgpa - The CGPA value
      */
-    createCgpaChart(semesterData) {
-        if (!semesterData || semesterData.length === 0 || !this.cgpaChartCanvas) return;
+    updateCircularCgpaDisplay(cgpa) {
+        const cgpaCircle = document.querySelector('.cgpa-circle');
+        if (!cgpaCircle) return;
         
-        // Sort semesters chronologically
-        const sortedSemesters = [...semesterData].sort((a, b) => a.year - b.year || a.term - b.term);
+        // Calculate percentage for the circle fill (0-100%)
+        const percentage = (cgpa / 4) * 100;
         
-        // Prepare data for chart
-        const labels = sortedSemesters.map(semester => semester.name);
-        const cgpaData = sortedSemesters.map(semester => semester.gpa);
-        
-        // Calculate cumulative GPA over time
-        const cumulativeGpa = [];
-        let totalPoints = 0;
-        let totalCredits = 0;
-        
-        sortedSemesters.forEach((semester, index) => {
-            const semesterPoints = semester.gpa * semester.totalCredits;
-            totalPoints += semesterPoints;
-            totalCredits += semester.totalCredits;
-            cumulativeGpa.push((totalPoints / totalCredits).toFixed(2));
-        });
-        
-        // Create chart
-        const ctx = this.cgpaChartCanvas.getContext('2d');
-        
-        // Destroy existing chart if it exists
-        if (this.cgpaChart) {
-            this.cgpaChart.destroy();
+        // Determine color based on CGPA value
+        let color;
+        if (cgpa >= 3.75) { // A+ to A
+            color = '#4CAF50'; // Green
+        } else if (cgpa >= 3.50) { // A-
+            color = '#8BC34A'; // Light Green
+        } else if (cgpa >= 3.25) { // B+
+            color = '#CDDC39'; // Lime
+        } else if (cgpa >= 3.00) { // B
+            color = '#FFEB3B'; // Yellow
+        } else if (cgpa >= 2.75) { // B-
+            color = '#FFC107'; // Amber
+        } else if (cgpa >= 2.50) { // C+
+            color = '#FF9800'; // Orange
+        } else if (cgpa >= 2.00) { // C to D
+            color = '#FF5722'; // Deep Orange
+        } else { // F
+            color = '#F44336'; // Red
         }
         
-        this.cgpaChart = new Chart(ctx, {
-            type: 'line',
-            data: {
-                labels: labels,
-                datasets: [
-                    {
-                        label: 'Semester GPA',
-                        data: cgpaData,
-                        backgroundColor: 'rgba(56, 178, 172, 0.2)', // Updated color
-                        borderColor: 'var(--color-success)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'var(--color-success)',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        tension: 0.1
-                    },
-                    {
-                        label: 'Cumulative GPA',
-                        data: cumulativeGpa,
-                        backgroundColor: 'rgba(67, 97, 238, 0.2)', // Updated color
-                        borderColor: 'var(--color-link)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'var(--color-link)',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        tension: 0.1
-                    }
-                ]
-            },
-            options: {
-                responsive: true,
-                maintainAspectRatio: false,
-                scales: {
-                    y: {
-                        beginAtZero: false,
-                        min: 0,
-                        max: 4,
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    },
-                    x: {
-                        reverse: true, // Reverse the X axis as requested
-                        grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
-                        }
-                    }
-                },
-                plugins: {
-                    tooltip: {
-                        backgroundColor: 'rgba(36, 41, 46, 0.9)',
-                        titleColor: '#ffffff',
-                        bodyColor: '#ffffff',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
-                        borderWidth: 1,
-                        padding: 10,
-                        callbacks: {
-                            label: function(context) {
-                                return `${context.dataset.label}: ${context.raw} / 4.00`;
-                            }
-                        }
-                    },
-                    legend: {
-                        labels: {
-                            boxWidth: 12,
-                            usePointStyle: true,
-                            pointStyle: 'circle'
-                        }
-                    }
-                }
-            }
-        });
+        // Update circle style with CSS variables
+        cgpaCircle.style.setProperty('--cgpa-percentage', `${percentage}%`);
+        cgpaCircle.style.setProperty('--cgpa-color', color);
+        
+        // Apply the dynamic styling using conic-gradient for circle completion
+        cgpaCircle.style.background = `conic-gradient(var(--cgpa-color) 0% var(--cgpa-percentage), #e0e0e0 var(--cgpa-percentage) 100%)`;
+        
+        // Update text color to match the circle
+        const cgpaValue = document.querySelector('.cgpa-value');
+        if (cgpaValue) {
+            cgpaValue.style.color = color;
+        }
     }
     
     /**
@@ -1995,6 +1935,114 @@ class UiController {
         
         // Show the snackbar
         snackbar.classList.add('show');
+    }
+
+    /**
+     * Create CGPA chart using Chart.js
+     * @param {Array} semesterData - Array of semester data objects
+     */
+    createCgpaChart(semesterData) {
+        if (!semesterData || semesterData.length === 0 || !this.cgpaChartCanvas) return;
+        
+        // Sort semesters chronologically
+        const sortedSemesters = [...semesterData].sort((a, b) => a.year - b.year || a.term - b.term);
+        
+        // Prepare data for chart
+        const labels = sortedSemesters.map(semester => semester.name);
+        const cgpaData = sortedSemesters.map(semester => semester.gpa);
+        
+        // Calculate cumulative GPA over time
+        const cumulativeGpa = [];
+        let totalPoints = 0;
+        let totalCredits = 0;
+        
+        sortedSemesters.forEach((semester, index) => {
+            const semesterPoints = semester.gpa * semester.totalCredits;
+            totalPoints += semesterPoints;
+            totalCredits += semester.totalCredits;
+            cumulativeGpa.push((totalPoints / totalCredits).toFixed(2));
+        });
+        
+        // Create chart
+        const ctx = this.cgpaChartCanvas.getContext('2d');
+        
+        // Destroy existing chart if it exists
+        if (this.cgpaChart) {
+            this.cgpaChart.destroy();
+        }
+        
+        this.cgpaChart = new Chart(ctx, {
+            type: 'line',
+            data: {
+                labels: labels,
+                datasets: [
+                    {
+                        label: 'Semester GPA',
+                        data: cgpaData,
+                        backgroundColor: 'rgba(56, 178, 172, 0.2)', // Updated color
+                        borderColor: 'var(--color-success)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'var(--color-success)',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.1
+                    },
+                    {
+                        label: 'Cumulative GPA',
+                        data: cumulativeGpa,
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)', // Updated color
+                        borderColor: 'var(--color-link)',
+                        borderWidth: 2,
+                        pointBackgroundColor: 'var(--color-link)',
+                        pointRadius: 5,
+                        pointHoverRadius: 7,
+                        tension: 0.1
+                    }
+                ]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: false,
+                        min: 0,
+                        max: 4,
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    },
+                    x: {
+                        reverse: true, // Reverse the X axis as requested
+                        grid: {
+                            color: 'rgba(0, 0, 0, 0.05)'
+                        }
+                    }
+                },
+                plugins: {
+                    tooltip: {
+                        backgroundColor: 'rgba(36, 41, 46, 0.9)',
+                        titleColor: '#ffffff',
+                        bodyColor: '#ffffff',
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        padding: 10,
+                        callbacks: {
+                            label: function(context) {
+                                return `${context.dataset.label}: ${context.raw} / 4.00`;
+                            }
+                        }
+                    },
+                    legend: {
+                        labels: {
+                            boxWidth: 12,
+                            usePointStyle: true,
+                            pointStyle: 'circle'
+                        }
+                    }
+                }
+            }
+        });
     }
 }
 
