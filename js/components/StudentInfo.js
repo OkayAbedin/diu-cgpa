@@ -36,6 +36,10 @@ class StudentInfo {
                     <h2 class="student-name">${studentName}</h2>
                     <p class="student-id">${studentId}</p>
                 </div>
+                <div class="department-display">
+                    <div class="department-value">${department}</div>
+                    <div class="department-label">Department</div>
+                </div>
                 <div class="student-stats">
                     <div class="stat-item">
                         <div class="stat-value" id="total-semesters">-</div>
@@ -48,10 +52,6 @@ class StudentInfo {
                     <div class="stat-item">
                         <div class="stat-value" id="total-credits">-</div>
                         <div class="stat-label">Credits</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">${department}</div>
-                        <div class="stat-label">Department</div>
                     </div>
                     <div class="stat-item">
                         <div class="stat-value">FSIT</div>

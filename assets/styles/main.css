@@ -1311,7 +1311,7 @@ textarea::placeholder {
 
 .advanced-result-id {
     font-weight: 600;
-    margin-bottom: var(--spacing-xs);
+    margin-bottom: var (--spacing-xs);
 }
 
 .advanced-result-cgpa {
@@ -2492,5 +2492,52 @@ textarea::placeholder {
         width: 36px;
         height: 36px;
         font-size: 14px;
+    }
+}
+
+/* Department display styling */
+.department-display {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    margin: var(--spacing-md) 0;
+    padding: var(--spacing-sm) var(--spacing-md);
+    background-color: var(--color-box-header);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+}
+
+.department-value {
+    font-size: 20px;
+    font-weight: 600;
+    color: var(--color-link);
+}
+
+.department-label {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-top: var(--spacing-xs);
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .department-display {
+    background-color: var(--color-box-header);
+}
+
+[data-theme="dark"] .department-value {
+    color: var(--color-chart-1);
+}
+
+/* Responsive styling */
+@media (max-width: 768px) {
+    .department-value {
+        font-size: 18px;
+    }
+}
+
+@media (max-width: 576px) {
+    .department-display {
+        padding: var(--spacing-xs) var(--spacing-sm);
     }
 }
