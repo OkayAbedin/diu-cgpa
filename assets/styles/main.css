@@ -266,27 +266,42 @@ img {
 }
 
 [data-theme="dark"] .gh-nav .gh-btn {
-    background-color: #343a40;
-    color: #e9ecef;
+    background-color: #2d3748;
+    color: #e2e8f0;
+    border: 1px solid #4a5568;
 }
 
 [data-theme="dark"] .gh-nav .gh-btn:hover {
-    background-color: #495057;
+    background-color: #4a5568;
+    border-color: #63b3ed;
 }
 
 [data-theme="dark"] .gh-nav .gh-btn-primary {
-    background-color: #0d6efd;
+    background: linear-gradient(to right, var(--color-chart-1), #4fd1c5);
     color: white;
+    border: none;
+}
+
+[data-theme="dark"] .gh-nav .gh-btn-primary:hover {
+    background: linear-gradient(to right, #3182ce, #38b2ac);
+    box-shadow: 0 0 15px rgba(49, 130, 206, 0.4);
+}
+
+[data-theme="dark"] .gh-nav .gh-btn.active {
+    background-color: #4299e1;
+    color: white;
+    box-shadow: 0 0 0 2px rgba(99, 179, 237, 0.4);
 }
 
 [data-theme="dark"] .gh-nav .fork-btn {
-    background-color: #212529;
-    border: 1px solid #495057;
-    color: #e9ecef;
+    background-color: #2d3748;
+    border: 1px solid #4a5568;
+    color: #e2e8f0;
 }
 
 [data-theme="dark"] .gh-nav .fork-btn:hover {
-    background-color: #343a40;
+    background-color: #4a5568;
+    border-color: #63b3ed;
 }
 
 /* Responsive header adjustments */
@@ -2591,57 +2606,59 @@ textarea::placeholder {
 
 /* Theme toggle button styling */
 .theme-toggle-btn {
-    border-radius: 50%;
+    background-color: transparent !important;
+    border: none !important;
     width: 40px;
     height: 40px;
     padding: 0;
+    margin: 0 5px;
     display: inline-flex;
     align-items: center;
     justify-content: center;
-    transition: all 0.3s ease;
-    background-color: transparent !important;
-    border: none;
-    box-shadow: none;
-    color: var(--color-text);
-    font-size: 16px; 
+    position: relative;
+    box-shadow: none !important;
+    outline: none !important;
 }
 
+.theme-toggle-btn i {
+    font-size: 22px;
+    color: var(--color-text);
+    transition: transform 0.3s ease, color 0.3s ease;
+}
+
+/* Remove hover background effect but keep icon color change */
 .theme-toggle-btn:hover {
     background-color: transparent !important;
-    transform: rotate(15deg);
+    transform: none !important;
+    box-shadow: none !important;
+}
+
+.theme-toggle-btn:hover i {
     color: var(--color-btn-primary-bg);
 }
 
-.theme-toggle-btn:active, .theme-toggle-btn:focus {
+/* Remove all button styling when active/focus */
+.theme-toggle-btn:active, 
+.theme-toggle-btn:focus {
     background-color: transparent !important;
-    box-shadow: none;
-    border: none;
-    outline: none;
+    box-shadow: none !important;
+    border: none !important;
+    outline: none !important;
 }
 
-[data-theme="dark"] .theme-toggle-btn {
-    color: #ffd700; /* Gold color for sun icon in dark mode */
-}
+/* Adjust icon color for dark mode */
 
-[data-theme="dark"] .theme-toggle-btn:hover {
-    background-color: transparent !important;
-}
 
-/* Make it consistent with other icons in the header nav */
+/* Responsive adjustments for the icon */
 @media (max-width: 768px) {
-    .theme-toggle-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 18px;
+    .theme-toggle-btn i {
+        font-size: 24px;
     }
 }
 
-/* Make it consistent with other icons in the header nav */
-@media (max-width: 768px) {
-    .theme-toggle-btn {
-        width: 36px;
-        height: 36px;
-        font-size: 14px;
+@media (max-width: 576px) {
+    .theme-toggle-btn i {
+        font-size: 22px;
     }
 }
 
