@@ -4,6 +4,16 @@
 [dev]
   functions = "netlify/functions"
 
+# Special redirect for sitemap.xml to ensure it's properly served
+[[redirects]]
+  from = "/sitemap.xml"
+  to = "/sitemap.xml"
+  status = 200
+  force = true
+  [redirects.headers]
+    Content-Type = "application/xml"
+    X-Content-Type-Options = "nosniff"
+
 [[redirects]]
   from = "/*"
   to = "/index.html"
