@@ -89,7 +89,7 @@ The project is configured for deployment on Netlify with serverless functions fo
 
 MIT License
 
-## 🙏 Acknowledgments
+## 🙏 About
 
 - Made with ❤️ by [Minhaz](https://bio.link/minhazabedin)
 - Version 2.0.0 | Last Updated: May 2025
