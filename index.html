@@ -159,6 +159,16 @@
                         <section id="student-info" class="gh-box hidden"></section>
                         
                         <section id="results-container" class="hidden">
+                            <div class="gh-chart-box" id="cgpa-progress-container">
+                                <div class="gh-chart-header">
+                                    <h3>CGPA Progress</h3>
+                                    <p class="chart-description">Track your academic performance over time</p>
+                                </div>
+                                <div class="gh-chart-body">
+                                    <canvas id="cgpa-chart"></canvas>
+                                </div>
+                            </div>
+                            
                             <div class="gh-section-title">
                                 <h3>Semester Results</h3>
                                 <div class="gh-section-actions">
@@ -171,9 +181,6 @@
                             <div style="display: none;">
                                 <div id="total-cgpa"></div>
                                 <div id="total-credits"></div>
-                                <div class="gh-chart-body">
-                                    <canvas id="cgpa-chart"></canvas>
-                                </div>
                             </div>
                             <div id="semester-results" class="gh-list"></div>
                         </section>

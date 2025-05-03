@@ -1944,23 +1944,73 @@ class UiController {
     createCgpaChart(semesterData) {
         if (!semesterData || semesterData.length === 0 || !this.cgpaChartCanvas) return;
         
-        // Sort semesters chronologically
-        const sortedSemesters = [...semesterData].sort((a, b) => a.year - b.year || a.term - b.term);
+        // Show chart container
+        const chartContainer = document.getElementById('cgpa-progress-container');
+        if (chartContainer) {
+            Helpers.showElement(chartContainer);
+        }
+        
+        // First extract year and term from semester name if they exist
+        semesterData.forEach(semester => {
+            if (!semester.year || !semester.term) {
+                const parts = semester.name.split(' ');
+                // Try to extract term (Fall, Spring, Summer) and year from semester name
+                if (parts.length >= 2) {
+                    const termMap = { 'Fall': 3, 'Spring': 1, 'Summer': 2 };
+                    semester.extractedTerm = termMap[parts[0]] || 0;
+                    semester.extractedYear = parseInt(parts[parts.length - 1]) || 0;
+                }
+            }
+        });
+        
+        // Sort semesters chronologically (oldest first) using either explicit year/term or extracted values
+        const sortedSemesters = [...semesterData].sort((a, b) => {
+            const aYear = a.year || a.extractedYear || 0;
+            const bYear = b.year || b.extractedYear || 0;
+            
+            if (aYear !== bYear) {
+                return aYear - bYear; // Sort by year first
+            }
+            
+            const aTerm = a.term || a.extractedTerm || 0;
+            const bTerm = b.term || b.extractedTerm || 0;
+            return aTerm - bTerm; // Then by term (Spring=1, Summer=2, Fall=3)
+        });
         
         // Prepare data for chart
         const labels = sortedSemesters.map(semester => semester.name);
         const cgpaData = sortedSemesters.map(semester => semester.gpa);
         
-        // Calculate cumulative GPA over time
+        // This array will store the CGPA value at each semester point
         const cumulativeGpa = [];
-        let totalPoints = 0;
+        
+        // Running totals for CGPA calculation
+        let totalWeightedPoints = 0;
         let totalCredits = 0;
         
+        // Calculate CGPA for each semester point (cumulative)
         sortedSemesters.forEach((semester, index) => {
-            const semesterPoints = semester.gpa * semester.totalCredits;
-            totalPoints += semesterPoints;
-            totalCredits += semester.totalCredits;
-            cumulativeGpa.push((totalPoints / totalCredits).toFixed(2));
+            // Get this semester's total points and credits
+            let semesterPoints = 0;
+            let semesterCredits = 0;
+            
+            semester.courses.forEach(course => {
+                const credit = parseFloat(course.totalCredit);
+                const gradePoint = parseFloat(course.pointEquivalent);
+                
+                if (!isNaN(credit) && !isNaN(gradePoint) && credit > 0) {
+                    semesterPoints += credit * gradePoint;
+                    semesterCredits += credit;
+                }
+            });
+            
+            // Add this semester's points and credits to the running total
+            totalWeightedPoints += semesterPoints;
+            totalCredits += semesterCredits;
+            
+            // Calculate the CGPA up to this semester
+            const cgpaUpToThisSemester = totalCredits > 0 ? (totalWeightedPoints / totalCredits).toFixed(2) : '0.00';
+            cumulativeGpa.push(cgpaUpToThisSemester);
         });
         
         // Create chart
@@ -1971,6 +2021,7 @@ class UiController {
             this.cgpaChart.destroy();
         }
         
+        // Create beautiful chart
         this.cgpaChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -1979,24 +2030,30 @@ class UiController {
                     {
                         label: 'Semester GPA',
                         data: cgpaData,
-                        backgroundColor: 'rgba(56, 178, 172, 0.2)', // Updated color
-                        borderColor: 'var(--color-success)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'var(--color-success)',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        tension: 0.1
+                        backgroundColor: 'transparent', // Remove area fill
+                        borderColor: '#7be280', // Bright green for semester GPA
+                        borderWidth: 3,
+                        pointBackgroundColor: '#7be280',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBorderWidth: 2,
+                        pointBorderColor: 'white',
+                        tension: 0.2,
+                        fill: false // Disable area fill
                     },
                     {
                         label: 'Cumulative GPA',
                         data: cumulativeGpa,
-                        backgroundColor: 'rgba(67, 97, 238, 0.2)', // Updated color
-                        borderColor: 'var(--color-link)',
-                        borderWidth: 2,
-                        pointBackgroundColor: 'var(--color-link)',
-                        pointRadius: 5,
-                        pointHoverRadius: 7,
-                        tension: 0.1
+                        backgroundColor: 'transparent', // Remove area fill
+                        borderColor: '#4361EE', // Blue for cumulative GPA
+                        borderWidth: 3,
+                        pointBackgroundColor: '#4361EE',
+                        pointRadius: 6,
+                        pointHoverRadius: 8,
+                        pointBorderWidth: 2,
+                        pointBorderColor: 'white',
+                        tension: 0.2,
+                        fill: false // Disable area fill
                     }
                 ]
             },
@@ -2006,38 +2063,144 @@ class UiController {
                 scales: {
                     y: {
                         beginAtZero: false,
-                        min: 0,
-                        max: 4,
+                        // Dynamically set min and max based on the data
+                        min: function(context) {
+                            // Find the minimum value in all datasets
+                            const minGpa = Math.min(...cgpaData.map(v => parseFloat(v)), ...cumulativeGpa.map(v => parseFloat(v)));
+                            // Set the minimum to be slightly lower than the lowest value
+                            // but never below 0 and with appropriate padding
+                            return Math.max(0, Math.floor(minGpa * 10) / 10 - 0.2);
+                        },
+                        max: function(context) {
+                            // Find the maximum value in all datasets
+                            const maxGpa = Math.max(...cgpaData.map(v => parseFloat(v)), ...cumulativeGpa.map(v => parseFloat(v)));
+                            // Set the maximum to be slightly higher than the highest value
+                            // but never above 4.0 (the maximum possible GPA)
+                            return Math.min(4.0, Math.ceil(maxGpa * 10) / 10 + 0.1);
+                        },
+                        // Force Y-axis to have same scale for both datasets
+                        offset: false,
+                        // Ensure Y-axis is not stacked
+                        stacked: false,
+                        // Ensure ticks are aligned
+                        alignToPixels: true,
+                        // Ensure same scale for all datasets
+                        ticks: {
+                            font: {
+                                weight: 'bold'
+                            },
+                            callback: function(value) {
+                                return value.toFixed(1);
+                            },
+                            // Ensure consistent spacing
+                            stepSize: 0.1
+                        },
+                        // Ensure grid lines are consistent
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: 'rgba(0, 0, 0, 0.05)',
+                            drawTicks: true,
+                            tickLength: 10
+                        },
+                        title: {
+                            display: true,
+                            text: 'GPA (out of 4.00)',
+                            font: {
+                                size: 14
+                            }
                         }
                     },
                     x: {
-                        reverse: true, // Reverse the X axis as requested
+                        // Oldest semesters are already on the left due to our sorting
+                        reverse: false,
                         grid: {
                             color: 'rgba(0, 0, 0, 0.05)'
+                        },
+                        ticks: {
+                            font: {
+                                weight: 'bold'
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Semesters (Oldest to Newest)',
+                            font: {
+                                size: 14
+                            }
                         }
                     }
+                },
+                // Ensure all animations are synchronized
+                animations: {
+                    tension: {
+                        duration: 1000,
+                        easing: 'linear'
+                    }
+                },
+                // Ensure tooltips show same data points
+                interaction: {
+                    mode: 'index',
+                    intersect: false
                 },
                 plugins: {
                     tooltip: {
                         backgroundColor: 'rgba(36, 41, 46, 0.9)',
                         titleColor: '#ffffff',
                         bodyColor: '#ffffff',
-                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderColor: 'rgba(255, 255, 255, 0.2)',
                         borderWidth: 1,
-                        padding: 10,
+                        padding: 12,
+                        cornerRadius: 8,
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
                         callbacks: {
                             label: function(context) {
                                 return `${context.dataset.label}: ${context.raw} / 4.00`;
+                            },
+                            title: function(context) {
+                                const semester = sortedSemesters[context[0].dataIndex];
+                                return `${semester.name} (${semester.totalCredits} Credits)`;
+                            },
+                            afterLabel: function(context) {
+                                if (context.datasetIndex === 0) { // Semester GPA
+                                    const semester = sortedSemesters[context.dataIndex];
+                                    return `Ranking: ${context.raw >= 3.75 ? 'A+' : 
+                                        context.raw >= 3.5 ? 'A' : 
+                                        context.raw >= 3.25 ? 'A-' : 
+                                        context.raw >= 3.0 ? 'B+' : 
+                                        context.raw >= 2.75 ? 'B' : 
+                                        context.raw >= 2.5 ? 'B-' : 
+                                        context.raw >= 2.25 ? 'C+' : 
+                                        context.raw >= 2.0 ? 'C' : 'F'}`;
+                                }
                             }
                         }
                     },
                     legend: {
                         labels: {
-                            boxWidth: 12,
                             usePointStyle: true,
-                            pointStyle: 'circle'
+                            pointStyle: 'circle',
+                            boxWidth: 10,
+                            boxHeight: 10,
+                            padding: 15,
+                            font: {
+                                size: 13
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'CGPA Progress',
+                            font: {
+                                size: 14,
+                                weight: 'bold'
+                            },
+                            padding: {
+                                bottom: 10
+                            }
                         }
                     }
                 }

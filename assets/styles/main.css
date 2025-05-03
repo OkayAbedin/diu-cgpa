@@ -755,6 +755,68 @@ textarea::placeholder {
     height: 300px;
 }
 
+/* CGPA Progress Chart Styles */
+.gh-chart-box {
+    background-color: var(--color-box-bg);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+    margin-bottom: var(--spacing-lg);
+    overflow: hidden;
+    transition: var(--transition-default);
+}
+
+.gh-chart-box:hover {
+    box-shadow: var(--shadow-medium);
+}
+
+.gh-chart-header {
+    padding: var(--spacing-md);
+    border-bottom: 1px solid var(--color-border);
+    background-color: var(--color-box-header);
+}
+
+.gh-chart-header h3 {
+    margin: 0;
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: var(--color-text);
+}
+
+.chart-description {
+    margin-top: 5px;
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+.gh-chart-body {
+    padding: var(--spacing-md);
+    height: 350px;
+    position: relative;
+}
+
+#cgpa-progress-container {
+    position: relative;
+    background: linear-gradient(145deg, var(--color-box-bg), var(--color-box-header));
+}
+
+#cgpa-progress-container .gh-chart-header {
+    background: transparent;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+#cgpa-progress-container .gh-chart-body {
+    padding: var(--spacing-lg);
+}
+
+/* Dark mode support */
+[data-theme="dark"] #cgpa-progress-container {
+    background: linear-gradient(145deg, var(--color-box-bg), rgba(30, 30, 30, 0.5));
+}
+
+[data-theme="dark"] #cgpa-progress-container .gh-chart-header {
+    border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
 /* Alert messages */
 .gh-alert {
     display: flex;
