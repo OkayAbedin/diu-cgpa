@@ -62,7 +62,7 @@ diu-cgpa/
 
 ## 💻 How It Works
 
-This tool communicates with DIU's academic database through a secure API and processes the raw data to provide you with a clean, understandable representation of your academic performance. All calculations follow DIU's official grading policy.
+This tool communicates with DIU's academic database through a secure API and processes the raw data to provide you with a clean, understandable representation of your academic performance. All calculations follow [DIU's official grading policy](https://daffodilvarsity.edu.bd/article/rules-and-regulation).
 
 ## 🔒 Privacy & Security
 

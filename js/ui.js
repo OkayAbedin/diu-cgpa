@@ -1041,7 +1041,7 @@ class UiController {
             Helpers.showElement(document.getElementById('advanced-results-container'));
             
             // Get timeout value and validate it
-            let timeout = parseInt(this.advancedTimeout.value, 10) || 15;
+            let timeout = parseInt(document.getElementById('advanced-timeout').value, 10) || 15;
             // Ensure timeout is within reasonable limits
             if (timeout < 5) timeout = 5;
             if (timeout > 120) timeout = 120;
@@ -1051,26 +1051,35 @@ class UiController {
             // Set custom API options
             this.apiService.setTimeout(timeout);
             
+            // Clear any previous error message
+            Helpers.hideElement(document.getElementById('advanced-error-message'));
+            
             if (this.advancedBaseUrl.value.trim()) {
                 this.apiService.setBaseUrl(this.advancedBaseUrl.value.trim());
             }
             
-            // Start timer
-            const startTime = performance.now();
+            // Create a global variable to track the start time
+            window.fetchStartTime = performance.now();
+            
+            // Create and append the timer display
             const timerDisplay = document.createElement('div');
+            timerDisplay.id = 'advanced-fetch-timer';
             timerDisplay.className = 'timer-display';
             timerDisplay.style.marginTop = '10px';
             timerDisplay.style.fontSize = '14px';
             timerDisplay.style.color = 'var(--color-text-secondary)';
-            timerDisplay.textContent = 'Time elapsed: 0.0 seconds';
-            
-            // Add timer display to results container
+            timerDisplay.textContent = `Time elapsed: 0.0 seconds`;
             resultsContainer.appendChild(timerDisplay);
             
-            // Set up timer update interval
+            // Set up timer update interval that uses the global startTime
             const timerInterval = setInterval(() => {
-                const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(1);
-                timerDisplay.textContent = `Time elapsed: ${elapsedTime} seconds`;
+                if (!window.fetchStartTime) return; // Safety check
+                const currentTime = performance.now();
+                const elapsedTime = ((currentTime - window.fetchStartTime) / 1000).toFixed(1);
+                const timerElement = document.getElementById('advanced-fetch-timer');
+                if (timerElement) {
+                    timerElement.textContent = `Time elapsed: ${elapsedTime} seconds`;
+                }
             }, 100);
             
             let studentIds = [];
@@ -1159,7 +1168,7 @@ class UiController {
                     newTimerDisplay.style.marginTop = '10px';
                     newTimerDisplay.style.fontSize = '14px';
                     newTimerDisplay.style.color = 'var(--color-text-secondary)';
-                    const elapsedTime = ((performance.now() - startTime) / 1000).toFixed(1);
+                    const elapsedTime = ((performance.now() - window.fetchStartTime) / 1000).toFixed(1);
                     newTimerDisplay.textContent = `Time elapsed: ${elapsedTime} seconds`;
                     resultsContainer.appendChild(newTimerDisplay);
                 }
@@ -1171,7 +1180,7 @@ class UiController {
             // Stop timer and store the final time
             clearInterval(timerInterval);
             const fetchEndTime = performance.now();
-            const totalFetchTime = ((fetchEndTime - startTime) / 1000).toFixed(2);
+            const totalFetchTime = ((fetchEndTime - window.fetchStartTime) / 1000).toFixed(2);
             
             // Store the fetch time for display in various places
             this.fetchTimerValue = totalFetchTime;
