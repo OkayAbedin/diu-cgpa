@@ -505,14 +505,14 @@ class UiController {
     showMissingSemestersWarning(missingSemesters) {
         if (!missingSemesters || missingSemesters.length === 0) return;
         
-        // Create snackbar if it doesn't exist
-        let snackbar = document.getElementById('missing-semesters-snackbar');
-        if (!snackbar) {
-            snackbar = document.createElement('div');
-            snackbar.id = 'missing-semesters-snackbar';
-            snackbar.className = 'gh-snackbar warning';
-            document.body.appendChild(snackbar);
-        }
+        // Close all existing snackbars before creating a new one
+        this.closeAllSnackbars();
+        
+        // Create new snackbar
+        let snackbar = document.createElement('div');
+        snackbar.id = 'missing-semesters-snackbar';
+        snackbar.className = 'gh-snackbar warning';
+        document.body.appendChild(snackbar);
         
         // Create warning message
         const semesterNames = missingSemesters.map(sem => sem.name).join(', ');
@@ -1901,14 +1901,14 @@ class UiController {
      * @param {number} elapsedTime - Time elapsed in seconds
      */
     showSlowApiWarning(elapsedTime) {
-        // Create snackbar if it doesn't exist
-        let snackbar = document.getElementById('slow-api-snackbar');
-        if (!snackbar) {
-            snackbar = document.createElement('div');
-            snackbar.id = 'slow-api-snackbar';
-            snackbar.className = 'gh-snackbar warning';
-            document.body.appendChild(snackbar);
-        }
+        // Close all existing snackbars before creating a new one
+        this.closeAllSnackbars();
+        
+        // Create new snackbar
+        let snackbar = document.createElement('div');
+        snackbar.id = 'slow-api-snackbar';
+        snackbar.className = 'gh-snackbar warning';
+        document.body.appendChild(snackbar);
         
         // Create warning message
         snackbar.innerHTML = `
@@ -2041,6 +2041,23 @@ class UiController {
                         }
                     }
                 }
+            }
+        });
+    }
+
+    /**
+     * Close all active snackbars
+     * Ensures no multiple snackbars appear at the same time
+     */
+    closeAllSnackbars() {
+        // List of all snackbar IDs used in the application
+        const snackbarIds = ['missing-semesters-snackbar', 'slow-api-snackbar'];
+        
+        // Remove each snackbar if it exists
+        snackbarIds.forEach(id => {
+            const snackbar = document.getElementById(id);
+            if (snackbar) {
+                snackbar.remove();
             }
         });
     }
