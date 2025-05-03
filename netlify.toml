@@ -11,3 +11,35 @@
 
 [[plugins]]
   package = "@netlify/plugin-functions-install-core"
+
+# Headers for better security and performance
+[[headers]]
+  for = "/*"
+  [headers.values]
+    X-Content-Type-Options = "nosniff"
+    X-Frame-Options = "DENY"
+    X-XSS-Protection = "1; mode=block"
+    Referrer-Policy = "strict-origin-when-cross-origin"
+    Content-Security-Policy = "default-src 'self' *.cloudflare.com *.jsdelivr.net *.bootstrap.com cdn.jsdelivr.net *.fontawesome.com fonts.googleapis.com cdnjs.cloudflare.com *.netlify.app *.diu.edu.bd 'unsafe-inline'; img-src 'self' data: *.netlify.app; connect-src 'self' *.netlify.app *.diu.edu.bd;"
+    
+# Cache control for better performance and SEO
+[[headers]]
+  for = "*.js"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.css"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "*.svg"
+  [headers.values]
+    Cache-Control = "public, max-age=31536000, immutable"
+
+[[headers]]
+  for = "/sitemap.xml"
+  [headers.values]
+    Content-Type = "application/xml"
+    Cache-Control = "public, max-age=86400"

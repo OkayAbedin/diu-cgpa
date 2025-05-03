@@ -113,6 +113,38 @@ body {
     transition: background-color 0.3s ease, color 0.3s ease;
 }
 
+/* SEO Performance Optimizations */
+img {
+    max-width: 100%;
+    height: auto;
+    /* Add loading="lazy" attribute to all images in HTML */
+}
+
+/* Add content-visibility for better rendering performance */
+.gh-main, .tab-pane:not(.active), .semester-card, .gh-result-card {
+    content-visibility: auto;
+    contain-intrinsic-size: 1px 5000px; /* Approximate size */
+}
+
+/* Preload critical fonts for better performance */
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 400;
+    font-display: swap; /* Important for SEO */
+    src: local('Inter Regular'), local('Inter-Regular'),
+         url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2) format('woff2');
+}
+
+@font-face {
+    font-family: 'Inter';
+    font-style: normal;
+    font-weight: 700;
+    font-display: swap;
+    src: local('Inter Bold'), local('Inter-Bold'),
+         url(https://fonts.gstatic.com/s/inter/v3/UcC73FwrK3iLTeHuS_fvQtMwCp50KnMa1ZL7.woff2) format('woff2');
+}
+
 /* Dashboard Layout */
 .app-container {
     display: flex;
