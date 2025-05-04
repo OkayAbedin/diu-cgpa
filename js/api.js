@@ -274,7 +274,7 @@ class ApiService {
      * Fetches semester results for a student
      * @param {string} semesterId - The semester ID
      * @param {string} studentId - The student ID
-     * @returns {Promise<Array>} Array of course results for the semester
+     * @returns {Promise<Object>} Object with results and status information
      */
     async getSemesterResults(semesterId, studentId) {
         try {
@@ -285,24 +285,50 @@ class ApiService {
                 }
             });
             
+            // Get the status code for checking if this is a valid request
+            const statusCode = response.status;
+            
             if (!response.ok) {
-                throw new Error(`Failed to fetch results for semester ${semesterId}: ${response.status} ${response.statusText}`);
+                console.warn(`Failed to fetch results for semester ${semesterId}: ${response.status} ${response.statusText}`);
+                return {
+                    data: [],
+                    statusCode,
+                    isMissing: true, // This is a missing semester (HTTP error)
+                    isValid: false
+                };
             }
             
             // Parse the response
             const data = await response.json();
             
             // Validate the data
-            if (!data || !Array.isArray(data)) {
-                console.warn(`Received invalid data for semester ${semesterId}:`, data);
-                return [];
+            const isEmpty = !data || !Array.isArray(data) || data.length === 0;
+            
+            if (isEmpty) {
+                console.log(`Received empty data for semester ${semesterId} with status code ${statusCode}`);
+                return {
+                    data: [],
+                    statusCode,
+                    isMissing: false, // Not missing, just invalid/empty
+                    isValid: false
+                };
             }
             
-            return data;
+            return {
+                data,
+                statusCode,
+                isMissing: false,
+                isValid: true
+            };
         } catch (error) {
             console.error(`Error fetching semester ${semesterId} results:`, error);
-            // Return empty array instead of throwing to handle gracefully
-            return [];
+            // Return object with error status instead of empty array
+            return {
+                data: [],
+                statusCode: 0, // Unknown status code due to exception
+                isMissing: true, // Consider it missing due to error
+                isValid: false
+            };
         }
     }
 
@@ -362,8 +388,8 @@ class ApiService {
                 console.log(`Fetching results for semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
                 const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
                 
-                if (semesterResult && semesterResult.length > 0) {
-                    results[semester.semesterId] = semesterResult;
+                if (semesterResult && semesterResult.isValid) {
+                    results[semester.semesterId] = semesterResult.data;
                     validSemesterIds.push(parseInt(semester.semesterId));
                     emptyCount = 0; // Reset counter when we find results
                 } else {
@@ -371,9 +397,18 @@ class ApiService {
                     emptySemesterIds.push({
                         id: parseInt(semester.semesterId),
                         name: `${semester.semesterName} ${semester.semesterYear}`,
-                        consecutive: emptyCount
+                        consecutive: emptyCount,
+                        isMissing: semesterResult.isMissing // Track if this is a missing or just invalid semester
                     });
-                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}`);
+                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}, missing: ${semesterResult.isMissing}`);
+                    
+                    // Only add to missing semesters if it's truly missing (HTTP error), not just empty
+                    if (semesterResult.isMissing) {
+                        this.missingSemesters.push({
+                            id: parseInt(semester.semesterId),
+                            name: `${semester.semesterName} ${semester.semesterYear}`
+                        });
+                    }
                 }
             }
             
@@ -393,14 +428,19 @@ class ApiService {
                             
                             if (missingSemester) {
                                 // Check if this is one of the consecutive empty semesters at the end
-                                const emptyMatch = emptySemesterIds.find(e => e.id === missingId && e.consecutive >= 4);
+                                const emptyMatch = emptySemesterIds.find(e => e.id === missingId);
                                 
-                                // Only add to missing if it's not part of the four consecutive empty ones
-                                if (!emptyMatch) {
-                                    this.missingSemesters.push({
-                                        id: missingId,
-                                        name: `${missingSemester.semesterName} ${missingSemester.semesterYear}`
-                                    });
+                                // Only add to missing if it was actually marked as missing (not just invalid)
+                                if (emptyMatch && emptyMatch.isMissing && emptyMatch.consecutive < 4) {
+                                    // Check if it's already in our missing semesters list
+                                    const alreadyExists = this.missingSemesters.some(ms => ms.id === missingId);
+                                    
+                                    if (!alreadyExists) {
+                                        this.missingSemesters.push({
+                                            id: missingId,
+                                            name: `${missingSemester.semesterName} ${missingSemester.semesterYear}`
+                                        });
+                                    }
                                 }
                             }
                         }
@@ -450,8 +490,8 @@ class ApiService {
                 console.log(`Fetching results for semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
                 const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
                 
-                if (semesterResult && semesterResult.length > 0) {
-                    results[semester.semesterId] = semesterResult;
+                if (semesterResult && semesterResult.isValid) {
+                    results[semester.semesterId] = semesterResult.data;
                     validSemesterIds.push(parseInt(semester.semesterId));
                     emptyCount = 0; // Reset counter when we find results
                 } else {
@@ -459,9 +499,18 @@ class ApiService {
                     emptySemesterIds.push({
                         id: parseInt(semester.semesterId),
                         name: `${semester.semesterName} ${semester.semesterYear}`,
-                        consecutive: emptyCount
+                        consecutive: emptyCount,
+                        isMissing: semesterResult.isMissing // Track if this is a missing or just invalid semester
                     });
-                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}`);
+                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}, missing: ${semesterResult.isMissing}`);
+                    
+                    // Only add to missing semesters if it's truly missing (HTTP error), not just empty
+                    if (semesterResult.isMissing) {
+                        this.missingSemesters.push({
+                            id: parseInt(semester.semesterId),
+                            name: `${semester.semesterName} ${semester.semesterYear}`
+                        });
+                    }
                 }
             }
             
@@ -481,14 +530,19 @@ class ApiService {
                             
                             if (missingSemester) {
                                 // Check if this is one of the consecutive empty semesters at the end
-                                const emptyMatch = emptySemesterIds.find(e => e.id === missingId && e.consecutive >= 4);
+                                const emptyMatch = emptySemesterIds.find(e => e.id === missingId);
                                 
-                                // Only add to missing if it's not part of the four consecutive empty ones
-                                if (!emptyMatch) {
-                                    this.missingSemesters.push({
-                                        id: missingId,
-                                        name: `${missingSemester.semesterName} ${missingSemester.semesterYear}`
-                                    });
+                                // Only add to missing if it was actually marked as missing (not just invalid)
+                                if (emptyMatch && emptyMatch.isMissing && emptyMatch.consecutive < 4) {
+                                    // Check if it's already in our missing semesters list
+                                    const alreadyExists = this.missingSemesters.some(ms => ms.id === missingId);
+                                    
+                                    if (!alreadyExists) {
+                                        this.missingSemesters.push({
+                                            id: missingId,
+                                            name: `${missingSemester.semesterName} ${missingSemester.semesterYear}`
+                                        });
+                                    }
                                 }
                             }
                         }
