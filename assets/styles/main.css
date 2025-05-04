@@ -2708,3 +2708,93 @@ textarea::placeholder {
         padding: var(--spacing-xs) var(--spacing-sm);
     }
 }
+
+/* Detailed progress display styles */
+.gh-loading-container {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: var(--spacing-lg);
+    background-color: var(--color-box-bg);
+    border-radius: var(--border-radius-medium);
+    box-shadow: var(--shadow-small);
+    max-width: 500px;
+    margin: 0 auto;
+}
+
+.gh-loading-header {
+    display: flex;
+    align-items: center;
+    margin-bottom: var(--spacing-md);
+}
+
+.gh-loading-header h3 {
+    margin: 0 0 0 var(--spacing-md);
+    font-size: var(--font-size-medium);
+}
+
+.gh-loading-message {
+    margin-bottom: var(--spacing-md);
+    font-size: var(--font-size-small);
+    color: var(--color-text-secondary);
+}
+
+.gh-progress-container {
+    width: 100%;
+    height: 8px;
+    background-color: var(--color-border);
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: var(--spacing-md);
+}
+
+.gh-progress-bar {
+    height: 100%;
+    background-color: var(--color-link);
+    border-radius: 4px;
+    transition: width 0.3s ease;
+}
+
+.gh-loading-details {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    margin-top: var(--spacing-md);
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.gh-loading-detail-item {
+    display: flex;
+    align-items: center;
+    padding: var(--spacing-xs) var(--spacing-sm);
+    border-radius: var(--border-radius-small);
+    font-size: var(--font-size-small);
+}
+
+.gh-loading-detail-item.fetching {
+    background-color: rgba(67, 97, 238, 0.1);
+}
+
+.gh-loading-detail-item.complete {
+    background-color: rgba(56, 178, 172, 0.1);
+}
+
+.gh-loading-detail-icon {
+    margin-right: var(--spacing-sm);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+}
+
+.gh-loading-detail-item.fetching .gh-loading-detail-icon {
+    color: var(--color-link);
+}
+
+.gh-loading-detail-item.complete .gh-loading-detail-icon {
+    color: var(--color-success);
+}

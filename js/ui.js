@@ -312,55 +312,21 @@ class UiController {
             // Use default timeout (15 seconds) instead of showing the dialog
             this.apiService.setTimeout(15);
             
+            // Show loading section with detailed progress
             Helpers.showElement(this.loadingSection);
-            
-            if (!this.semesterList || this.semesterList.length === 0) {
-                // Try to reload semester list if it's empty
-                await this.loadSemesterList();
-            }
+            this.showDetailedProgress();
             
             // Record start time for performance monitoring
             const apiStartTime = performance.now();
-            // Set up slow response detection
-            const slowResponseThreshold = 5000; // 5 seconds
-            let slowResponseDetected = false;
             
-            // Set up interval to check if API is responding slowly
-            const slowCheckInterval = setInterval(() => {
-                const currentTime = performance.now();
-                const elapsedTime = (currentTime - apiStartTime) / 1000;
-                if (elapsedTime > slowResponseThreshold / 1000 && !slowResponseDetected) {
-                    slowResponseDetected = true;
-                    this.showSlowApiWarning(elapsedTime);
-                }
-            }, 1000);
+            // Fetch the student CGPA data with progress tracking
+            const result = await this.apiService.fetchStudentCGPA(studentId, (stage, progress, message, data) => {
+                this.updateProgressInfo(stage, progress, message, data);
+            });
             
-            // Load student info
-            try {
-                this.studentInfo = await this.apiService.getStudentInfo(studentId);
-                console.log('Student info loaded:', this.studentInfo);
-                if (!this.studentInfo || typeof this.studentInfo !== 'object') {
-                    throw new Error('Invalid student information returned');
-                }
-            } catch (error) {
-                console.error('Error loading student info:', error);
-                throw new Error(`Could not find student with ID ${studentId}. Please check the ID and try again.`);
-            }
-            
-            // Load all semester results
-            try {
-                this.semesterResults = await this.apiService.getAllSemesterResults(
-                    studentId, 
-                    this.semesterList
-                );
-                console.log('Semester results loaded:', Object.keys(this.semesterResults).length, 'semesters');
-            } catch (error) {
-                console.error('Error loading semester results:', error);
-                throw new Error('Failed to load semester results. The student ID may be incorrect or there might be a connection issue.');
-            }
-            
-            // Clear slow response check interval
-            clearInterval(slowCheckInterval);
+            // Store the fetched data
+            this.studentInfo = result.studentInfo;
+            this.semesterResults = result.results;
             
             // Process and display results
             this.displayResults();
@@ -373,6 +339,97 @@ class UiController {
             // Re-enable button
             this.calculateBtn.disabled = false;
             this.calculateBtn.textContent = 'Calculate CGPA';
+        }
+    }
+    
+    /**
+     * Show detailed progress UI
+     */
+    showDetailedProgress() {
+        // Get the loading section
+        const loadingSection = document.getElementById('loading');
+        if (!loadingSection) return;
+        
+        // Clear the loading section
+        loadingSection.innerHTML = `
+            <div class="gh-loading-container">
+                <div class="gh-loading-header">
+                    <div class="gh-spinner"></div>
+                    <h3>Fetching Data</h3>
+                </div>
+                <div class="gh-loading-message" id="loading-message">Initializing request...</div>
+                <div class="gh-progress-container">
+                    <div class="gh-progress-bar" id="loading-progress-bar" style="width: 0%"></div>
+                </div>
+                <div class="gh-loading-details" id="loading-details"></div>
+            </div>
+        `;
+    }
+    
+    /**
+     * Update progress information
+     * @param {string} stage - The current stage of the process
+     * @param {number} progress - Progress percentage (0-100)
+     * @param {string} message - Current progress message
+     * @param {Object} data - Additional data related to the current stage
+     */
+    updateProgressInfo(stage, progress, message, data) {
+        // Get the loading message and progress bar elements
+        const messageElement = document.getElementById('loading-message');
+        const progressBar = document.getElementById('loading-progress-bar');
+        const detailsElement = document.getElementById('loading-details');
+        
+        if (!messageElement || !progressBar || !detailsElement) return;
+        
+        // Update the message and progress bar
+        messageElement.textContent = message;
+        progressBar.style.width = `${progress}%`;
+        
+        // Add details based on the stage
+        if (stage === 'fetching_semester' && data) {
+            const semesterName = `${data.semesterName} ${data.semesterYear}`;
+            
+            // Create or update the semester item
+            let semesterItem = document.getElementById(`semester-progress-${data.semesterId}`);
+            
+            if (!semesterItem) {
+                // Create a new semester item if it doesn't exist
+                semesterItem = document.createElement('div');
+                semesterItem.id = `semester-progress-${data.semesterId}`;
+                semesterItem.className = 'gh-loading-detail-item fetching';
+                semesterItem.innerHTML = `
+                    <div class="gh-loading-detail-icon">
+                        <i class="fas fa-sync fa-spin"></i>
+                    </div>
+                    <div class="gh-loading-detail-text">
+                        ${semesterName} (${data.semesterId})
+                    </div>
+                `;
+                detailsElement.appendChild(semesterItem);
+            }
+        } else if (stage === 'complete') {
+            // Mark all semester items as complete
+            const semesterItems = document.querySelectorAll('.gh-loading-detail-item.fetching');
+            semesterItems.forEach(item => {
+                item.className = 'gh-loading-detail-item complete';
+                const icon = item.querySelector('.gh-loading-detail-icon i');
+                if (icon) {
+                    icon.className = 'fas fa-check';
+                }
+            });
+            
+            // Add a complete message
+            const completeItem = document.createElement('div');
+            completeItem.className = 'gh-loading-detail-item complete';
+            completeItem.innerHTML = `
+                <div class="gh-loading-detail-icon">
+                    <i class="fas fa-check"></i>
+                </div>
+                <div class="gh-loading-detail-text">
+                    All data fetched successfully!
+                </div>
+            `;
+            detailsElement.appendChild(completeItem);
         }
     }
     

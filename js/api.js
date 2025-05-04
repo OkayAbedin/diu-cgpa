@@ -585,22 +585,84 @@ class ApiService {
     async fetchStudentCGPA(studentId, progressCallback = null) {
         try {
             // Progress update: Starting
-            if (progressCallback) progressCallback('starting', 0);
+            if (progressCallback) progressCallback('starting', 0, 'Initializing request...');
             
             // Step 1: Get student info
-            if (progressCallback) progressCallback('fetching_info', 10);
+            if (progressCallback) progressCallback('fetching_info', 10, 'Fetching student information...');
             const studentInfo = await this.getStudentInfo(studentId);
             
             // Step 2: Get semester list
-            if (progressCallback) progressCallback('fetching_semesters', 30);
+            if (progressCallback) progressCallback('fetching_semesters', 20, 'Fetching semester list...');
             const semesterList = await this.getSemesterList();
             
             // Step 3: Get all semester results
-            if (progressCallback) progressCallback('fetching_results', 50);
-            const allResults = await this.getAllSemesterResults(studentId, semesterList);
+            if (progressCallback) progressCallback('fetching_results', 30, 'Preparing to fetch semester results...');
             
-            // Step 4: Compile the data
-            if (progressCallback) progressCallback('compiling', 90);
+            // Extract enrollment semester ID from student ID (first three digits)
+            const enrollmentSemesterId = studentId.split('-')[0];
+            
+            // Sort semesters for proper order
+            const sortedSemesters = [...semesterList].sort((a, b) => 
+                parseInt(a.semesterId) - parseInt(b.semesterId)
+            );
+            
+            // Find the starting semester
+            let startSemesterIndex = 0;
+            if (enrollmentSemesterId && enrollmentSemesterId.length === 3) {
+                startSemesterIndex = sortedSemesters.findIndex(s => 
+                    parseInt(s.semesterId) >= parseInt(enrollmentSemesterId)
+                );
+                if (startSemesterIndex === -1) startSemesterIndex = 0;
+            }
+            
+            // Get relevant semesters
+            const relevantSemesters = sortedSemesters.slice(startSemesterIndex);
+            const totalSemesters = relevantSemesters.length;
+            
+            // Initialize results object
+            const allResults = {};
+            let emptyCount = 0;
+            this.missingSemesters = []; // Reset missing semesters list
+            
+            // Fetch each semester with detailed progress updates
+            for (let i = 0; i < relevantSemesters.length; i++) {
+                const semester = relevantSemesters[i];
+                
+                // Stop after four consecutive empty semesters
+                if (emptyCount >= 4) {
+                    break;
+                }
+                
+                // Calculate progress based on current semester index
+                const semesterProgress = 30 + Math.floor(((i + 1) / totalSemesters) * 60);
+                const progressMessage = `Fetching ${semester.semesterName} ${semester.semesterYear} (${semester.semesterId})...`;
+                
+                if (progressCallback) progressCallback('fetching_semester', semesterProgress, progressMessage, semester);
+                
+                // Fetch semester results
+                const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
+                
+                if (semesterResult && semesterResult.isValid) {
+                    allResults[semester.semesterId] = semesterResult.data;
+                    emptyCount = 0; // Reset counter when we find results
+                } else {
+                    emptyCount++;
+                    
+                    // Only add to missing semesters if it's truly missing (HTTP error), not just empty
+                    if (semesterResult.isMissing) {
+                        this.missingSemesters.push({
+                            id: parseInt(semester.semesterId),
+                            name: `${semester.semesterName} ${semester.semesterYear}`
+                        });
+                    }
+                }
+            }
+            
+            // Add missing semesters to the results object
+            allResults.missingSemesters = this.missingSemesters;
+            
+            // Step 4: Compiling the data
+            if (progressCallback) progressCallback('compiling', 95, 'Compiling results...');
             
             const result = {
                 studentInfo,
@@ -611,7 +673,7 @@ class ApiService {
             };
             
             // Progress update: Complete
-            if (progressCallback) progressCallback('complete', 100);
+            if (progressCallback) progressCallback('complete', 100, 'Fetch complete!');
             
             return result;
         } catch (error) {
