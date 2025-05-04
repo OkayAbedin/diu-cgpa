@@ -361,7 +361,6 @@ class UiController {
                 <div class="gh-progress-container">
                     <div class="gh-progress-bar" id="loading-progress-bar" style="width: 0%"></div>
                 </div>
-                <div class="gh-loading-details" id="loading-details"></div>
             </div>
         `;
     }
@@ -377,59 +376,19 @@ class UiController {
         // Get the loading message and progress bar elements
         const messageElement = document.getElementById('loading-message');
         const progressBar = document.getElementById('loading-progress-bar');
-        const detailsElement = document.getElementById('loading-details');
         
-        if (!messageElement || !progressBar || !detailsElement) return;
+        if (!messageElement || !progressBar) return;
         
         // Update the message and progress bar
         messageElement.textContent = message;
         progressBar.style.width = `${progress}%`;
         
-        // Add details based on the stage
+        // Display current semester being fetched
         if (stage === 'fetching_semester' && data) {
             const semesterName = `${data.semesterName} ${data.semesterYear}`;
-            
-            // Create or update the semester item
-            let semesterItem = document.getElementById(`semester-progress-${data.semesterId}`);
-            
-            if (!semesterItem) {
-                // Create a new semester item if it doesn't exist
-                semesterItem = document.createElement('div');
-                semesterItem.id = `semester-progress-${data.semesterId}`;
-                semesterItem.className = 'gh-loading-detail-item fetching';
-                semesterItem.innerHTML = `
-                    <div class="gh-loading-detail-icon">
-                        <i class="fas fa-sync fa-spin"></i>
-                    </div>
-                    <div class="gh-loading-detail-text">
-                        ${semesterName} (${data.semesterId})
-                    </div>
-                `;
-                detailsElement.appendChild(semesterItem);
-            }
+            messageElement.textContent = `Fetching ${semesterName} (${data.semesterId})...`;
         } else if (stage === 'complete') {
-            // Mark all semester items as complete
-            const semesterItems = document.querySelectorAll('.gh-loading-detail-item.fetching');
-            semesterItems.forEach(item => {
-                item.className = 'gh-loading-detail-item complete';
-                const icon = item.querySelector('.gh-loading-detail-icon i');
-                if (icon) {
-                    icon.className = 'fas fa-check';
-                }
-            });
-            
-            // Add a complete message
-            const completeItem = document.createElement('div');
-            completeItem.className = 'gh-loading-detail-item complete';
-            completeItem.innerHTML = `
-                <div class="gh-loading-detail-icon">
-                    <i class="fas fa-check"></i>
-                </div>
-                <div class="gh-loading-detail-text">
-                    All data fetched successfully!
-                </div>
-            `;
-            detailsElement.appendChild(completeItem);
+            messageElement.textContent = 'All data fetched successfully!';
         }
     }
     
