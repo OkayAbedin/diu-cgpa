@@ -1335,7 +1335,7 @@ class UiController {
         }
         
         // Create CSV header with student info and semester columns
-        let csvContent = 'Student ID,Name,Department,CGPA,Total Credits,Status';
+        let csvContent = 'Student ID,Name,Department,CGPA,Total Credits';
         
         // First, determine how many semesters we have across all students to create proper headers
         const allSemesters = new Set();
@@ -1363,8 +1363,8 @@ class UiController {
             }
         });
         
-        // Convert to array and sort alphabetically
-        const semesterNames = Array.from(allSemesters).sort();
+        // Convert to array and sort in reverse order (latest to oldest)
+        const semesterNames = Array.from(allSemesters).sort().reverse();
         
         // Add semester GPA headers
         semesterNames.forEach(semName => {
@@ -1433,10 +1433,9 @@ class UiController {
             // Escape any fields that might contain commas
             const escapedName = name.includes(',') ? `"${name}"` : name;
             const escapedDepartment = department.includes(',') ? `"${department}"` : department;
-            const status = this.advancedFetchResults.errors && this.advancedFetchResults.errors[studentId] ? 'Failed' : 'Success';
             
-            // Start with basic student info
-            csvContent += `${studentId},${escapedName},${escapedDepartment},${cgpa},${totalCredits},${status}`;
+            // Start with basic student info (removed status column)
+            csvContent += `${studentId},${escapedName},${escapedDepartment},${cgpa},${totalCredits}`;
             
             // Add semester GPAs
             semesterNames.forEach(semName => {
@@ -1451,7 +1450,7 @@ class UiController {
             Object.entries(this.advancedFetchResults.errors).forEach(([studentId, error]) => {
                 if (!this.advancedFetchResults.results[studentId]) {
                     // Only add if not already included in results
-                    csvContent += `${studentId},N/A,N/A,N/A,N/A,Failed`;
+                    csvContent += `${studentId},N/A,N/A,N/A,N/A`;
                     
                     // Add N/A for all semester columns
                     semesterNames.forEach(() => {
