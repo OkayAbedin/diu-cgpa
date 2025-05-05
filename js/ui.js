@@ -1344,7 +1344,6 @@ class UiController {
         Object.values(this.advancedFetchResults.results).forEach(data => {
             if (data && data.results) {
                 // Process semester data to gather all semesters
-                const semesterResults = {};
                 
                 // Filter out missingSemesters key
                 Object.entries(data.results).forEach(([key, value]) => {
