@@ -326,13 +326,17 @@ class ResultCard {
                             <td style="width:130px;">Name of the Student</td>
                             <td>: ${studentInfo.studentName || studentInfo.name || ""}</td>
                             <td style="width:130px;">Enrollment Session</td>
-                            <td>: ${studentInfo.enrollmentSession || "Spring 2022"}</td>
+                            <td>: ${studentInfo.semesterName || studentInfo.enrollmentSession || (studentInfo.studentId ? `${studentInfo.studentId.substring(0, 3)} Batch` : "Not Available")}</td>
                         </tr>
                         <tr>
                             <td>Student ID</td>
                             <td>: ${studentInfo.studentId || studentInfo.id || ""}</td>
                             <td>Date of Issue</td>
-                            <td>: ${new Date().toLocaleDateString()}</td>
+                            <td>: ${new Date().toLocaleDateString('en-GB', {
+                                day: '2-digit',
+                                month: '2-digit',
+                                year: 'numeric'
+                            })}</td>
                         </tr>
                         <tr>
                             <td>Batch</td>
@@ -615,7 +619,7 @@ class ResultCard {
         sessionLabel.textContent = 'Enrollment Session';
         
         const sessionValue = document.createElement('td');
-        sessionValue.textContent = ': ' + (studentInfo.enrollmentSession || 'Spring 2022');
+        sessionValue.textContent = ': ' + (studentInfo.semesterName || studentInfo.enrollmentSession || (studentInfo.studentId ? `${studentInfo.studentId.substring(0, 3)} Batch` : "Not Available"));
         
         row1.appendChild(nameLabel);
         row1.appendChild(nameValue);
@@ -635,7 +639,7 @@ class ResultCard {
         
         const today = new Date();
         const issueValue = document.createElement('td');
-        issueValue.textContent = ': ' + today.toLocaleDateString('en-US', {
+        issueValue.textContent = ': ' + today.toLocaleDateString('en-GB', {
             day: '2-digit',
             month: '2-digit',
             year: 'numeric'
