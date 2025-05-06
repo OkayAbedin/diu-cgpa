@@ -210,10 +210,11 @@ class ResultCard {
                         .semester-table {
                             width: 100%;
                             border-collapse: collapse;
-                            border: 1px solid #000;
+                        }
+                        .semester-table, .semester-table th, .semester-table td {
+                            border: 1px solid black;
                         }
                         .semester-table th, .semester-table td {
-                            border: 1px solid #000;
                             padding: 3px 5px;
                         }
                         .semester-table th {
@@ -279,7 +280,7 @@ class ResultCard {
                     // Add logo
                     const logo = previewWindow.document.createElement("img");
                     logo.alt = "Daffodil International University";
-                    logo.style.height = "20mm";
+                    logo.style.height = "15mm";
                     logo.style.marginBottom = "5mm";
                     const logoSrc = logo.src;
                     logo.src = "assets/img/diu-logo.svg"; // Use the actual DIU logo from assets
@@ -360,16 +361,22 @@ class ResultCard {
                             const semesterContainer = previewWindow.document.createElement("div");
                             semesterContainer.className = "semester-table-container";
                             
-                            // Semester header
-                            const semesterHeader = previewWindow.document.createElement("div");
-                            semesterHeader.style.marginBottom = "5mm";
-                            semesterHeader.innerHTML = `<strong>Semester:</strong> ${semester.name}`;
+                            // Semester header with simple styling
+                            semesterContainer.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5mm;">
+                                    <div><strong>Semester:</strong> ${semester.name}</div>
+                                    <div>
+                                        <span><strong>GPA:</strong> ${semester.gpa || semester.cgpa || "0.00"}</span>
+                                        <span style="margin-left: 10px;"><strong>Credits:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
+                                    </div>
+                                </div>
+                            `;
                             
                             // Semester table
                             const semesterTable = previewWindow.document.createElement("table");
                             semesterTable.className = "semester-table";
                             
-                            // Table header
+                            // Table without GPA column
                             let tableHTML = `
                                 <thead>
                                     <tr>
@@ -378,7 +385,6 @@ class ResultCard {
                                         <th style="width:50px;">Credit</th>
                                         <th style="width:60px;">Grade</th>
                                         <th style="width:80px;">Grade Point</th>
-                                        <th style="width:50px;">GPA</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -386,7 +392,7 @@ class ResultCard {
                             
                             // Course rows
                             if (semester.courses && semester.courses.length > 0) {
-                                semester.courses.forEach(course => {
+                                semester.courses.forEach((course) => {
                                     tableHTML += `
                                         <tr>
                                             <td style="text-align:center;">${course.courseCode || course.customCourseId || "-"}</td>
@@ -394,26 +400,15 @@ class ResultCard {
                                             <td style="text-align:center;">${course.totalCredit || "0"}</td>
                                             <td style="text-align:center;">${course.gradeLetter || "-"}</td>
                                             <td style="text-align:center;">${course.pointEquivalent || "0"}</td>
-                                            <td></td>
                                         </tr>
                                     `;
                                 });
-                                
-                                // GPA row
-                                tableHTML += `
-                                    <tr>
-                                        <td colspan="5"></td>
-                                        <td style="text-align:center;font-weight:bold;">${semester.gpa || semester.cgpa || "0.00"}</td>
-                                    </tr>
-                                `;
                             } else {
-                                tableHTML += '<tr><td colspan="6" style="text-align:center;">No courses found for this semester</td></tr>';
+                                tableHTML += '<tr><td colspan="5" style="text-align:center;">No courses found for this semester</td></tr>';
                             }
                             
-                            tableHTML += '</tbody>';
                             semesterTable.innerHTML = tableHTML;
                             
-                            semesterContainer.appendChild(semesterHeader);
                             semesterContainer.appendChild(semesterTable);
                             transcriptContainer.appendChild(semesterContainer);
                         });
@@ -708,7 +703,7 @@ class ResultCard {
         tableContainer.style.marginBottom = '10mm';
         tableContainer.style.pageBreakInside = 'avoid';
         
-        // Semester header table
+        // Semester header table with modern styling - include GPA and credits
         const headerRow = document.createElement('table');
         headerRow.style.width = '100%';
         headerRow.style.borderCollapse = 'collapse';
@@ -717,17 +712,32 @@ class ResultCard {
         const headerRowBody = document.createElement('tbody');
         const semRow = document.createElement('tr');
         
+        // Semester label
         const semCell = document.createElement('td');
         semCell.textContent = 'Semester';
         semCell.style.width = '80px';
         semCell.style.fontSize = '10pt';
         
+        // Semester value
         const semValueCell = document.createElement('td');
         semValueCell.textContent = semester.name || 'Spring 2025';
         semValueCell.style.fontWeight = 'normal';
         
+        // Semester GPA badge - simplified styling
+        const gpaCell = document.createElement('td');
+        gpaCell.style.textAlign = 'right';
+        
+        const gpaInfo = document.createElement('div');
+        gpaInfo.innerHTML = `
+            <span><strong>GPA:</strong> ${semester.gpa || '0.00'}</span>
+            <span style="margin-left: 10px;"><strong>Credits:</strong> ${semester.totalCredits || '0'}</span>
+        `;
+        
+        gpaCell.appendChild(gpaInfo);
+        
         semRow.appendChild(semCell);
         semRow.appendChild(semValueCell);
+        semRow.appendChild(gpaCell);
         headerRowBody.appendChild(semRow);
         headerRow.appendChild(headerRowBody);
         
@@ -743,8 +753,9 @@ class ResultCard {
         const headerTr = document.createElement('tr');
         
         // Create header cells based on exact image layout
-        const headers = ['Course Code', 'Course Title', 'Credit', 'Grade', 'Grade Point', 'GPA'];
-        const widths = ['100px', '', '50px', '60px', '80px', '50px'];
+        // Remove GPA column as requested
+        const headers = ['Course Code', 'Course Title', 'Credit', 'Grade', 'Grade Point'];
+        const widths = ['100px', '', '50px', '60px', '80px'];
         
         headers.forEach((text, idx) => {
             const th = document.createElement('th');
@@ -765,19 +776,19 @@ class ResultCard {
         
         // Add course rows
         if (semester.courses && semester.courses.length > 0) {
-            semester.courses.forEach(course => {
+            semester.courses.forEach((course) => {
                 const tr = document.createElement('tr');
                 
                 // Course code
                 const codeCell = document.createElement('td');
-                codeCell.textContent = course.courseCode || 'CSE332';
+                codeCell.textContent = course.courseCode || course.customCourseId || '-';
                 codeCell.style.border = '1px solid #000';
                 codeCell.style.padding = '3px 5px';
                 codeCell.style.textAlign = 'center';
                 
                 // Course title
                 const titleCell = document.createElement('td');
-                titleCell.textContent = course.courseName || course.courseTitle || 'Computer Design Lab';
+                titleCell.textContent = course.courseName || course.courseTitle || 'Unknown Course';
                 titleCell.style.border = '1px solid #000';
                 titleCell.style.padding = '3px 5px';
                 
@@ -790,61 +801,32 @@ class ResultCard {
                 
                 // Grade
                 const gradeCell = document.createElement('td');
-                gradeCell.textContent = course.gradeLetter || course.grade || 'A+';
+                gradeCell.textContent = course.gradeLetter || course.grade || '-';
                 gradeCell.style.border = '1px solid #000';
                 gradeCell.style.padding = '3px 5px';
                 gradeCell.style.textAlign = 'center';
                 
                 // Grade point
                 const pointCell = document.createElement('td');
-                pointCell.textContent = course.pointEquivalent || '4.00';
+                pointCell.textContent = course.pointEquivalent || '0';
                 pointCell.style.border = '1px solid #000';
                 pointCell.style.padding = '3px 5px';
                 pointCell.style.textAlign = 'center';
                 
-                // GPA column - empty for course rows
-                const gpaCell = document.createElement('td');
-                gpaCell.style.border = '1px solid #000';
-                gpaCell.style.padding = '3px 5px';
-                gpaCell.style.textAlign = 'center';
-                
+                // Add cells to the row
                 tr.appendChild(codeCell);
                 tr.appendChild(titleCell);
                 tr.appendChild(creditCell);
                 tr.appendChild(gradeCell);
                 tr.appendChild(pointCell);
-                tr.appendChild(gpaCell);
                 
                 tbody.appendChild(tr);
             });
-            
-            // Add the semester GPA row at the bottom - exactly like in the image
-            const gpaRow = document.createElement('tr');
-            
-            // Empty cells for course code and title
-            const emptyCell1 = document.createElement('td');
-            emptyCell1.colSpan = 5;
-            emptyCell1.style.border = '1px solid #000';
-            emptyCell1.style.padding = '3px 5px';
-            emptyCell1.textContent = '';
-            
-            // GPA cell
-            const semesterGpaCell = document.createElement('td');
-            semesterGpaCell.textContent = semester.gpa || '4.00';
-            semesterGpaCell.style.border = '1px solid #000';
-            semesterGpaCell.style.padding = '3px 5px';
-            semesterGpaCell.style.textAlign = 'center';
-            semesterGpaCell.style.fontWeight = 'bold';
-            
-            gpaRow.appendChild(emptyCell1);
-            gpaRow.appendChild(semesterGpaCell);
-            
-            tbody.appendChild(gpaRow);
         } else {
             // No courses found
             const noCoursesRow = document.createElement('tr');
             const noCoursesCell = document.createElement('td');
-            noCoursesCell.colSpan = 6;
+            noCoursesCell.colSpan = 5; // Reduced by one since we removed the GPA column
             noCoursesCell.textContent = 'No courses found for this semester';
             noCoursesCell.style.border = '1px solid #000';
             noCoursesCell.style.padding = '10px';
