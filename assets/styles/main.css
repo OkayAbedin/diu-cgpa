@@ -171,17 +171,17 @@ img {
 
 /* Add blur effect when scrolling */
 .gh-header.scrolled {
-    background: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(255, 255, 255, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
     box-shadow: var(--shadow-medium);
 }
 
 /* Dark mode header with blur */
 [data-theme="dark"] .gh-header.scrolled {
-    background: rgba(26, 32, 44, 0.7);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
+    background: rgba(26, 32, 44, 0.3);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 }
 
 .gh-header-inner {
