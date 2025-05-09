@@ -129,6 +129,12 @@ class UiController {
             savePdfBtn.addEventListener('click', () => this.generateTranscriptPDF());
         }
         
+        // Export as CSV button event
+        const exportCsvBtn = document.getElementById('export-csv-btn');
+        if (exportCsvBtn) {
+            exportCsvBtn.addEventListener('click', () => this.exportSingleStudentCsv());
+        }
+        
         // Manual calculator events
         this.addSemesterBtn.addEventListener('click', () => this.addManualSemester());
         this.calculateManualBtn.addEventListener('click', () => this.calculateManualCgpa());
@@ -2237,6 +2243,79 @@ class UiController {
                 snackbar.remove();
             }
         });
+    }
+
+    /**
+     * Export a single student's CGPA results as CSV
+     * Creates a downloadable CSV file with all course information
+     */
+    exportSingleStudentCsv() {
+        if (!this.studentInfo || !this.semesterResults || Object.keys(this.semesterResults).length === 0) {
+            alert('No student data available to export. Please fetch CGPA data first.');
+            return;
+        }
+        
+        try {
+            // Process semester data
+            const semesterData = this.calculator.processSemesterData(
+                this.semesterResults, 
+                this.semesterList
+            );
+            
+            // Calculate CGPA and total credits
+            const { cgpa } = this.calculator.calculateCgpa(this.semesterResults);
+            
+            // Sort semesters chronologically (oldest first)
+            const sortedSemesters = [...semesterData].sort((a, b) => a.id.localeCompare(b.id));
+            
+            // Start with headers
+            let csvContent = 'Semester,CGPA,Course Code,Course Title,Credits,Grade,Points\n';
+            
+            // Add data rows
+            sortedSemesters.forEach(semester => {
+                if (semester.courses && semester.courses.length > 0) {
+                    semester.courses.forEach(course => {
+                        // Handle potential commas in course titles by enclosing in quotes if needed
+                        const courseTitle = course.courseName || course.courseTitle || '';
+                        const escapedTitle = courseTitle.includes(',') ? `"${courseTitle}"` : courseTitle;
+                        
+                        // Look for course code in either courseCode or customCourseId property
+                        const courseCode = course.courseCode || course.customCourseId || '';
+                        
+                        csvContent += `${semester.name},${semester.gpa},${courseCode},${escapedTitle},${course.totalCredit || '0'},${course.gradeLetter || '-'},${course.pointEquivalent || '0'}\n`;
+                    });
+                } else {
+                    // Add a row for semesters with no courses
+                    csvContent += `${semester.name},${semester.gpa},,,,,\n`;
+                }
+            });
+            
+            // Create a blob and download link
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            
+            // Set download attributes
+            const studentId = this.studentInfo.studentId || this.studentInfo.id || 'student';
+            const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+            link.setAttribute('href', url);
+            link.setAttribute('download', `diu-cgpa-${studentId}-${date}.csv`);
+            link.style.display = 'none';
+            
+            // Trigger download
+            document.body.appendChild(link);
+            link.click();
+            
+            // Clean up
+            setTimeout(() => {
+                document.body.removeChild(link);
+                URL.revokeObjectURL(url);
+            }, 100);
+            
+        } catch (error) {
+            console.error('Error exporting to CSV:', error);
+            alert('An error occurred while exporting to CSV. Please try again.');
+        }
     }
 }
 
