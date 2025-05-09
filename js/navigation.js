@@ -13,10 +13,28 @@ function initNavigation() {
   // Get dark mode toggle button
   const darkModeToggle = document.getElementById('dark-mode-toggle');
   
+  // Get header element for scroll effect
+  const header = document.querySelector('.gh-header');
+  
   // Create overlay for mobile menu
   let menuOverlay = document.createElement('div');
   menuOverlay.className = 'menu-overlay';
   document.body.appendChild(menuOverlay);
+  
+  // Add scroll event listener for header blur effect
+  function handleScroll() {
+    if (window.scrollY > 10) {
+      header.classList.add('scrolled');
+    } else {
+      header.classList.remove('scrolled');
+    }
+  }
+  
+  // Add event listener for scroll
+  window.addEventListener('scroll', handleScroll);
+  
+  // Check scroll position on page load
+  handleScroll();
   
   // Check for saved theme preference or respect OS theme preference
   function getThemePreference() {
