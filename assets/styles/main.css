@@ -1487,7 +1487,7 @@ textarea::placeholder {
 
 .advanced-result-id {
     font-weight: 600;
-    margin-bottom: var (--spacing-xs);
+    margin-bottom: var(--spacing-xs);
 }
 
 .advanced-result-cgpa {
@@ -2227,7 +2227,7 @@ textarea::placeholder {
 .manual-header-icon {
     font-size: 48px;
     color: rgba(255, 255, 255, 0.25);
-    margin-right: var (--spacing-md);
+    margin-right: var(--spacing-md);
     z-index: 1;
 }
 
@@ -2237,9 +2237,9 @@ textarea::placeholder {
     justify-content: space-between;
     align-items: center;
     background: linear-gradient(135deg, #614385, #516395);
-    border-radius: var (--border-radius-medium);
+    border-radius: var(--border-radius-medium);
     padding: var(--spacing-lg);
-    margin-bottom: var (--spacing-lg);
+    margin-bottom: var(--spacing-lg);
     position: relative;
     overflow: hidden;
     box-shadow: var(--shadow-medium);

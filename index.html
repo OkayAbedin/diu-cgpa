@@ -36,9 +36,9 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    <!-- Google Fonts - GitHub uses system fonts, but we'll use similar web fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Google Fonts - GitHub uses system fonts, but we'll use similar web fonts -->    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/styles/main.css">
+    <link rel="stylesheet" href="assets/styles/manual-calculator.css">
     <style>
         /* Critical tab navigation styles that override any problematic CSS */
         .tab-pane {
@@ -198,8 +198,7 @@
                             </div>
                         </section>
                     </div>
-                    
-                    <!-- Manual Calculator Tab -->
+                      <!-- Manual Calculator Tab -->
                     <div class="tab-pane" id="manual-calculator">
                         <div class="gh-content-header manual-calculator-header">
                             <div class="manual-header-content">
@@ -212,49 +211,13 @@
                         </div>
                         
                         <div class="gh-box">
+                            <!-- Instructions for users -->
+                            <div class="gh-manual-instructions">
+                                <p><i class="fas fa-info-circle"></i> Add semesters and courses to calculate your expected CGPA. You can add multiple semesters and multiple courses per semester.</p>
+                            </div>
+                            
                             <div id="manual-semester-list">
-                                <!-- Semester entries will be added here -->
-                                <div class="gh-semester">
-                                    <div class="gh-semester-header">
-                                        <h4>Semester 1</h4>
-                                        <button class="gh-btn gh-btn-sm gh-btn-danger remove-semester-btn">
-                                            <i class="fas fa-trash"></i>
-                                            <span>Remove</span>
-                                        </button>
-                                    </div>
-                                    
-                                    <div class="courses-container">
-                                        <div class="gh-course-row">
-                                            <div class="gh-course-inputs">
-                                                <input type="text" class="gh-form-control course-name" placeholder="Course Name (optional)">
-                                                <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0" step="0.5">
-                                                <select class="gh-form-select course-grade">
-                                                    <option value="custom" selected>Custom Grade</option>
-                                                    <option value="4.00">A+ (4.00)</option>
-                                                    <option value="3.75">A (3.75)</option>
-                                                    <option value="3.50">A- (3.50)</option>
-                                                    <option value="3.25">B+ (3.25)</option>
-                                                    <option value="3.00">B (3.00)</option>
-                                                    <option value="2.75">B- (2.75)</option>
-                                                    <option value="2.50">C+ (2.50)</option>
-                                                    <option value="2.25">C (2.25)</option>
-                                                    <option value="2.00">D (2.00)</option>
-                                                    <option value="0.00">F (0.00)</option>
-                                                </select>
-                                                <div class="custom-grade-container" style="display: block;">
-                                                    <input type="number" class="gh-form-control custom-grade-input" placeholder="Custom Grade Point" min="0" max="4" step="0.5" value="4.00">
-                                                </div>
-                                                <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn">
-                                                    <i class="fas fa-times"></i>
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    
-                                    <button class="gh-btn gh-btn-secondary add-course-btn">
-                                        <i class="fas fa-plus"></i> Add Course
-                                    </button>
-                                </div>
+                                <!-- Semester entries will be added dynamically -->
                             </div>
                             
                             <div class="gh-button-group">
@@ -262,24 +225,117 @@
                                     <i class="fas fa-plus"></i> Add Semester
                                 </button>
                                 <button id="calculate-manual-btn" class="gh-btn gh-btn-primary">
-                                    Calculate CGPA
+                                    <i class="fas fa-calculator"></i> Calculate CGPA
                                 </button>
                             </div>
                         </div>
                         
-                        <div class="gh-stats-container hidden" id="manual-results-container">
-                            <div class="gh-stats-box" id="manual-results">
-                                <h3>Manual Calculation Results</h3>
-                                <div class="gh-stats-value" id="manual-total-cgpa">CGPA: 0.00</div>
-                                <div class="gh-stats-label" id="manual-total-credits">Total Credits: 0</div>
+                        <!-- Template for semester (hidden, will be cloned by JavaScript) -->
+                        <template id="semester-template">
+                            <div class="gh-semester">
+                                <div class="gh-semester-header">
+                                    <h4>Semester <span class="semester-number">1</span></h4>
+                                    <div class="gh-semester-actions">
+                                        <span class="semester-gpa-badge">GPA: <span class="semester-gpa">0.00</span></span>
+                                        <button class="gh-btn gh-btn-sm gh-btn-danger remove-semester-btn">
+                                            <i class="fas fa-trash"></i>
+                                            <span>Remove</span>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="courses-container">
+                                    <!-- Course rows will be added here -->
+                                </div>
+                                
+                                <div class="semester-footer">
+                                    <button class="gh-btn gh-btn-secondary add-course-btn">
+                                        <i class="fas fa-plus"></i> Add Course
+                                    </button>
+                                    <div class="semester-summary">
+                                        <span>Total Credits: <span class="semester-credit-count">0</span></span>
+                                    </div>
+                                </div>
                             </div>
+                        </template>
+                          <!-- Template for course row (hidden, will be cloned by JavaScript) -->
+                        <template id="course-template">
+                            <div class="gh-course-row">
+                                <div class="gh-course-inputs">
+                                    <input type="text" class="gh-form-control course-name" placeholder="Course Name/Code (optional)">
+                                    <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0.5" max="4" step="0.5" required>
+                                    <select class="gh-form-select course-grade">
+                                        <option value="" disabled selected>Select Grade</option>
+                                        <option value="4.00">A+ (4.00)</option>
+                                        <option value="3.75">A (3.75)</option>
+                                        <option value="3.50">A- (3.50)</option>
+                                        <option value="3.25">B+ (3.25)</option>
+                                        <option value="3.00">B (3.00)</option>
+                                        <option value="2.75">B- (2.75)</option>
+                                        <option value="2.50">C+ (2.50)</option>
+                                        <option value="2.25">C (2.25)</option>
+                                        <option value="2.00">D (2.00)</option>
+                                        <option value="0.00">F (0.00)</option>
+                                        <option value="custom">Custom Grade</option>
+                                    </select>
+                                    <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn" title="Remove Course" aria-label="Remove Course">
+                                        <i class="fas fa-times"></i>
+                                    </button>
+                                    <div class="custom-grade-container" style="display: none;">
+                                        <input type="number" class="gh-form-control custom-grade-input" placeholder="Grade Point" min="0" max="4" step="0.01">
+                                    </div>
+                                </div>
+                            </div>
+                        </template>
+                          <div class="gh-stats-container hidden" id="manual-results-container">
+                            <!-- CGPA Display Card (Similar to student-info) -->
+                            <div class="gh-box" id="manual-cgpa-display">
+                                <div class="student-info-container">
+                                    <div class="cgpa-display">
+                                        <div class="cgpa-circle">
+                                            <div class="cgpa-value" id="manual-cgpa-value">0.00</div>
+                                        </div>
+                                    </div>
+                                    <div class="student-stats">
+                                        <div class="stat-item">
+                                            <div class="stat-value" id="manual-total-semesters">0</div>
+                                            <div class="stat-label">Semesters</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value" id="manual-total-credits-value">0</div>
+                                            <div class="stat-label">Credits</div>
+                                        </div>
+                                        <div class="stat-item">
+                                            <div class="stat-value" id="manual-last-updated">Today</div>
+                                            <div class="stat-label">Last Updated</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>                            <!-- CGPA Progress Chart -->
                             <div class="gh-chart-box" id="manual-chart-container">
                                 <div class="gh-chart-header">
-                                    <h3>CGPA Analysis</h3>
+                                    <h3>CGPA Progress</h3>
+                                    <p class="chart-description">Visualization of your semester-by-semester performance</p>
                                 </div>
                                 <div class="gh-chart-body">
                                     <canvas id="manual-cgpa-chart"></canvas>
                                 </div>
+                            </div>
+                              <!-- Manual Export Options -->
+                            <div class="gh-section-title">
+                                <h3>Export Options</h3>
+                                <div class="gh-section-actions">
+                                    <button id="manual-export-csv-btn" class="gh-btn gh-btn-sm gh-btn-secondary">
+                                        <i class="fas fa-file-csv"></i> Export as CSV
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- Hidden legacy elements for backward compatibility -->
+                            <div style="display: none;">
+                                <div id="manual-total-cgpa">CGPA: 0.00</div>
+                                <div id="manual-total-credits">Total Credits: 0</div>
+                                <div id="manual-semester-count">Total Semesters: 0</div>
                             </div>
                         </div>
                     </div>

@@ -75,25 +75,18 @@ class UiController {
         // Initialize
         this.init();
     }
-    
-    /**
+      /**
      * Initialize the application
      */
     async init() {
         this.bindEvents();
         
-        // Initialize event listeners for the default semester's grade dropdown
-        const initialGradeSelect = this.manualSemesterList.querySelector('.course-grade');
-        const initialCustomGradeContainer = this.manualSemesterList.querySelector('.custom-grade-container');
+        // Initialize theme from localStorage
+        this.initTheme();
         
-        if (initialGradeSelect && initialCustomGradeContainer) {
-            initialGradeSelect.addEventListener('change', (e) => {
-                if (e.target.value === 'custom') {
-                    initialCustomGradeContainer.style.display = 'block';
-                } else {
-                    initialCustomGradeContainer.style.display = 'none';
-                }
-            });
+        // Add first semester by default for the manual calculator
+        if (this.manualSemesterList && this.manualSemesterList.children.length === 0) {
+            this.addManualSemester();
         }
         
         try {
@@ -133,11 +126,15 @@ class UiController {
         const exportCsvBtn = document.getElementById('export-csv-btn');
         if (exportCsvBtn) {
             exportCsvBtn.addEventListener('click', () => this.exportSingleStudentCsv());
-        }
-        
-        // Manual calculator events
+        }        // Manual calculator events
         this.addSemesterBtn.addEventListener('click', () => this.addManualSemester());
         this.calculateManualBtn.addEventListener('click', () => this.calculateManualCgpa());
+        
+        // Manual export buttons
+        const manualExportCsvBtn = document.getElementById('manual-export-csv-btn');
+        if (manualExportCsvBtn) {
+            manualExportCsvBtn.addEventListener('click', () => this.exportManualResultsToCSV());
+        }
         
         // Navigation events
         this.navItems.forEach(navItem => {
@@ -573,70 +570,46 @@ class UiController {
             errorElement.textContent = message;
         }
         Helpers.showElement(this.errorMessageSection);
-    }
-
-    /**
+    }    /**
      * Add a new manual semester to the list
      */
     addManualSemester() {
-        this.manualSemesterCounter++;
-        const semesterHtml = `
-            <div class="gh-semester">
-                <div class="gh-semester-header">
-                    <h4>Semester ${this.manualSemesterCounter}</h4>
-                    <button class="gh-btn gh-btn-sm gh-btn-danger remove-semester-btn">
-                        <i class="fas fa-trash"></i>
-                        <span>Remove</span>
-                    </button>
-                </div>
-                
-                <div class="courses-container">
-                    <div class="gh-course-row">
-                        <div class="gh-course-inputs">
-                            <input type="text" class="gh-form-control course-name" placeholder="Course Name (optional)">
-                            <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0" step="0.5">
-                            <select class="gh-form-select course-grade">
-                                <option value="custom" selected>Custom Grade</option>
-                                <option value="4.00">A+ (4.00)</option>
-                                <option value="3.75">A (3.75)</option>
-                                <option value="3.50">A- (3.50)</option>
-                                <option value="3.25">B+ (3.25)</option>
-                                <option value="3.00">B (3.00)</option>
-                                <option value="2.75">B- (2.75)</option>
-                                <option value="2.50">C+ (2.50)</option>
-                                <option value="2.25">C (2.25)</option>
-                                <option value="2.00">D (2.00)</option>
-                                <option value="0.00">F (0.00)</option>
-                            </select>
-                            <div class="custom-grade-container" style="display: block;">
-                                <input type="number" class="gh-form-control custom-grade-input" placeholder="Custom Grade Point" min="0" max="4" step="0.5" value="4.00">
-                            </div>
-                            <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn">
-                                <i class="fas fa-times"></i>
-                            </button>
-                        </div>
-                    </div>
-                </div>
-                
-                <button class="gh-btn gh-btn-secondary add-course-btn">
-                    <i class="fas fa-plus"></i> Add Course
-                </button>
-            </div>
-        `;
+        // Get the semester template
+        const semesterTemplate = document.getElementById('semester-template');
+        if (!semesterTemplate) return;
         
-        this.manualSemesterList.insertAdjacentHTML('beforeend', semesterHtml);
+        // Clone the template
+        const newSemester = document.importNode(semesterTemplate.content, true);
         
-        // Add event listener for the custom grade option
-        const newSemester = this.manualSemesterList.lastElementChild;
-        const gradeSelect = newSemester.querySelector('.course-grade');
-        const customGradeContainer = newSemester.querySelector('.custom-grade-container');
+        // Set the semester number
+        const semesterNumber = this.manualSemesterList.querySelectorAll('.gh-semester').length + 1;
+        newSemester.querySelector('.semester-number').textContent = semesterNumber;
         
-        gradeSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'custom') {
-                customGradeContainer.style.display = 'block';
-            } else {
-                customGradeContainer.style.display = 'none';
-            }
+        // Add the new semester to the list
+        this.manualSemesterList.appendChild(newSemester);
+        
+        // Add event listeners for the custom grade dropdowns
+        this.setupGradeDropdowns(this.manualSemesterList.lastElementChild);
+        
+        // Add one course row by default
+        this.addManualCourse(this.manualSemesterList.lastElementChild);
+    }
+    
+    /**
+     * Setup event listeners for grade dropdowns
+     * @param {HTMLElement} container - Container element with grade dropdowns
+     */
+    setupGradeDropdowns(container) {
+        const gradeSelects = container.querySelectorAll('.course-grade');
+        gradeSelects.forEach(select => {
+            select.addEventListener('change', (e) => {
+                const customGradeContainer = e.target.closest('.gh-course-inputs').querySelector('.custom-grade-container');
+                if (e.target.value === 'custom') {
+                    customGradeContainer.style.display = 'block';
+                } else {
+                    customGradeContainer.style.display = 'none';
+                }
+            });
         });
     }
     
@@ -648,48 +621,18 @@ class UiController {
         const coursesContainer = semesterElement.querySelector('.courses-container');
         if (!coursesContainer) return;
         
-        const courseHtml = `
-            <div class="gh-course-row">
-                <div class="gh-course-inputs">
-                    <input type="text" class="gh-form-control course-name" placeholder="Course Name (optional)">
-                    <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0" step="0.5">
-                    <select class="gh-form-select course-grade">
-                        <option value="custom" selected>Custom Grade</option>
-                        <option value="4.00">A+ (4.00)</option>
-                        <option value="3.75">A (3.75)</option>
-                        <option value="3.50">A- (3.50)</option>
-                        <option value="3.25">B+ (3.25)</option>
-                        <option value="3.00">B (3.00)</option>
-                        <option value="2.75">B- (2.75)</option>
-                        <option value="2.50">C+ (2.50)</option>
-                        <option value="2.25">C (2.25)</option>
-                        <option value="2.00">D (2.00)</option>
-                        <option value="0.00">F (0.00)</option>
-                    </select>
-                    <div class="custom-grade-container" style="display: block;">
-                        <input type="number" class="gh-form-control custom-grade-input" placeholder="Custom Grade Point" min="0" max="4" step="0.01" value="3.50">
-                    </div>
-                    <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn">
-                        <i class="fas fa-times"></i>
-                    </button>
-                </div>
-            </div>
-        `;
+        // Get the course template
+        const courseTemplate = document.getElementById('course-template');
+        if (!courseTemplate) return;
         
-        coursesContainer.insertAdjacentHTML('beforeend', courseHtml);
+        // Clone the template
+        const newCourse = document.importNode(courseTemplate.content, true);
         
-        // Add event listener for the custom grade option
-        const newCourse = coursesContainer.lastElementChild;
-        const gradeSelect = newCourse.querySelector('.course-grade');
-        const customGradeContainer = newCourse.querySelector('.custom-grade-container');
+        // Add the new course to the container
+        coursesContainer.appendChild(newCourse);
         
-        gradeSelect.addEventListener('change', (e) => {
-            if (e.target.value === 'custom') {
-                customGradeContainer.style.display = 'block';
-            } else {
-                customGradeContainer.style.display = 'none';
-            }
-        });
+        // Setup grade dropdown event listeners
+        this.setupGradeDropdowns(coursesContainer.lastElementChild);
     }
     
     /**
@@ -698,25 +641,94 @@ class UiController {
     updateSemesterNumbers() {
         const semesterElements = this.manualSemesterList.querySelectorAll('.gh-semester');
         semesterElements.forEach((element, index) => {
-            const heading = element.querySelector('h4');
-            if (heading) {
-                heading.textContent = `Semester ${index + 1}`;
+            const numberSpan = element.querySelector('.semester-number');
+            if (numberSpan) {
+                numberSpan.textContent = index + 1;
             }
         });
-        
-        // Update the counter for adding new semesters
-        this.manualSemesterCounter = semesterElements.length;
     }
     
     /**
+     * Validate manual calculator inputs
+     * @returns {boolean} Whether the inputs are valid
+     */
+    validateManualInputs() {
+        const semesterElements = this.manualSemesterList.querySelectorAll('.gh-semester');
+        
+        // Check if there are any semesters
+        if (semesterElements.length === 0) {
+            alert('Please add at least one semester to calculate CGPA.');
+            return false;
+        }
+        
+        let isValid = true;
+        let emptyFields = [];
+        
+        // Check each semester
+        semesterElements.forEach((semesterElement, semesterIndex) => {
+            const courseRows = semesterElement.querySelectorAll('.gh-course-row');
+            
+            // Check if the semester has any courses
+            if (courseRows.length === 0) {
+                emptyFields.push(`Semester ${semesterIndex + 1} has no courses`);
+                isValid = false;
+                return;
+            }
+            
+            // Check each course
+            courseRows.forEach((row, courseIndex) => {
+                const creditInput = row.querySelector('.course-credit');
+                const gradeSelect = row.querySelector('.course-grade');
+                
+                // Validate credit
+                if (!creditInput.value || parseFloat(creditInput.value) <= 0) {
+                    emptyFields.push(`Semester ${semesterIndex + 1}, Course ${courseIndex + 1}: Missing credit value`);
+                    creditInput.classList.add('gh-input-error');
+                    isValid = false;
+                } else {
+                    creditInput.classList.remove('gh-input-error');
+                }
+                
+                // Validate grade
+                if (!gradeSelect.value) {
+                    emptyFields.push(`Semester ${semesterIndex + 1}, Course ${courseIndex + 1}: No grade selected`);
+                    gradeSelect.classList.add('gh-input-error');
+                    isValid = false;
+                } else {
+                    gradeSelect.classList.remove('gh-input-error');
+                    
+                    // If custom grade is selected, validate the custom grade input
+                    if (gradeSelect.value === 'custom') {
+                        const customGradeInput = row.querySelector('.custom-grade-input');
+                        if (!customGradeInput.value || isNaN(parseFloat(customGradeInput.value)) || 
+                            parseFloat(customGradeInput.value) < 0 || parseFloat(customGradeInput.value) > 4) {
+                            emptyFields.push(`Semester ${semesterIndex + 1}, Course ${courseIndex + 1}: Invalid custom grade (must be 0-4)`);
+                            customGradeInput.classList.add('gh-input-error');
+                            isValid = false;
+                        } else {
+                            customGradeInput.classList.remove('gh-input-error');
+                        }
+                    }
+                }
+            });
+        });
+        
+        // Display specific validation errors if any
+        if (!isValid && emptyFields.length > 0) {
+            const errorMessage = 'Please fix the following issues:\n- ' + emptyFields.join('\n- ');
+            alert(errorMessage);
+        }
+        
+        return isValid;
+    }
+      /**
      * Calculate CGPA based on manually entered data
      */
     calculateManualCgpa() {
         // Validate inputs first
         const isValid = this.validateManualInputs();
         if (!isValid) {
-            alert('Please fill in all course credits and grades in the manual calculator.');
-            return;
+            return; // Validation message is already shown
         }
         
         // Collect semester data
@@ -764,10 +776,50 @@ class UiController {
         
         // Calculate CGPA
         const result = this.calculator.calculateManualCgpa(semesters);
+        const cgpaValue = parseFloat(result.cgpa);
         
-        // Display results
+        // Update semester GPAs in the UI
+        semesters.forEach((semester, index) => {
+            let semesterPoints = 0;
+            let semesterCredits = 0;
+            
+            semester.courses.forEach(course => {
+                semesterPoints += course.grade * course.credit;
+                semesterCredits += course.credit;
+            });
+            
+            const semesterGpa = semesterCredits > 0 ? (semesterPoints / semesterCredits).toFixed(2) : '0.00';
+            
+            // Update the semester GPA badge
+            const semesterElement = semesterElements[index];
+            const gpaBadge = semesterElement.querySelector('.semester-gpa');
+            const creditCount = semesterElement.querySelector('.semester-credit-count');
+            
+            if (gpaBadge) gpaBadge.textContent = semesterGpa;
+            if (creditCount) creditCount.textContent = semesterCredits.toFixed(1);
+        });
+        
+        // Update the circular CGPA display
+        const manualCgpaValue = document.getElementById('manual-cgpa-value');
+        if (manualCgpaValue) {
+            manualCgpaValue.textContent = result.cgpa;
+            this.updateManualCircularCgpaDisplay(cgpaValue);
+        }
+        
+        // Update stats in the new UI
+        document.getElementById('manual-total-semesters').textContent = semesters.length;
+        document.getElementById('manual-total-credits-value').textContent = result.totalCredits;
+        document.getElementById('manual-last-updated').textContent = this.formatDate(new Date());
+        
+        // Update hidden legacy elements to maintain compatibility
         this.manualTotalCgpa.textContent = `CGPA: ${result.cgpa}`;
         this.manualTotalCredits.textContent = `Total Credits: ${result.totalCredits}`;
+        
+        // Update semester count
+        const semesterCountElement = document.getElementById('manual-semester-count');
+        if (semesterCountElement) {
+            semesterCountElement.textContent = `Total Semesters: ${semesters.length}`;
+        }
         
         // Create chart for manual calculation
         this.createManualCgpaChart(semesters, result.cgpa);
@@ -780,6 +832,60 @@ class UiController {
     }
     
     /**
+     * Format date as Month Day, Year
+     * @param {Date} date - Date to format
+     * @returns {string} Formatted date string
+     */
+    formatDate(date) {
+        const options = { month: 'short', day: 'numeric', year: 'numeric' };
+        return date.toLocaleDateString('en-US', options);
+    }
+    
+    /**
+     * Update the circular CGPA display for manual calculator
+     * @param {number} cgpa - The CGPA value
+     */
+    updateManualCircularCgpaDisplay(cgpa) {
+        const cgpaCircle = document.querySelector('#manual-cgpa-display .cgpa-circle');
+        if (!cgpaCircle) return;
+        
+        // Calculate percentage for the circle fill (0-100%)
+        const percentage = (cgpa / 4) * 100;
+        
+        // Determine color based on CGPA value
+        let color;
+        if (cgpa >= 3.75) { // A+ to A
+            color = '#4CAF50'; // Green
+        } else if (cgpa >= 3.50) { // A-
+            color = '#8BC34A'; // Light Green
+        } else if (cgpa >= 3.25) { // B+
+            color = '#CDDC39'; // Lime
+        } else if (cgpa >= 3.00) { // B
+            color = '#FFEB3B'; // Yellow
+        } else if (cgpa >= 2.75) { // B-
+            color = '#FFC107'; // Amber
+        } else if (cgpa >= 2.50) { // C+
+            color = '#FF9800'; // Orange
+        } else if (cgpa >= 2.00) { // C to D
+            color = '#FF5722'; // Deep Orange
+        } else { // F
+            color = '#F44336'; // Red
+        }
+        
+        // Update circle style with CSS variables
+        cgpaCircle.style.setProperty('--cgpa-percentage', `${percentage}%`);
+        cgpaCircle.style.setProperty('--cgpa-color', color);
+        
+        // Apply the dynamic styling using conic-gradient for circle completion
+        cgpaCircle.style.background = `conic-gradient(var(--cgpa-color) 0% var(--cgpa-percentage), #e0e0e0 var(--cgpa-percentage) 100%)`;
+        
+        // Update text color to match the circle
+        const cgpaValue = document.querySelector('#manual-cgpa-display .cgpa-value');
+        if (cgpaValue) {
+            cgpaValue.style.color = color;
+        }
+    }
+      /**
      * Create chart for manual CGPA calculation
      * @param {Array} semesters - Array of semester data 
      * @param {string} finalCgpa - Final calculated CGPA
@@ -828,6 +934,11 @@ class UiController {
             this.manualCgpaChart.destroy();
         }
         
+        // Theme-aware chart colors
+        const isDarkTheme = document.documentElement.getAttribute('data-theme') === 'dark';
+        const gridColor = isDarkTheme ? 'rgba(255, 255, 255, 0.1)' : 'rgba(0, 0, 0, 0.05)';
+        const textColor = isDarkTheme ? '#e0e0e0' : '#333333';
+        
         // Create a combined chart
         this.manualCgpaChart = new Chart(ctx, {
             type: 'line',
@@ -837,10 +948,10 @@ class UiController {
                     {
                         label: 'Semester GPA',
                         data: gpaData,
-                        backgroundColor: 'rgba(56, 178, 172, 0.2)', // Updated color
-                        borderColor: 'var(--color-success)',
+                        backgroundColor: 'rgba(56, 178, 172, 0.2)',
+                        borderColor: '#38B2AC',
                         borderWidth: 2,
-                        pointBackgroundColor: 'var(--color-success)',
+                        pointBackgroundColor: '#38B2AC',
                         pointRadius: 5,
                         pointHoverRadius: 7,
                         tension: 0.1
@@ -848,10 +959,10 @@ class UiController {
                     {
                         label: 'Cumulative GPA',
                         data: cumulativeGpa,
-                        backgroundColor: 'rgba(67, 97, 238, 0.2)', // Updated color
-                        borderColor: 'var(--color-link)',
+                        backgroundColor: 'rgba(67, 97, 238, 0.2)',
+                        borderColor: '#4361EE',
                         borderWidth: 2,
-                        pointBackgroundColor: 'var(--color-link)',
+                        pointBackgroundColor: '#4361EE',
                         pointRadius: 5,
                         pointHoverRadius: 7,
                         tension: 0.1
@@ -863,23 +974,28 @@ class UiController {
                 maintainAspectRatio: false,
                 scales: {
                     y: {
-                        reverse: true, // Reverse the Y axis as requested
                         beginAtZero: false,
                         min: 0,
                         max: 4,
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
                         }
                     },
                     x: {
                         grid: {
-                            color: 'rgba(0, 0, 0, 0.05)'
+                            color: gridColor
+                        },
+                        ticks: {
+                            color: textColor
                         }
                     }
                 },
                 plugins: {
                     tooltip: {
-                        backgroundColor: 'rgba(36, 41, 46, 0.9)',
+                        backgroundColor: isDarkTheme ? 'rgba(30, 30, 30, 0.9)' : 'rgba(36, 41, 46, 0.9)',
                         titleColor: '#ffffff',
                         bodyColor: '#ffffff',
                         borderColor: 'rgba(255, 255, 255, 0.1)',
@@ -895,7 +1011,8 @@ class UiController {
                         labels: {
                             boxWidth: 12,
                             usePointStyle: true,
-                            pointStyle: 'circle'
+                            pointStyle: 'circle',
+                            color: textColor
                         }
                     }
                 }
@@ -2298,6 +2415,341 @@ class UiController {
         } catch (error) {
             console.error('Error exporting to CSV:', error);
             alert('An error occurred while exporting to CSV. Please try again.');
+        }
+    }
+
+    /**
+     * Export manual calculation results to CSV
+     */
+    exportManualResultsToCSV() {
+        // Get the semesters data from the UI
+        const semesters = [];
+        const semesterElements = this.manualSemesterList.querySelectorAll('.gh-semester');
+        
+        // Extract data from the UI
+        semesterElements.forEach((semesterElement, index) => {
+            const courseRows = semesterElement.querySelectorAll('.gh-course-row');
+            const courses = [];
+            
+            courseRows.forEach(row => {
+                const nameInput = row.querySelector('.course-name');
+                const creditInput = row.querySelector('.course-credit');
+                const gradeSelect = row.querySelector('.course-grade');
+                
+                // Only include if credit and grade are filled
+                if (creditInput.value && gradeSelect.value) {
+                    // Get grade value
+                    let gradeValue;
+                    if (gradeSelect.value === 'custom') {
+                        const customGradeInput = row.querySelector('.custom-grade-input');
+                        gradeValue = customGradeInput.value ? parseFloat(customGradeInput.value) : 0;
+                    } else {
+                        gradeValue = parseFloat(gradeSelect.value);
+                    }
+                    
+                    // Determine grade letter based on grade value
+                    let gradeLetter;
+                    if (gradeValue >= 4.00) gradeLetter = 'A+';
+                    else if (gradeValue >= 3.75) gradeLetter = 'A';
+                    else if (gradeValue >= 3.50) gradeLetter = 'A-';
+                    else if (gradeValue >= 3.25) gradeLetter = 'B+';
+                    else if (gradeValue >= 3.00) gradeLetter = 'B';
+                    else if (gradeValue >= 2.75) gradeLetter = 'B-';
+                    else if (gradeValue >= 2.50) gradeLetter = 'C+';
+                    else if (gradeValue >= 2.25) gradeLetter = 'C';
+                    else if (gradeValue >= 2.00) gradeLetter = 'D';
+                    else gradeLetter = 'F';
+                    
+                    courses.push({
+                        courseName: nameInput.value || 'Untitled Course',
+                        totalCredit: parseFloat(creditInput.value),
+                        pointEquivalent: gradeValue,
+                        gradeLetter: gradeLetter
+                    });
+                }
+            });
+            
+            if (courses.length > 0) {
+                // Calculate semester GPA
+                let semesterPoints = 0;
+                let semesterCredits = 0;
+                
+                courses.forEach(course => {
+                    semesterPoints += course.pointEquivalent * course.totalCredit;
+                    semesterCredits += course.totalCredit;
+                });
+                
+                const semesterGpa = semesterCredits > 0 ? (semesterPoints / semesterCredits).toFixed(2) : '0.00';
+                
+                semesters.push({
+                    name: `Semester ${index + 1}`,
+                    courses: courses,
+                    gpa: semesterGpa,
+                    totalCredits: semesterCredits
+                });
+            }
+        });
+        
+        // Get result data
+        const result = this.calculator.calculateManualCgpa(semesters.map((sem, index) => ({
+            id: `manual-${index + 1}`,
+            name: sem.name,
+            courses: sem.courses.map(c => ({
+                name: c.courseName,
+                credit: c.totalCredit,
+                grade: c.pointEquivalent
+            }))
+        })));
+        
+        // Create CSV content
+        let csvContent = 'Semester,GPA,Course Name,Credits,Grade,Grade Points\n';
+        
+        semesters.forEach(semester => {
+            // Add a row for each course in the semester
+            semester.courses.forEach(course => {
+                // Handle commas in course names
+                const escapedName = course.courseName.includes(',') ? `"${course.courseName}"` : course.courseName;
+                
+                csvContent += `${semester.name},${semester.gpa},${escapedName},${course.totalCredit},${course.gradeLetter},${course.pointEquivalent}\n`;
+            });
+            
+            // Add a summary row for the semester
+            csvContent += `${semester.name} Summary,${semester.gpa},Total Credits,${semester.totalCredits},,\n`;
+        });
+        
+        // Add CGPA summary
+        csvContent += `\nFinal CGPA,${result.cgpa},Total Credits,${result.totalCredits},,\n`;
+        
+        // Create and trigger download
+        const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        
+        // Set download attributes
+        const date = new Date().toISOString().split('T')[0]; // YYYY-MM-DD format
+        link.setAttribute('href', url);
+        link.setAttribute('download', `manual-cgpa-calculation-${date}.csv`);
+        link.style.display = 'none';
+        
+        // Trigger download
+        document.body.appendChild(link);
+        link.click();
+        
+        // Clean up
+        setTimeout(() => {
+            document.body.removeChild(link);
+            URL.revokeObjectURL(url);
+        }, 100);
+    }
+    
+    /**
+     * Generate PDF for manual calculation results
+     */
+    generateManualPDF() {
+        // Get the semesters data from the UI
+        const semesters = [];
+        const semesterElements = this.manualSemesterList.querySelectorAll('.gh-semester');
+        
+        // Extract data from UI
+        semesterElements.forEach((semesterElement, index) => {
+            const courseRows = semesterElement.querySelectorAll('.gh-course-row');
+            const courses = [];
+            
+            courseRows.forEach(row => {
+                const nameInput = row.querySelector('.course-name');
+                const creditInput = row.querySelector('.course-credit');
+                const gradeSelect = row.querySelector('.course-grade');
+                
+                if (creditInput.value && gradeSelect.value) {
+                    // Get grade value
+                    let gradeValue;
+                    if (gradeSelect.value === 'custom') {
+                        const customGradeInput = row.querySelector('.custom-grade-input');
+                        gradeValue = customGradeInput.value ? parseFloat(customGradeInput.value) : 0;
+                    } else {
+                        gradeValue = parseFloat(gradeSelect.value);
+                    }
+                    
+                    // Determine grade letter based on grade value
+                    let gradeLetter;
+                    if (gradeValue >= 4.00) gradeLetter = 'A+';
+                    else if (gradeValue >= 3.75) gradeLetter = 'A';
+                    else if (gradeValue >= 3.50) gradeLetter = 'A-';
+                    else if (gradeValue >= 3.25) gradeLetter = 'B+';
+                    else if (gradeValue >= 3.00) gradeLetter = 'B';
+                    else if (gradeValue >= 2.75) gradeLetter = 'B-';
+                    else if (gradeValue >= 2.50) gradeLetter = 'C+';
+                    else if (gradeValue >= 2.25) gradeLetter = 'C';
+                    else if (gradeValue >= 2.00) gradeLetter = 'D';
+                    else gradeLetter = 'F';
+                    
+                    courses.push({
+                        courseCode: 'MANUAL',
+                        courseName: nameInput.value || 'Untitled Course',
+                        totalCredit: parseFloat(creditInput.value),
+                        pointEquivalent: gradeValue,
+                        gradeLetter: gradeLetter
+                    });
+                }
+            });
+            
+            if (courses.length > 0) {
+                semesters.push({
+                    id: `manual-${index + 1}`,
+                    name: `Semester ${index + 1}`,
+                    courses: courses
+                });
+            }
+        });
+        
+        // Create simulated student info
+        const simulatedStudentInfo = {
+            name: 'Manual Calculation',
+            id: 'MANUAL-SIM-' + new Date().getTime(),
+            department: 'Simulation',
+            program: 'Manual CGPA Calculator',
+            batch: 'N/A',
+            cgpa: document.getElementById('manual-cgpa-value').textContent
+        };
+        
+        // Get CGPA data
+        const result = this.calculator.calculateManualCgpa(semesters.map(sem => ({
+            id: sem.id,
+            name: sem.name,
+            courses: sem.courses.map(c => ({
+                name: c.courseName,
+                credit: c.totalCredit,
+                grade: c.pointEquivalent
+            }))
+        })));
+        
+        // Calculate GPA for each semester
+        semesters.forEach(semester => {
+            let totalPoints = 0;
+            let totalCredits = 0;
+            
+            semester.courses.forEach(course => {
+                totalPoints += course.pointEquivalent * course.totalCredit;
+                totalCredits += course.totalCredit;
+            });
+            
+            semester.gpa = totalCredits > 0 ? (totalPoints / totalCredits).toFixed(2) : '0.00';
+            semester.totalCredits = totalCredits;
+        });
+        
+        // Use the ResultCard to generate PDF
+        if (window.ResultCard) {
+            try {
+                const pdfContent = document.getElementById('transcript-template').cloneNode(true);
+                pdfContent.style.display = 'block';
+                
+                // Update title to indicate this is a manual calculation
+                const title = pdfContent.querySelector('.transcript-title h3');
+                if (title) {
+                    title.textContent = 'Manual CGPA Calculation';
+                }
+                
+                // Update student info
+                const pdfStudentInfo = pdfContent.querySelector('#pdf-student-info');
+                if (pdfStudentInfo) {
+                    pdfStudentInfo.innerHTML = `
+                        <table>
+                            <tr>
+                                <th>Name:</th>
+                                <td>Manual Calculation</td>
+                                <th>Simulation ID:</th>
+                                <td>${simulatedStudentInfo.id}</td>
+                            </tr>
+                            <tr>
+                                <th>CGPA:</th>
+                                <td>${result.cgpa}</td>
+                                <th>Total Credits:</th>
+                                <td>${result.totalCredits}</td>
+                            </tr>
+                            <tr>
+                                <th>Simulation Date:</th>
+                                <td colspan="3">${this.formatDate(new Date())}</td>
+                            </tr>
+                        </table>
+                    `;
+                }
+                
+                // Update summary info
+                pdfContent.querySelector('#pdf-cgpa').textContent = result.cgpa;
+                pdfContent.querySelector('#pdf-credits').textContent = result.totalCredits;
+                pdfContent.querySelector('#pdf-date').textContent = this.formatDate(new Date());
+                
+                // Generate semester results content
+                const pdfSemesterResults = pdfContent.querySelector('#pdf-semester-results');
+                if (pdfSemesterResults) {
+                    let semesterHtml = '';
+                    
+                    semesters.forEach((semester, index) => {
+                        semesterHtml += `
+                            <div class="transcript-semester">
+                                <h3>${semester.name} - GPA: ${semester.gpa}</h3>
+                                <table class="transcript-courses">
+                                    <thead>
+                                        <tr>
+                                            <th>Course Name</th>
+                                            <th>Credits</th>
+                                            <th>Grade</th>
+                                            <th>Points</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                        `;
+                        
+                        semester.courses.forEach(course => {
+                            semesterHtml += `
+                                <tr>
+                                    <td>${course.courseName}</td>
+                                    <td>${course.totalCredit}</td>
+                                    <td>${course.gradeLetter}</td>
+                                    <td>${course.pointEquivalent}</td>
+                                </tr>
+                            `;
+                        });
+                        
+                        semesterHtml += `
+                                    </tbody>
+                                    <tfoot>
+                                        <tr>
+                                            <th>Semester Total</th>
+                                            <th>${semester.totalCredits}</th>
+                                            <th>GPA</th>
+                                            <th>${semester.gpa}</th>
+                                        </tr>
+                                    </tfoot>
+                                </table>
+                            </div>
+                        `;
+                    });
+                    
+                    pdfSemesterResults.innerHTML = semesterHtml;
+                }
+                
+                // Update generation date
+                pdfContent.querySelector('#pdf-generation-date').textContent = new Date().toLocaleDateString();
+                
+                // Generate PDF
+                const options = {
+                    margin: 10,
+                    filename: `manual-cgpa-calculation-${new Date().toISOString().split('T')[0]}.pdf`,
+                    image: { type: 'jpeg', quality: 0.98 },
+                    html2canvas: { scale: 2 },
+                    jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+                };
+                
+                // Generate the PDF
+                html2pdf().from(pdfContent).set(options).save();
+                
+            } catch (error) {
+                console.error('Error generating PDF:', error);
+                alert('An error occurred while generating the PDF. Please try again.');
+            }
+        } else {
+            alert('PDF generation component is not available. Please try again later.');
         }
     }
 }
