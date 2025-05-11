@@ -1033,16 +1033,11 @@ class UiController {
             if (timeout > 120) timeout = 120;
             
             console.log(`Setting API timeout to ${timeout} seconds`);
-            
-            // Set custom API options
+              // Set custom API options
             this.apiService.setTimeout(timeout);
             
             // Clear any previous error message
             Helpers.hideElement(document.getElementById('advanced-error-message'));
-            
-            if (this.advancedBaseUrl.value.trim()) {
-                this.apiService.setBaseUrl(this.advancedBaseUrl.value.trim());
-            }
             
             // Create a global variable to track the start time
             window.fetchStartTime = performance.now();
@@ -1070,8 +1065,7 @@ class UiController {
             timerDisplay.style.color = 'var(--color-text-secondary)';
             timerDisplay.textContent = `Time elapsed: 0.0 seconds`;
             resultsContainer.appendChild(timerDisplay);
-            
-            // Set up timer update interval that uses the global startTime
+              // Set up timer update interval that uses the global startTime
             const timerInterval = setInterval(() => {
                 if (!window.fetchStartTime) return; // Safety check
                 const currentTime = performance.now();
@@ -1089,8 +1083,6 @@ class UiController {
                 case 'single':
                     const singleId = this.advancedStudentId.value.trim();
                     if (!singleId) {
-                        throw new Error('Please enter a student ID');
-                    }                    if (!Helpers.isValidStudentId(singleId)) {
                         throw new Error('Please enter a student ID');
                     }
                     studentIds.push(singleId);
@@ -1128,16 +1120,10 @@ class UiController {
                     
                     // Split by commas, newlines, or spaces
                     studentIds = multipleIdsText.split(/[\s,]+/).filter(id => id.trim().length > 0);
-                    
-                    if (studentIds.length > 50) {
+                      if (studentIds.length > 50) {
                         throw new Error('Too many IDs. Maximum of 50 students allowed.');
                     }
                     
-                    // Validate each ID
-                    for (const id of studentIds) {                        if (!Helpers.isValidStudentId(id)) {
-                            throw new Error(`Invalid student ID: ${id}`);
-                        }
-                    }
                     break;
                     
                 default:
