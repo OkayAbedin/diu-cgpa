@@ -302,9 +302,8 @@ class UiController {
      */
     async handleCalculate() {
         const studentId = this.studentIdInput.value.trim();
-        
-        if (!Helpers.isValidStudentId(studentId)) {
-            alert('Please enter a valid student ID (e.g., 221-15-4919)');
+          if (!Helpers.isValidStudentId(studentId)) {
+            alert('Please enter a student ID');
             return;
         }
         
@@ -1091,9 +1090,8 @@ class UiController {
                     const singleId = this.advancedStudentId.value.trim();
                     if (!singleId) {
                         throw new Error('Please enter a student ID');
-                    }
-                    if (!Helpers.isValidStudentId(singleId)) {
-                        throw new Error('Please enter a valid student ID (e.g., 221-15-4919)');
+                    }                    if (!Helpers.isValidStudentId(singleId)) {
+                        throw new Error('Please enter a student ID');
                     }
                     studentIds.push(singleId);
                     break;
@@ -1136,9 +1134,8 @@ class UiController {
                     }
                     
                     // Validate each ID
-                    for (const id of studentIds) {
-                        if (!Helpers.isValidStudentId(id)) {
-                            throw new Error(`Invalid student ID format: ${id}`);
+                    for (const id of studentIds) {                        if (!Helpers.isValidStudentId(id)) {
+                            throw new Error(`Invalid student ID: ${id}`);
                         }
                     }
                     break;

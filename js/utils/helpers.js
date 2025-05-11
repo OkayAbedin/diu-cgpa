@@ -21,18 +21,14 @@ class Helpers {
         if (element) {
             element.classList.add('hidden');
         }
-    }
-
-    /**
+    }    /**
      * Validate student ID format
      * @param {string} studentId - The student ID to validate
      * @returns {boolean} True if valid, false otherwise
      */
     static isValidStudentId(studentId) {
-        // Validation for DIU student ID format (e.g., 221-15-4919)
-        // Format: 3 digits, hyphen, 2 digits, hyphen, any number of digits
-        const regex = /^\d{3}-\d{2}-\d+$/;
-        return regex.test(studentId);
+        // Validation removed as requested - any non-empty ID is valid now
+        return studentId && studentId.trim() !== '';
     }
 
     /**

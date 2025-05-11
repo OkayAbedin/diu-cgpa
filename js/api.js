@@ -338,16 +338,18 @@ class ApiService {
      * @param {Array} semesterList - Array of semester objects
      * @returns {Promise<Object>} Object containing semester results by semesterId and missingSemesters
      */
-    async getAllSemesterResults(studentId, semesterList) {
-        try {
+    async getAllSemesterResults(studentId, semesterList) {        try {
             if (!semesterList || !Array.isArray(semesterList) || semesterList.length === 0) {
                 throw new Error('No semester list provided');
             }
             
-            // Extract enrollment semester ID from student ID (first three digits)
-            const enrollmentSemesterId = studentId.split('-')[0];
-            if (!enrollmentSemesterId || enrollmentSemesterId.length !== 3) {
-                console.warn(`Could not extract enrollment semester from student ID: ${studentId}, using default approach`);
+            // First, get student info to obtain enrollment semester
+            const studentInfo = await this.getStudentInfo(studentId);
+            
+            // Get enrollment semester ID from student info
+            const enrollmentSemesterId = studentInfo.semesterId || studentInfo.enrollmentSemesterId;
+            if (!enrollmentSemesterId) {
+                console.warn(`Could not get enrollment semester from student info for: ${studentId}, using default approach`);
                 return this.getAllSemesterResultsLegacy(studentId, semesterList);
             }
             
@@ -587,8 +589,7 @@ class ApiService {
             // Progress update: Starting
             if (progressCallback) progressCallback('starting', 0, 'Initializing request...');
             
-            // Step 1: Get student info
-            if (progressCallback) progressCallback('fetching_info', 10, 'Fetching student information...');
+            // Step 1: Get student info            if (progressCallback) progressCallback('fetching_info', 10, 'Fetching student information...');
             const studentInfo = await this.getStudentInfo(studentId);
             
             // Step 2: Get semester list
@@ -598,8 +599,8 @@ class ApiService {
             // Step 3: Get all semester results
             if (progressCallback) progressCallback('fetching_results', 30, 'Preparing to fetch semester results...');
             
-            // Extract enrollment semester ID from student ID (first three digits)
-            const enrollmentSemesterId = studentId.split('-')[0];
+            // Get enrollment semester ID from student info response
+            const enrollmentSemesterId = studentInfo.semesterId || studentInfo.enrollmentSemesterId;
             
             // Sort semesters for proper order
             const sortedSemesters = [...semesterList].sort((a, b) => 
@@ -608,7 +609,7 @@ class ApiService {
             
             // Find the starting semester
             let startSemesterIndex = 0;
-            if (enrollmentSemesterId && enrollmentSemesterId.length === 3) {
+            if (enrollmentSemesterId) {
                 startSemesterIndex = sortedSemesters.findIndex(s => 
                     parseInt(s.semesterId) >= parseInt(enrollmentSemesterId)
                 );
