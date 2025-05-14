@@ -47,8 +47,7 @@ class UiController {
         this.studentInfo = null;
         this.semesterResults = {};
         this.manualSemesterCounter = 1;
-        
-        // DOM Elements - Advanced Fetch
+          // DOM Elements - Advanced Fetch
         this.advancedTimeout = document.getElementById('advanced-timeout');
         this.advancedBaseUrl = document.getElementById('advanced-base-url');
         this.advancedStudentId = document.getElementById('advanced-student-id');
@@ -57,7 +56,7 @@ class UiController {
         this.advancedResults = document.getElementById('advanced-results');
         this.advancedErrorMessage = document.getElementById('advanced-error-message');
         this.exportResultsBtn = document.getElementById('export-results-btn');
-        
+        this.semesterSelect = document.getElementById('semester-select');
         // Fetch mode forms
         this.fetchModeRadios = document.querySelectorAll('input[name="fetch-mode"]');
         this.singleStudentForm = document.getElementById('single-student-form');
@@ -77,8 +76,7 @@ class UiController {
     }
       /**
      * Initialize the application
-     */
-    async init() {
+     */    async init() {
         this.bindEvents();
         
         // Initialize theme from localStorage
@@ -91,10 +89,37 @@ class UiController {
         
         try {
             await this.loadSemesterList();
+            // Populate semester dropdown after loading semester list
+            this.populateSemesterDropdown();
         } catch (error) {
             console.error('Failed to load semester list:', error);
             this.showError('Failed to load semester list. Please check your internet connection and try again.');
         }
+    }
+      /**
+     * Populate the semester dropdown menu with options from the semester list
+     */
+    populateSemesterDropdown() {
+        const semesterSelect = document.getElementById('semester-select');
+        if (!semesterSelect || !this.semesterList || !Array.isArray(this.semesterList)) return;
+        
+        // Clear existing options except "All Semesters"
+        while (semesterSelect.options.length > 1) {
+            semesterSelect.remove(1);
+        }
+        
+        // Sort semesters by ID in reverse order (newest first)
+        const sortedSemesters = [...this.semesterList].sort((a, b) => 
+            parseInt(b.semesterId) - parseInt(a.semesterId)
+        );
+        
+        // Add sorted semesters to dropdown
+        sortedSemesters.forEach(semester => {
+            const option = document.createElement('option');
+            option.value = semester.semesterId;
+            option.textContent = `${semester.semesterName} ${semester.semesterYear}`;
+            semesterSelect.appendChild(option);
+        });
     }
     
     /**
@@ -317,14 +342,26 @@ class UiController {
             // Show loading section with detailed progress
             Helpers.showElement(this.loadingSection);
             this.showDetailedProgress();
-            
-            // Record start time for performance monitoring
+              // Record start time for performance monitoring
             const apiStartTime = performance.now();
             
+            // Check if a specific semester is selected
+            let selectedSemesterId = null;
+            if (this.semesterSelect) {
+                const selectedSemester = this.semesterSelect.value;
+                if (selectedSemester && selectedSemester !== 'all') {
+                    selectedSemesterId = selectedSemester;
+                }
+            }
+            
             // Fetch the student CGPA data with progress tracking
-            const result = await this.apiService.fetchStudentCGPA(studentId, (stage, progress, message, data) => {
-                this.updateProgressInfo(stage, progress, message, data);
-            });
+            const result = await this.apiService.fetchStudentCGPA(
+                studentId, 
+                (stage, progress, message, data) => {
+                    this.updateProgressInfo(stage, progress, message, data);
+                },
+                selectedSemesterId
+            );
             
             // Store the fetched data
             this.studentInfo = result.studentInfo;
@@ -373,8 +410,7 @@ class UiController {
      * @param {number} progress - Progress percentage (0-100)
      * @param {string} message - Current progress message
      * @param {Object} data - Additional data related to the current stage
-     */
-    updateProgressInfo(stage, progress, message, data) {
+     */    updateProgressInfo(stage, progress, message, data) {
         // Get the loading message and progress bar elements
         const messageElement = document.getElementById('loading-message');
         const progressBar = document.getElementById('loading-progress-bar');
@@ -388,9 +424,25 @@ class UiController {
         // Display current semester being fetched
         if (stage === 'fetching_semester' && data) {
             const semesterName = `${data.semesterName} ${data.semesterYear}`;
-            messageElement.textContent = `Fetching ${semesterName} (${data.semesterId})...`;
+            let statusText = `Fetching ${semesterName} (${data.semesterId})...`;
+            
+            // If filtering by a specific semester, show that information
+            if (this.semesterSelect && this.semesterSelect.value !== 'all') {
+                const selectedOption = this.semesterSelect.options[this.semesterSelect.selectedIndex];
+                statusText += ` (Filtering for ${selectedOption.textContent})`;
+            }
+            
+            messageElement.textContent = statusText;
         } else if (stage === 'complete') {
-            messageElement.textContent = 'All data fetched successfully!';
+            let completionText = 'All data fetched successfully!';
+            
+            // If filtering by a specific semester, show that information
+            if (this.semesterSelect && this.semesterSelect.value !== 'all') {
+                const selectedOption = this.semesterSelect.options[this.semesterSelect.selectedIndex];
+                completionText += ` (Showing only ${selectedOption.textContent})`;
+            }
+            
+            messageElement.textContent = completionText;
         }
     }
     
@@ -415,8 +467,7 @@ class UiController {
     
     /**
      * Display student info and results
-     */
-    displayResults() {
+     */    displayResults() {
         // Display student info
         this.displayStudentInfo();
         
@@ -431,6 +482,40 @@ class UiController {
             this.showMissingSemestersWarning(this.semesterResults.missingSemesters);
         }
         
+        // Check if a specific semester is selected
+        let selectedSemesterName = null;
+        if (this.semesterSelect && this.semesterSelect.value !== 'all') {
+            const selectedOption = this.semesterSelect.options[this.semesterSelect.selectedIndex];
+            selectedSemesterName = selectedOption.textContent;
+            
+            // Add a filter notification banner
+            const filterNotice = document.createElement('div');
+            filterNotice.className = 'gh-alert gh-alert-info';
+            filterNotice.innerHTML = `
+                <div class="gh-alert-content">
+                    <p><strong>Note:</strong> Showing results for ${selectedSemesterName} only. <a href="#" id="clear-semester-filter">Show all semesters</a></p>
+                </div>
+            `;
+            
+            // Add clear filter functionality
+            setTimeout(() => {
+                const clearFilterLink = document.getElementById('clear-semester-filter');
+                if (clearFilterLink) {
+                    clearFilterLink.addEventListener('click', (e) => {
+                        e.preventDefault();
+                        this.semesterSelect.value = 'all';
+                        this.handleCalculate();
+                    });
+                }
+            }, 0);
+            
+            // Insert the filter notice at the top of the results container
+            const resultsContainer = document.getElementById('results-container');
+            if (resultsContainer && resultsContainer.firstChild) {
+                resultsContainer.insertBefore(filterNotice, resultsContainer.firstChild);
+            }
+        }
+        
         // Calculate and display CGPA
         const { cgpa, totalCredits } = this.calculator.calculateCgpa(this.semesterResults);
         
@@ -441,22 +526,29 @@ class UiController {
             
             // Update the circular display to reflect the CGPA value
             this.updateCircularCgpaDisplay(parseFloat(cgpa));
+            
+            // If filtering by semester, add indication to CGPA display
+            if (selectedSemesterName) {
+                const cgpaLabelElement = document.querySelector('.cgpa-label');
+                if (cgpaLabelElement) {
+                    cgpaLabelElement.textContent = `CGPA (${selectedSemesterName})`;
+                }
+            }
         }
-        
-        // Process semester data
+          // Process semester data
         const semesterData = this.calculator.processSemesterData(
             this.semesterResults, 
             this.semesterList
         );
         
         // Update the stats in the student info section
-        StudentInfo.updateStats(semesterData.length, totalCredits);
+        StudentInfo.updateStats(semesterData.length, totalCredits, selectedSemesterName);
         
         // Display semester results
         this.semesterResultsSection.innerHTML = SemesterList.render(semesterData);
         
         // Create CGPA chart
-        this.createCgpaChart(semesterData);
+        this.createCgpaChart(semesterData, selectedSemesterName);
         
         Helpers.showElement(this.resultsContainer);
     }
@@ -1194,8 +1286,7 @@ class UiController {
             }, 100);
             
             let studentIds = [];
-            
-            // Get student IDs based on the selected mode
+              // Get student IDs based on the selected mode
             switch (selectedMode) {
                 case 'single':
                     const singleId = this.advancedStudentId.value.trim();
@@ -1203,6 +1294,17 @@ class UiController {
                         throw new Error('Please enter a student ID');
                     }
                     studentIds.push(singleId);
+                    
+                    // If it's a single student, check for semester selection
+                    if (this.semesterSelect) {
+                        const selectedSemester = this.semesterSelect.value;
+                        if (selectedSemester && selectedSemester !== 'all') {
+                            // Store the selected semester to use later
+                            this.selectedSemester = selectedSemester;
+                        } else {
+                            this.selectedSemester = null;
+                        }
+                    }
                     break;
                     
                 case 'range':
@@ -1249,6 +1351,12 @@ class UiController {
             
             if (studentIds.length === 0) {
                 throw new Error('No valid student IDs provided');
+            }            // Fetch data for each student ID
+            const fetchOptions = {};
+            
+            // Add semester selection for single student mode
+            if (selectedMode === 'single' && this.selectedSemester) {
+                fetchOptions.semesterId = this.selectedSemester;
             }
             
             // Fetch data for each student ID
@@ -1261,6 +1369,7 @@ class UiController {
                         <p>Fetching data: ${completed}/${total} (${progress}%)</p>
                         <p>Current ID: ${currentId}</p>
                         <p><small>Timeout setting: ${timeout} seconds per request</small></p>
+                        ${fetchOptions.semesterId ? `<p><small>Filtering for semester ID: ${fetchOptions.semesterId}</small></p>` : ''}
                     </div>`;
                     
                     // Re-add timer display during progress updates
@@ -1272,7 +1381,8 @@ class UiController {
                     const elapsedTime = ((performance.now() - window.fetchStartTime) / 1000).toFixed(1);
                     newTimerDisplay.textContent = `Time elapsed: ${elapsedTime} seconds`;
                     resultsContainer.appendChild(newTimerDisplay);
-                }
+                },
+                fetchOptions
             );
             
             // Clear slow response check interval
@@ -2060,8 +2170,12 @@ class UiController {
     /**
      * Create CGPA chart using Chart.js
      * @param {Array} semesterData - Array of semester data objects
+     */    /**
+     * Create chart for CGPA visualization
+     * @param {Array} semesterData - Array of processed semester data
+     * @param {string|null} selectedSemesterName - Name of selected semester for filtering
      */
-    createCgpaChart(semesterData) {
+    createCgpaChart(semesterData, selectedSemesterName = null) {
         if (!semesterData || semesterData.length === 0 || !this.cgpaChartCanvas) return;
         
         // Show chart container
@@ -2140,8 +2254,7 @@ class UiController {
         if (this.cgpaChart) {
             this.cgpaChart.destroy();
         }
-        
-        // Create beautiful chart
+          // Create beautiful chart
         this.cgpaChart = new Chart(ctx, {
             type: 'line',
             data: {
@@ -2162,7 +2275,7 @@ class UiController {
                         fill: false // Disable area fill
                     },
                     {
-                        label: 'Cumulative GPA',
+                        label: selectedSemesterName ? 'GPA' : 'Cumulative GPA',
                         data: cumulativeGpa,
                         backgroundColor: 'transparent', // Remove area fill
                         borderColor: '#4361EE', // Blue for cumulative GPA
@@ -2173,13 +2286,43 @@ class UiController {
                         pointBorderWidth: 2,
                         pointBorderColor: 'white',
                         tension: 0.2,
-                        fill: false // Disable area fill
+                        fill: false, // Disable area fill
+                        // Hide the cumulative line when showing only one semester
+                        hidden: selectedSemesterName ? true : false
                     }
                 ]
-            },
-            options: {
+            },            options: {
                 responsive: true,
                 maintainAspectRatio: false,
+                plugins: {
+                    title: {
+                        display: !!selectedSemesterName,
+                        text: selectedSemesterName ? `Showing results for ${selectedSemesterName}` : '',
+                        position: 'top',
+                        padding: {
+                            top: 10,
+                            bottom: 10
+                        },
+                        font: {
+                            size: 14
+                        }
+                    },
+                    tooltip: {
+                        mode: 'index',
+                        intersect: false,
+                        backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                        titleFont: {
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            size: 13
+                        },
+                        padding: 10,
+                        cornerRadius: 4,
+                        displayColors: true
+                    }
+                },
                 scales: {
                     y: {
                         beginAtZero: false,

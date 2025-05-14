@@ -576,20 +576,26 @@ class ApiService {
      */
     hasMissingSemesters() {
         return this.missingSemesters.length > 0;
-    }
-
-    /**
+    }    /**
      * Fetches student CGPA data with progress tracking
      * @param {string} studentId - The student ID
+     * @param {string|null} semesterId - Optional semester ID to fetch only one semester. If null or "all", fetches all semesters.
      * @param {function} progressCallback - Optional callback for progress updates
      * @returns {Promise<Object>} Complete student data including info and results
      */
-    async fetchStudentCGPA(studentId, progressCallback = null) {
+    async fetchStudentCGPA(studentId, semesterId = null, progressCallback = null) {
         try {
+            // If semesterId is passed as a function (old API usage), adjust parameters
+            if (typeof semesterId === 'function' && progressCallback === null) {
+                progressCallback = semesterId;
+                semesterId = null;
+            }
+            
             // Progress update: Starting
             if (progressCallback) progressCallback('starting', 0, 'Initializing request...');
             
-            // Step 1: Get student info            if (progressCallback) progressCallback('fetching_info', 10, 'Fetching student information...');
+            // Step 1: Get student info            
+            if (progressCallback) progressCallback('fetching_info', 10, 'Fetching student information...');
             const studentInfo = await this.getStudentInfo(studentId);
             
             // Step 2: Get semester list
@@ -620,14 +626,24 @@ class ApiService {
             const relevantSemesters = sortedSemesters.slice(startSemesterIndex);
             const totalSemesters = relevantSemesters.length;
             
-            // Initialize results object
+            // Filter semesters if a specific semester is selected
+            let semestersToFetch = relevantSemesters;
+            if (semesterId && semesterId !== 'all') {
+                semestersToFetch = relevantSemesters.filter(s => s.semesterId === semesterId);
+                
+                // If no matching semester is found, show an error
+                if (semestersToFetch.length === 0) {
+                    throw new Error(`Selected semester (ID: ${semesterId}) not found or not available for this student.`);
+                }
+            }
+              // Initialize results object
             const allResults = {};
             let emptyCount = 0;
             this.missingSemesters = []; // Reset missing semesters list
             
             // Fetch each semester with detailed progress updates
-            for (let i = 0; i < relevantSemesters.length; i++) {
-                const semester = relevantSemesters[i];
+            for (let i = 0; i < semestersToFetch.length; i++) {
+                const semester = semestersToFetch[i];
                 
                 // Stop after four consecutive empty semesters
                 if (emptyCount >= 4) {
@@ -635,7 +651,7 @@ class ApiService {
                 }
                 
                 // Calculate progress based on current semester index
-                const semesterProgress = 30 + Math.floor(((i + 1) / totalSemesters) * 60);
+                const semesterProgress = 30 + Math.floor(((i + 1) / semestersToFetch.length) * 60);
                 const progressMessage = `Fetching ${semester.semesterName} ${semester.semesterYear} (${semester.semesterId})...`;
                 
                 if (progressCallback) progressCallback('fetching_semester', semesterProgress, progressMessage, semester);
@@ -769,15 +785,15 @@ class ApiService {
             studentIds.push(`${prefix}${i}`);
         }
         return studentIds;
-    }
-
-    /**
+    }    /**
      * Fetch CGPA data for multiple student IDs with progress tracking
      * @param {Array} studentIds - Array of student IDs to fetch
      * @param {Function} progressCallback - Callback for fetch progress updates
+     * @param {Object} options - Additional options
+     * @param {string} options.semesterId - Optional semester ID to fetch specific semester data
      * @returns {Object} Object containing results and errors
      */
-    async fetchMultipleStudentsCGPA(studentIds, progressCallback) {
+    async fetchMultipleStudentsCGPA(studentIds, progressCallback, options = {}) {
         const results = {};
         const errors = {};
         let completed = 0;
@@ -791,8 +807,12 @@ class ApiService {
                     progressCallback('Processing', progress, studentId, completed, total);
                 }
                 
-                // Fetch student data
-                const studentData = await this.fetchStudentCGPA(studentId);
+                // Fetch student data with optional semester filter
+                const studentData = await this.fetchStudentCGPA(
+                    studentId, 
+                    options?.semesterId || null, 
+                    null
+                );
                 
                 // Store result
                 results[studentId] = studentData;

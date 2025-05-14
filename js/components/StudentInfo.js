@@ -65,18 +65,44 @@ class StudentInfo {
             </div>
         `;
     }
-    
-    /**
+      /**
      * Update stats in the student info section
      * @param {number} semesters - Number of semesters
      * @param {number} credits - Total credits
+     * @param {string|null} selectedSemesterName - Name of selected semester for filtering (optional)
      */
-    static updateStats(semesters, credits) {
+    static updateStats(semesters, credits, selectedSemesterName = null) {
         const semestersElement = document.getElementById('total-semesters');
         const creditsElement = document.getElementById('total-credits');
         
-        if (semestersElement) semestersElement.textContent = semesters;
-        if (creditsElement) creditsElement.textContent = credits;
+        if (semestersElement) {
+            if (selectedSemesterName) {
+                semestersElement.textContent = '1';
+                semestersElement.setAttribute('title', `Showing 1 semester (${selectedSemesterName})`);
+            } else {
+                semestersElement.textContent = semesters;
+                semestersElement.removeAttribute('title');
+            }
+        }
+        
+        if (creditsElement) {
+            creditsElement.textContent = credits;
+            if (selectedSemesterName) {
+                creditsElement.setAttribute('title', `Credits for ${selectedSemesterName}`);
+            } else {
+                creditsElement.removeAttribute('title');
+            }
+        }
+        
+        // Update CGPA label if needed
+        const cgpaLabelElement = document.querySelector('.cgpa-label');
+        if (cgpaLabelElement) {
+            if (selectedSemesterName) {
+                cgpaLabelElement.textContent = `CGPA (${selectedSemesterName})`;
+            } else {
+                cgpaLabelElement.textContent = 'CGPA';
+            }
+        }
     }
 }
 
