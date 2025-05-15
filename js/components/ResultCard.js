@@ -212,18 +212,32 @@ class ResultCard {
                             padding: 20px;
                             display: flex;
                             justify-content: center;
-                        }
-                        .message {
+                        }                        .message {
                             color: var(--color-text-secondary);
                             font-size: var(--font-size-small);
                             margin: 20px;
                         }
                         @media print {
+                            body {
+                                margin: 0;
+                                padding: 0;
+                                background: #ffffff;
+                            }
                             .controls, .message {
                                 display: none;
                             }
                             .content-wrapper {
-                                margin-top: 0;
+                                margin: 0;
+                                padding: 0;
+                                display: block;
+                            }
+                            .transcript-container {
+                                width: 210mm;
+                                min-height: 297mm;
+                                margin: 0;
+                                padding: 10mm;
+                                box-shadow: none;
+                                page-break-inside: avoid;
                             }
                         }
                         /* Transcript styles */
@@ -270,22 +284,32 @@ class ResultCard {
                             color: #555;
                         }
                     </style>
-                </head>                <body>
-                    <div class="controls">
+                </head>                <body>                    <div class="controls">
                         <button class="btn" id="savePdf">Save as PDF</button>
                         <button class="btn" id="printBtn">Print</button>
                         <button class="btn" id="closeBtn">Close</button>
-                        <span style="font-size: var(--font-size-small); margin-left: 15px; color: #e2e8f0;">Preview your transcript before saving or printing</span>
+                        <span style="font-size: var(--font-size-small); margin-left: 15px; color: #e2e8f0;">Click "Save as PDF" to download or "Print" for a paper copy</span>
                     </div>
                     <div class="content-wrapper" id="content">
                         <div class="message">Loading transcript...</div>
-                    </div>
-                    <script>
+                    </div>                    <script>
                         document.getElementById("closeBtn").addEventListener("click", function() {
                             window.close();
                         });
                         
                         document.getElementById("printBtn").addEventListener("click", function() {
+                            // Ensure the content wrapper has proper print styling
+                            document.querySelector('.content-wrapper').style.margin = "0";
+                            document.querySelector('.content-wrapper').style.padding = "0";
+                            
+                            // Optimize transcript container for printing
+                            const transcriptContainer = document.querySelector('.transcript-container');
+                            if (transcriptContainer) {
+                                transcriptContainer.style.margin = "0";
+                                transcriptContainer.style.boxShadow = "none";
+                            }
+                            
+                            // Print the document
                             window.print();
                         });
                     </script>
