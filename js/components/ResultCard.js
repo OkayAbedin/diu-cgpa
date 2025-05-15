@@ -469,8 +469,7 @@ class ResultCard {
                         noData.textContent = "No semester data available";
                         transcriptContainer.appendChild(noData);
                     }
-                    
-                    // Add timer information display
+                      // Add timer information display
                     if (this.fetchTimerValue) {
                         const timerInfo = previewWindow.document.createElement("div");
                         timerInfo.className = "timer-info";
@@ -480,7 +479,91 @@ class ResultCard {
                         timerInfo.style.textAlign = "center";
                         timerInfo.textContent = `Data fetched in ${this.fetchTimerValue} seconds`;
                         transcriptContainer.appendChild(timerInfo);
+                    }                    // Add CGPA and Total Credits Summary Box
+                    const cgpaSummary = previewWindow.document.createElement("div");
+                    cgpaSummary.className = "cgpa-summary";
+                    cgpaSummary.style.marginTop = "10mm";
+                    cgpaSummary.style.marginBottom = "10mm";
+                    cgpaSummary.style.textAlign = "right";
+                    
+                    // Calculate CGPA and total credits if not provided
+                    let totalCGPA = cgpaData?.cgpa || "0.00";
+                    let totalCredits = cgpaData?.totalCredits || "0";
+                    
+                    // If cgpaData is not provided, calculate from semester data
+                    if (!cgpaData && semesterData && semesterData.length > 0) {
+                        let creditSum = 0;
+                        let weightedSum = 0;
+                        
+                        semesterData.forEach(sem => {
+                            const credits = parseFloat(sem.totalCredits || sem.totalCredit || 0);
+                            const gpa = parseFloat(sem.gpa || sem.cgpa || 0);
+                            
+                            if (!isNaN(credits) && !isNaN(gpa)) {
+                                creditSum += credits;
+                                weightedSum += credits * gpa;
+                            }
+                        });
+                        
+                        totalCGPA = creditSum > 0 ? (weightedSum / creditSum).toFixed(2) : "0.00";
+                        totalCredits = creditSum.toString();
                     }
+                    
+                    // Create summary table
+                    const summaryTable = previewWindow.document.createElement("table");
+                    summaryTable.style.width = "auto";
+                    summaryTable.style.marginLeft = "auto"; // Right align the table
+                    summaryTable.style.borderCollapse = "collapse";
+                    summaryTable.style.border = "1px solid #000";
+                    
+                    // CGPA row
+                    const cgpaRow = previewWindow.document.createElement("tr");
+                    
+                    const cgpaLabelCell = previewWindow.document.createElement("td");
+                    cgpaLabelCell.style.padding = "3px 10px";
+                    cgpaLabelCell.style.border = "1px solid #000";
+                    cgpaLabelCell.style.fontWeight = "bold";
+                    cgpaLabelCell.textContent = "CGPA";
+                    
+                    const cgpaValueCell = previewWindow.document.createElement("td");
+                    cgpaValueCell.style.padding = "3px 10px";
+                    cgpaValueCell.style.border = "1px solid #000";
+                    cgpaValueCell.style.width = "60px";
+                    cgpaValueCell.style.textAlign = "center";
+                    cgpaValueCell.style.fontWeight = "bold";
+                    cgpaValueCell.textContent = totalCGPA;
+                    
+                    cgpaRow.appendChild(cgpaLabelCell);
+                    cgpaRow.appendChild(cgpaValueCell);
+                    
+                    // Credits row
+                    const creditsRow = previewWindow.document.createElement("tr");
+                    
+                    const creditsLabelCell = previewWindow.document.createElement("td");
+                    creditsLabelCell.style.padding = "3px 10px";
+                    creditsLabelCell.style.border = "1px solid #000";
+                    creditsLabelCell.style.fontWeight = "bold";
+                    creditsLabelCell.textContent = "Credits Completed";
+                    
+                    const creditsValueCell = previewWindow.document.createElement("td");
+                    creditsValueCell.style.padding = "3px 10px";
+                    creditsValueCell.style.border = "1px solid #000";
+                    creditsValueCell.style.width = "60px";
+                    creditsValueCell.style.textAlign = "center";
+                    creditsValueCell.style.fontWeight = "bold";
+                    creditsValueCell.textContent = totalCredits;
+                    
+                    creditsRow.appendChild(creditsLabelCell);
+                    creditsRow.appendChild(creditsValueCell);
+                    
+                    // Add rows to table
+                    summaryTable.appendChild(cgpaRow);
+                    summaryTable.appendChild(creditsRow);
+                    
+                    // Add table to summary container
+                    cgpaSummary.appendChild(summaryTable);
+                    
+                    transcriptContainer.appendChild(cgpaSummary);
                     
                     // Add footer
                     const footer = previewWindow.document.createElement("div");
@@ -530,9 +613,11 @@ class ResultCard {
         
         // Add program and student information section
         container.appendChild(this.createStudentSection(studentInfo));
-        
-        // Add semester results (will handle pagination) - this needs to be exactly like the image
+          // Add semester results (will handle pagination) - this needs to be exactly like the image
         this.appendSemesterTables(container, semesterData);
+        
+        // Add CGPA and Total Credits Summary Box
+        container.appendChild(this.createCGPASummary(semesterData, cgpaData));
         
         // Add transcript footer
         container.appendChild(this.createTranscriptFooter());
@@ -854,9 +939,7 @@ class ResultCard {
         tableContainer.appendChild(table);
         
         return tableContainer;
-    }
-
-    /**
+    }    /**
      * Create transcript footer with disclaimer text
      * @returns {HTMLElement} Footer element
      */
@@ -874,6 +957,97 @@ class ResultCard {
         footer.appendChild(disclaimer);
         
         return footer;
+    }    /**
+     * Create a summary box displaying CGPA and total credits
+     * @param {Array} semesterData - Array of semester data
+     * @param {Object} cgpaData - Object containing CGPA and total credits
+     * @returns {HTMLElement} CGPA summary box
+     */
+    createCGPASummary(semesterData, cgpaData) {
+        const summaryBox = document.createElement('div');
+        summaryBox.className = 'cgpa-summary';
+        summaryBox.style.marginTop = '10mm';
+        summaryBox.style.marginBottom = '10mm';
+        summaryBox.style.textAlign = 'right';
+        
+        // Calculate CGPA and total credits if not provided
+        let totalCGPA = cgpaData?.cgpa || "0.00";
+        let totalCredits = cgpaData?.totalCredits || "0";
+        
+        // If cgpaData is not provided, calculate from semester data
+        if (!cgpaData && semesterData && semesterData.length > 0) {
+            let creditSum = 0;
+            let weightedSum = 0;
+            
+            semesterData.forEach(sem => {
+                const credits = parseFloat(sem.totalCredits || sem.totalCredit || 0);
+                const gpa = parseFloat(sem.gpa || sem.cgpa || 0);
+                
+                if (!isNaN(credits) && !isNaN(gpa)) {
+                    creditSum += credits;
+                    weightedSum += credits * gpa;
+                }
+            });
+            
+            totalCGPA = creditSum > 0 ? (weightedSum / creditSum).toFixed(2) : "0.00";
+            totalCredits = creditSum.toString();
+        }
+        
+        // Create summary table
+        const summaryTable = document.createElement('table');
+        summaryTable.style.width = 'auto';
+        summaryTable.style.marginLeft = 'auto'; // Right align the table
+        summaryTable.style.borderCollapse = 'collapse';
+        summaryTable.style.border = '1px solid #000';
+        
+        // CGPA row
+        const cgpaRow = document.createElement('tr');
+        
+        const cgpaLabelCell = document.createElement('td');
+        cgpaLabelCell.style.padding = '3px 10px';
+        cgpaLabelCell.style.border = '1px solid #000';
+        cgpaLabelCell.style.fontWeight = 'bold';
+        cgpaLabelCell.textContent = 'CGPA';
+        
+        const cgpaValueCell = document.createElement('td');
+        cgpaValueCell.style.padding = '3px 10px';
+        cgpaValueCell.style.border = '1px solid #000';
+        cgpaValueCell.style.width = '60px';
+        cgpaValueCell.style.textAlign = 'center';
+        cgpaValueCell.style.fontWeight = 'bold';
+        cgpaValueCell.textContent = totalCGPA;
+        
+        cgpaRow.appendChild(cgpaLabelCell);
+        cgpaRow.appendChild(cgpaValueCell);
+        
+        // Credits row
+        const creditsRow = document.createElement('tr');
+        
+        const creditsLabelCell = document.createElement('td');
+        creditsLabelCell.style.padding = '3px 10px';
+        creditsLabelCell.style.border = '1px solid #000';
+        creditsLabelCell.style.fontWeight = 'bold';
+        creditsLabelCell.textContent = 'Credits Completed';
+        
+        const creditsValueCell = document.createElement('td');
+        creditsValueCell.style.padding = '3px 10px';
+        creditsValueCell.style.border = '1px solid #000';
+        creditsValueCell.style.width = '60px';
+        creditsValueCell.style.textAlign = 'center';
+        creditsValueCell.style.fontWeight = 'bold';
+        creditsValueCell.textContent = totalCredits;
+        
+        creditsRow.appendChild(creditsLabelCell);
+        creditsRow.appendChild(creditsValueCell);
+        
+        // Add rows to table
+        summaryTable.appendChild(cgpaRow);
+        summaryTable.appendChild(creditsRow);
+        
+        // Add table to summary container
+        summaryBox.appendChild(summaryTable);
+        
+        return summaryBox;
     }
 }
 
