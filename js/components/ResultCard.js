@@ -169,24 +169,15 @@ class ResultCard {
                             background-color: var(--main-bg);
                             color: var(--color-text);
                             line-height: 1.6;
-                            -webkit-font-smoothing: antialiased;
-                        }                        .controls {
+                            -webkit-font-smoothing: antialiased;                        }                        .floating-controls {
                             position: fixed;
-                            top: 0;
-                            left: 0;
-                            right: 0;
-                            background: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));
-                            color: white;
-                            padding: 15px;
-                            text-align: center;
+                            top: 20px;
+                            right: 20px;
                             z-index: 1000;
-                            box-shadow: var(--dash-shadow);
                             display: flex;
-                            justify-content: center;
-                            align-items: center;
-                            height: 65px;
-                        }
-                        .btn {
+                            flex-direction: column;
+                            gap: 10px;
+                        }                        .btn {
                             display: inline-flex;
                             align-items: center;
                             justify-content: center;
@@ -201,18 +192,17 @@ class ResultCard {
                             color: var(--color-btn-primary-text);
                             cursor: pointer;
                             transition: var(--transition-default);
-                            box-shadow: var(--shadow-small);
-                            margin: 0 8px;
+                            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+                            width: 100%;
                         }
                         .btn:hover {
                             background-color: var(--color-btn-primary-hover-bg);
                             box-shadow: var(--shadow-medium);
                         }                        .content-wrapper {
-                            margin-top: 70px;
                             padding: 20px;
                             display: flex;
                             justify-content: center;
-                        }                        .message {
+                        }.message {
                             color: var(--color-text-secondary);
                             font-size: var(--font-size-small);
                             margin: 20px;
@@ -223,7 +213,7 @@ class ResultCard {
                                 padding: 0;
                                 background: #ffffff;
                             }
-                            .controls, .message {
+                            .controls, .floating-controls, .message {
                                 display: none;
                             }
                             .content-wrapper {
@@ -283,12 +273,9 @@ class ResultCard {
                             font-size: 9pt;
                             color: #555;
                         }
-                    </style>
-                </head>                <body>                    <div class="controls">
-                        <button class="btn" id="savePdf">Save as PDF</button>
-                        <button class="btn" id="printBtn">Print</button>
+                    </style>                </head>                <body>                    <div class="floating-controls">
+                        <button class="btn" id="printBtn">Print or Save PDF</button>
                         <button class="btn" id="closeBtn">Close</button>
-                        <span style="font-size: var(--font-size-small); margin-left: 15px; color: #e2e8f0;">Click "Save as PDF" to download or "Print" for a paper copy</span>
                     </div>
                     <div class="content-wrapper" id="content">
                         <div class="message">Loading transcript...</div>
@@ -500,45 +487,8 @@ class ResultCard {
                     footer.className = "transcript-footer";
                     footer.innerHTML = "<p>This is not an official document. Generated with https://diucgpa.netlify.app</p>";
                     transcriptContainer.appendChild(footer);
-                    
-                    // Add to the content container
+                      // Add to the content container
                     contentContainer.appendChild(transcriptContainer);
-                    
-                    // Add PDF save button functionality
-                    previewWindow.document.getElementById("savePdf").addEventListener("click", function() {
-                        const element = previewWindow.document.querySelector(".transcript-container");
-                        
-                        if (!element) {
-                            console.error("Transcript container not found");
-                            return;
-                        }
-                        
-                        const options = {
-                            margin: [10, 10],
-                            filename: `${studentInfo.studentId || "student"}_transcript.pdf`,
-                            image: { type: "jpeg", quality: 1.0 },
-                            html2canvas: { 
-                                scale: 2, 
-                                useCORS: true,
-                                logging: true,
-                                letterRendering: true,
-                                allowTaint: true 
-                            },
-                            jsPDF: { unit: "mm", format: "a4", orientation: "portrait" },
-                            pagebreak: { mode: "avoid-all" }
-                        };
-                        
-                        // Load html2pdf library dynamically
-                        const script = previewWindow.document.createElement("script");
-                        script.src = "https://cdnjs.cloudflare.com/ajax/libs/html2pdf.js/0.10.1/html2pdf.bundle.min.js";
-                        script.onload = function() {
-                            previewWindow.html2pdf().set(options).from(element).save();
-                        };
-                        script.onerror = function() {
-                            alert("Failed to load the PDF generation library. Please try again later.");
-                        };
-                        previewWindow.document.head.appendChild(script);
-                    });
                 } catch (err) {
                     console.error("Error building transcript:", err);
                     const contentContainer = previewWindow.document.getElementById("content");
