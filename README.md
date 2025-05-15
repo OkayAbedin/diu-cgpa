@@ -7,10 +7,12 @@ A modern web application designed specifically for Daffodil International Univer
 ## 🚀 Features
 
 - **Automatic CGPA Calculation**: Fetch your complete academic record using just your student ID
-- **Manual CGPA Calculator**: Plan future semesters by adding hypothetical courses and grades
-- **Advanced Fetch Options**: Use batch processing for multiple student IDs or ID ranges
+- **Manual CGPA Calculator**: Plan future semesters by adding hypothetical courses with custom grades
+- **Advanced Fetch Options**: Use batch processing for multiple student IDs or ID ranges with configurable timeout settings
 - **Academic Transcript**: Generate and save professional PDF transcripts of your results
-- **Data Visualization**: View your semester-by-semester progress with interactive charts
+- **Data Export**: Export your results to CSV format for further analysis
+- **Interactive Visualization**: Track your semester-by-semester progress with dynamic charts showing both semester and cumulative GPAs
+- **Visual GPA Indicator**: Color-coded circular GPA display that changes based on performance level
 - **Dark Mode Support**: Comfortable viewing experience in any lighting condition
 - **Mobile-Friendly Design**: Fully responsive interface works on all devices
 
@@ -23,7 +25,8 @@ diu-cgpa/
 │   │   ├── diu-cgpa-logo.svg
 │   │   └── diu-logo.svg
 │   └── styles/        # CSS stylesheets
-│       └── main.css
+│       ├── main.css
+│       └── manual-calculator.css
 ├── js/
 │   ├── components/    # UI components
 │   │   ├── ResultCard.js
@@ -62,7 +65,15 @@ diu-cgpa/
 
 ## 💻 How It Works
 
-This tool communicates with DIU's academic database through a secure API and processes the raw data to provide you with a clean, understandable representation of your academic performance. All calculations follow [DIU's official grading policy](https://daffodilvarsity.edu.bd/article/rules-and-regulation).
+This tool communicates with DIU's academic database through a secure API and processes the raw data to provide you with a clean, understandable representation of your academic performance. All calculations follow [DIU's official grading policy](https://daffodilvarsity.edu.bd/article/rules-and-regulation), with grades ranging from A+ (4.00) to F (0.00).
+
+### CGPA Calculation Process
+
+The application implements a weighted average calculation for CGPA:
+- Each course's grade point (0.00 to 4.00) is multiplied by its credit hours
+- These weighted values are summed up across all courses
+- The total is divided by the total credit hours to get the CGPA
+- Results are formatted to two decimal places
 
 ## 🔒 Privacy & Security
 
@@ -71,15 +82,26 @@ Your privacy matters to us. This application:
 - Processes all data locally in your browser
 - Does not use cookies to track your activity
 - Makes direct API calls to the university system with no third-party intermediaries
+- Provides configurable response timeout options to handle server delays
 
 ## 🛠 Development
 
-### Dependencies
+### Technologies Used
 
-- Bootstrap 5.3.0
-- Chart.js
-- HTML2PDF.js
-- Font Awesome
+- **Vanilla JavaScript**: For core functionality and DOM manipulation
+- **Chart.js**: For interactive data visualization
+- **Bootstrap 5**: For responsive layouts and UI components
+- **HTML2PDF.js**: For PDF transcript generation
+- **FontAwesome**: For icons and visual elements
+- **Netlify**: For hosting and serverless functions to handle CORS issues
+
+### Key Features Implementation
+
+- **Dynamic Charts**: Semester and cumulative GPA tracking with responsive charts
+- **Custom Grading**: Support for DIU's grading system with custom grade input option
+- **Batch Processing**: Multiple student IDs can be processed in sequence with progress tracking
+- **Responsive Design**: Optimized layout for desktop, tablet, and mobile devices
+- **Error Handling**: Comprehensive handling of API timeouts and network issues
 
 ### Deployment
 
