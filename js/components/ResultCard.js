@@ -131,51 +131,91 @@ class ResultCard {
             previewWindow.document.write(`
                 <!DOCTYPE html>
                 <html>
-                <head>
-                    <title>Transcript Preview - ${studentInfo.studentName || studentInfo.name || "Student"}</title>
+                <head>                    <title>Transcript Preview - ${studentInfo.studentName || studentInfo.name || "Student"}</title>
                     <meta charset="utf-8">
                     <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
                     <style>
+                        :root {
+                            --color-bg: #ffffff;
+                            --color-header-bg: #1a1c2c;
+                            --color-text: #2d3748;
+                            --color-text-secondary: #718096;
+                            --color-border: #e2e8f0;
+                            --color-btn-bg: #edf2f7;
+                            --color-btn-border: #e2e8f0;
+                            --color-btn-text: #2d3748;
+                            --color-btn-primary-bg: #4361ee;
+                            --color-btn-primary-text: #ffffff;
+                            --color-btn-hover-bg: #e2e8f0;
+                            --color-btn-primary-hover-bg: #3849e0;
+                            --main-bg: #f3f4f9;
+                            --header-gradient-start: #1a1c2c;
+                            --header-gradient-end: #293245;
+                            --dash-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+                            --font-size-small: 13px;
+                            --font-size-normal: 15px;
+                            --border-radius-small: 6px;
+                            --shadow-small: 0 2px 4px rgba(0, 0, 0, 0.05);
+                            --shadow-medium: 0 4px 12px rgba(0, 0, 0, 0.08);
+                            --transition-default: all 0.25s ease-in-out;
+                            --font-family: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+                        }
+                        
                         body {
-                            font-family: Arial, sans-serif;
+                            font-family: var(--font-family);
                             margin: 0;
                             padding: 0;
-                            background-color: #f0f0f0;
-                        }
-                        .controls {
+                            background-color: var(--main-bg);
+                            color: var(--color-text);
+                            line-height: 1.6;
+                            -webkit-font-smoothing: antialiased;
+                        }                        .controls {
                             position: fixed;
                             top: 0;
                             left: 0;
                             right: 0;
-                            background-color: #333;
+                            background: linear-gradient(to right, var(--header-gradient-start), var(--header-gradient-end));
                             color: white;
-                            padding: 10px;
+                            padding: 15px;
                             text-align: center;
                             z-index: 1000;
-                            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+                            box-shadow: var(--dash-shadow);
+                            display: flex;
+                            justify-content: center;
+                            align-items: center;
+                            height: 65px;
                         }
                         .btn {
-                            background-color: #4CAF50;
-                            color: white;
+                            display: inline-flex;
+                            align-items: center;
+                            justify-content: center;
+                            padding: 10px 18px;
+                            font-size: var(--font-size-normal);
+                            font-weight: 500;
+                            line-height: 1.5;
+                            white-space: nowrap;
                             border: none;
-                            padding: 8px 16px;
-                            margin: 0 5px;
-                            border-radius: 4px;
+                            border-radius: var(--border-radius-small);
+                            background-color: var(--color-btn-primary-bg);
+                            color: var(--color-btn-primary-text);
                             cursor: pointer;
-                            font-size: 14px;
+                            transition: var(--transition-default);
+                            box-shadow: var(--shadow-small);
+                            margin: 0 8px;
                         }
                         .btn:hover {
-                            background-color: #45a049;
-                        }
-                        .content-wrapper {
-                            margin-top: 60px;
+                            background-color: var(--color-btn-primary-hover-bg);
+                            box-shadow: var(--shadow-medium);
+                        }                        .content-wrapper {
+                            margin-top: 70px;
                             padding: 20px;
                             display: flex;
                             justify-content: center;
                         }
                         .message {
-                            color: #999;
-                            font-size: 14px;
+                            color: var(--color-text-secondary);
+                            font-size: var(--font-size-small);
                             margin: 20px;
                         }
                         @media print {
@@ -230,13 +270,12 @@ class ResultCard {
                             color: #555;
                         }
                     </style>
-                </head>
-                <body>
+                </head>                <body>
                     <div class="controls">
                         <button class="btn" id="savePdf">Save as PDF</button>
                         <button class="btn" id="printBtn">Print</button>
                         <button class="btn" id="closeBtn">Close</button>
-                        <span style="font-size: 12px; margin-left: 10px; color: #ddd;">You can preview the transcript and decide to save it or print it.</span>
+                        <span style="font-size: var(--font-size-small); margin-left: 15px; color: #e2e8f0;">Preview your transcript before saving or printing</span>
                     </div>
                     <div class="content-wrapper" id="content">
                         <div class="message">Loading transcript...</div>
