@@ -2750,10 +2750,23 @@ textarea::placeholder {
     font-size: var(--font-size-medium);
 }
 
-.gh-loading-message {
+.gh-loading-status {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    width: 100%;
     margin-bottom: var(--spacing-md);
+}
+
+.gh-loading-message {
     font-size: var(--font-size-small);
     color: var(--color-text-secondary);
+}
+
+.gh-loading-percentage {
+    font-size: var(--font-size-small);
+    font-weight: 600;
+    color: var(--color-link);
 }
 
 .gh-progress-container {

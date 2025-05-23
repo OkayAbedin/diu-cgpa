@@ -3,8 +3,7 @@
  * Handles all API requests to the DIU server
  */
 
-class ApiService {
-    constructor() {
+class ApiService {    constructor() {
         // Check if we're running on Netlify (production)
         const isProduction = window.location.hostname !== 'localhost' && 
                              window.location.hostname !== '127.0.0.1';
@@ -26,6 +25,9 @@ class ApiService {
         
         // Maximum number of retries
         this.maxRetries = 3;
+        
+        // Global batch size for parallel API requests
+        this.BATCH_SIZE = 5;
         
         console.log(`API Service initialized with base URL: ${this.baseUrl}`);
     }
@@ -369,47 +371,57 @@ class ApiService {
                 console.warn(`Could not find enrollment semester ${enrollmentSemesterId} or later, using default approach`);
                 return this.getAllSemesterResultsLegacy(studentId, semesterList);
             }
-            
-            // Get semesters from enrollment semester onwards
+              // Get semesters from enrollment semester onwards
             const relevantSemesters = sortedSemesters.slice(startSemesterIndex);
             
             const results = {};
-            let emptyCount = 0;
             this.missingSemesters = []; // Reset missing semesters list
             
             // Track valid semesters to identify gaps later
             const validSemesterIds = [];
             const emptySemesterIds = [];
             
-            for (const semester of relevantSemesters) {
-                // Stop after four consecutive empty semesters
-                if (emptyCount >= 4) {
-                    break;
-                }
+            console.log(`Fetching results for ${relevantSemesters.length} semesters in parallel...`);
+              // Use batch size for parallel requests
+            const batchSize = this.BATCH_SIZE;
+            
+            // Process semesters in batches for controlled parallelism
+            for (let i = 0; i < relevantSemesters.length; i += batchSize) {
+                // Get a batch of semesters to process in parallel
+                const batch = relevantSemesters.slice(i, i + batchSize);
                 
-                console.log(`Fetching results for semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
-                const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
-                
-                if (semesterResult && semesterResult.isValid) {
-                    results[semester.semesterId] = semesterResult.data;
-                    validSemesterIds.push(parseInt(semester.semesterId));
-                    emptyCount = 0; // Reset counter when we find results
-                } else {
-                    emptyCount++;
-                    emptySemesterIds.push({
-                        id: parseInt(semester.semesterId),
-                        name: `${semester.semesterName} ${semester.semesterYear}`,
-                        consecutive: emptyCount,
-                        isMissing: semesterResult.isMissing // Track if this is a missing or just invalid semester
-                    });
-                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}, missing: ${semesterResult.isMissing}`);
-                    
-                    // Only add to missing semesters if it's truly missing (HTTP error), not just empty
-                    if (semesterResult.isMissing) {
-                        this.missingSemesters.push({
-                            id: parseInt(semester.semesterId),
-                            name: `${semester.semesterName} ${semester.semesterYear}`
+                // Create promises for each semester in the batch
+                const semesterPromises = batch.map(semester => {
+                    console.log(`Requesting semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
+                    return this.getSemesterResults(semester.semesterId, studentId)
+                        .then(semesterResult => {
+                            return { semester, semesterResult };
                         });
+                });
+                
+                // Wait for all promises in this batch to resolve
+                const batchResults = await Promise.all(semesterPromises);
+                
+                // Process the results of this batch
+                for (const { semester, semesterResult } of batchResults) {
+                    if (semesterResult && semesterResult.isValid) {
+                        results[semester.semesterId] = semesterResult.data;
+                        validSemesterIds.push(parseInt(semester.semesterId));
+                    } else {
+                        emptySemesterIds.push({
+                            id: parseInt(semester.semesterId),
+                            name: `${semester.semesterName} ${semester.semesterYear}`,
+                            isMissing: semesterResult.isMissing
+                        });
+                        console.log(`No results found for semester ${semester.semesterId}, missing: ${semesterResult.isMissing}`);
+                        
+                        // Only add to missing semesters if it's truly missing (HTTP error), not just empty
+                        if (semesterResult.isMissing) {
+                            this.missingSemesters.push({
+                                id: parseInt(semester.semesterId),
+                                name: `${semester.semesterName} ${semester.semesterYear}`
+                            });
+                        }
                     }
                 }
             }
@@ -474,44 +486,54 @@ class ApiService {
             const sortedSemesters = [...semesterList].sort((a, b) => 
                 parseInt(b.semesterId) - parseInt(a.semesterId)
             );
-            
-            const results = {};
-            let emptyCount = 0;
+              const results = {};
             this.missingSemesters = []; // Reset missing semesters list
             
             // Track valid semesters to identify gaps later
             const validSemesterIds = [];
             const emptySemesterIds = [];
             
-            for (const semester of sortedSemesters) {
-                // Stop after four consecutive empty semesters
-                if (emptyCount >= 4) {
-                    break;
-                }
+            console.log(`Legacy method: Fetching results for ${sortedSemesters.length} semesters in parallel...`);
+              // Use batch size for parallel requests
+            const batchSize = this.BATCH_SIZE;
+            
+            // Process semesters in batches for controlled parallelism
+            for (let i = 0; i < sortedSemesters.length; i += batchSize) {
+                // Get a batch of semesters to process in parallel
+                const batch = sortedSemesters.slice(i, i + batchSize);
                 
-                console.log(`Fetching results for semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
-                const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
-                
-                if (semesterResult && semesterResult.isValid) {
-                    results[semester.semesterId] = semesterResult.data;
-                    validSemesterIds.push(parseInt(semester.semesterId));
-                    emptyCount = 0; // Reset counter when we find results
-                } else {
-                    emptyCount++;
-                    emptySemesterIds.push({
-                        id: parseInt(semester.semesterId),
-                        name: `${semester.semesterName} ${semester.semesterYear}`,
-                        consecutive: emptyCount,
-                        isMissing: semesterResult.isMissing // Track if this is a missing or just invalid semester
-                    });
-                    console.log(`No results found for semester ${semester.semesterId}, empty count: ${emptyCount}, missing: ${semesterResult.isMissing}`);
-                    
-                    // Only add to missing semesters if it's truly missing (HTTP error), not just empty
-                    if (semesterResult.isMissing) {
-                        this.missingSemesters.push({
-                            id: parseInt(semester.semesterId),
-                            name: `${semester.semesterName} ${semester.semesterYear}`
+                // Create promises for each semester in the batch
+                const semesterPromises = batch.map(semester => {
+                    console.log(`Requesting semester ${semester.semesterId} (${semester.semesterName} ${semester.semesterYear})`);
+                    return this.getSemesterResults(semester.semesterId, studentId)
+                        .then(semesterResult => {
+                            return { semester, semesterResult };
                         });
+                });
+                
+                // Wait for all promises in this batch to resolve
+                const batchResults = await Promise.all(semesterPromises);
+                
+                // Process the results of this batch
+                for (const { semester, semesterResult } of batchResults) {
+                    if (semesterResult && semesterResult.isValid) {
+                        results[semester.semesterId] = semesterResult.data;
+                        validSemesterIds.push(parseInt(semester.semesterId));
+                    } else {
+                        emptySemesterIds.push({
+                            id: parseInt(semester.semesterId),
+                            name: `${semester.semesterName} ${semester.semesterYear}`,
+                            isMissing: semesterResult.isMissing
+                        });
+                        console.log(`No results found for semester ${semester.semesterId}, missing: ${semesterResult.isMissing}`);
+                        
+                        // Only add to missing semesters if it's truly missing (HTTP error), not just empty
+                        if (semesterResult.isMissing) {
+                            this.missingSemesters.push({
+                                id: parseInt(semester.semesterId),
+                                name: `${semester.semesterName} ${semester.semesterYear}`
+                            });
+                        }
                     }
                 }
             }
@@ -635,42 +657,52 @@ class ApiService {
                 if (semestersToFetch.length === 0) {
                     throw new Error(`Selected semester (ID: ${semesterId}) not found or not available for this student.`);
                 }
-            }
-              // Initialize results object
+            }            // Initialize results object
             const allResults = {};
-            let emptyCount = 0;
             this.missingSemesters = []; // Reset missing semesters list
             
-            // Fetch each semester with detailed progress updates
-            for (let i = 0; i < semestersToFetch.length; i++) {
-                const semester = semestersToFetch[i];
+            if (progressCallback) progressCallback('fetching_semester', 30, 'Preparing to fetch semester data in parallel...', null);
+              // Use batch size for parallel requests
+            const batchSize = this.BATCH_SIZE;
+            
+            // Process semesters in batches for controlled parallelism
+            for (let i = 0; i < semestersToFetch.length; i += batchSize) {
+                // Get a batch of semesters to process in parallel
+                const batch = semestersToFetch.slice(i, i + batchSize);
                 
-                // Stop after four consecutive empty semesters
-                if (emptyCount >= 4) {
-                    break;
+                const batchProgress = 30 + Math.floor(((i + batch.length) / semestersToFetch.length) * 60);
+                if (progressCallback) {
+                    progressCallback(
+                        'fetching_semester_batch', 
+                        batchProgress, 
+                        `Fetching semesters ${i+1}-${Math.min(i+batchSize, semestersToFetch.length)} of ${semestersToFetch.length}...`, 
+                        batch
+                    );
                 }
                 
-                // Calculate progress based on current semester index
-                const semesterProgress = 30 + Math.floor(((i + 1) / semestersToFetch.length) * 60);
-                const progressMessage = `Fetching ${semester.semesterName} ${semester.semesterYear} (${semester.semesterId})...`;
-                
-                if (progressCallback) progressCallback('fetching_semester', semesterProgress, progressMessage, semester);
-                
-                // Fetch semester results
-                const semesterResult = await this.getSemesterResults(semester.semesterId, studentId);
-                
-                if (semesterResult && semesterResult.isValid) {
-                    allResults[semester.semesterId] = semesterResult.data;
-                    emptyCount = 0; // Reset counter when we find results
-                } else {
-                    emptyCount++;
-                    
-                    // Only add to missing semesters if it's truly missing (HTTP error), not just empty
-                    if (semesterResult.isMissing) {
-                        this.missingSemesters.push({
-                            id: parseInt(semester.semesterId),
-                            name: `${semester.semesterName} ${semester.semesterYear}`
+                // Create promises for each semester in the batch
+                const semesterPromises = batch.map(semester => {
+                    return this.getSemesterResults(semester.semesterId, studentId)
+                        .then(semesterResult => {
+                            return { semester, semesterResult };
                         });
+                });
+                
+                // Wait for all promises in this batch to resolve
+                const batchResults = await Promise.all(semesterPromises);
+                
+                // Process the results of this batch
+                for (const { semester, semesterResult } of batchResults) {
+                    if (semesterResult && semesterResult.isValid) {
+                        allResults[semester.semesterId] = semesterResult.data;
+                    } else {
+                        // Only add to missing semesters if it's truly missing (HTTP error), not just empty
+                        if (semesterResult.isMissing) {
+                            this.missingSemesters.push({
+                                id: parseInt(semester.semesterId),
+                                name: `${semester.semesterName} ${semester.semesterYear}`
+                            });
+                        }
                     }
                 }
             }
@@ -791,41 +823,54 @@ class ApiService {
      * @param {Function} progressCallback - Callback for fetch progress updates
      * @param {Object} options - Additional options
      * @param {string} options.semesterId - Optional semester ID to fetch specific semester data
+     * @param {number} options.concurrentStudents - Maximum number of students to process concurrently
      * @returns {Object} Object containing results and errors
      */
     async fetchMultipleStudentsCGPA(studentIds, progressCallback, options = {}) {
         const results = {};
         const errors = {};
         let completed = 0;
-        const total = studentIds.length;
+        const total = studentIds.length;        // Use batch size from class property for optimal performance
+        const batchSize = options.concurrentStudents || this.BATCH_SIZE;
         
-        for (const studentId of studentIds) {
-            try {
-                // Update progress (studentId, completed count, total count)
-                if (progressCallback) {
-                    const progress = Math.floor((completed / total) * 100);
-                    progressCallback('Processing', progress, studentId, completed, total);
-                }
-                
-                // Fetch student data with optional semester filter
-                const studentData = await this.fetchStudentCGPA(
-                    studentId, 
-                    options?.semesterId || null, 
-                    null
-                );
-                
-                // Store result
-                results[studentId] = studentData;
-            } catch (error) {
-                // Store error
-                errors[studentId] = error.message || 'Unknown error';
+        // Process students in batches for controlled parallelism
+        for (let i = 0; i < studentIds.length; i += batchSize) {
+            // Get a batch of students to process in parallel
+            const batch = studentIds.slice(i, i + batchSize);
+            
+            // Update progress for batch start
+            if (progressCallback) {
+                const progress = Math.floor((completed / total) * 100);                progressCallback('Processing batch', progress, 
+                    `Processing students ${i+1}-${Math.min(i+batchSize, total)} of ${total}`, 
+                    completed, total);
             }
             
-            // Update progress
-            completed++;
+            // Create promises for each student in the batch
+            const studentPromises = batch.map(studentId => {
+                return this.fetchStudentCGPA(studentId, options?.semesterId || null, null)
+                    .then(studentData => {
+                        // Store success result
+                        results[studentId] = studentData;
+                        return { success: true, studentId };
+                    })
+                    .catch(error => {
+                        // Store error
+                        errors[studentId] = error.message || 'Unknown error';
+                        return { success: false, studentId, error };
+                    });
+            });
+            
+            // Wait for all promises in this batch to resolve
+            const batchResults = await Promise.all(studentPromises);
+            
+            // Update completed count
+            completed += batch.length;
+            
+            // Update progress for batch completion
             if (progressCallback) {
-                const progress = Math.floor((completed / total) * 100);
-                progressCallback('Processing', progress, studentId, completed, total);
+                const progress = Math.floor((completed / total) * 100);                progressCallback('Processing', progress, 
+                    `Completed students ${i+1}-${Math.min(i+batchSize, total)} of ${total}`, 
+                    completed, total);
             }
         }
         

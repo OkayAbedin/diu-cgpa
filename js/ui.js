@@ -379,70 +379,55 @@ class UiController {
             this.calculateBtn.disabled = false;
             this.calculateBtn.textContent = 'Calculate CGPA';
         }
-    }
-    
-    /**
-     * Show detailed progress UI
+    }    /**
+     * Show simplified progress UI with percentage
      */
     showDetailedProgress() {
         // Get the loading section
         const loadingSection = document.getElementById('loading');
         if (!loadingSection) return;
         
-        // Clear the loading section
+        // Clear the loading section and show simpler UI with percentage
         loadingSection.innerHTML = `
             <div class="gh-loading-container">
-                <div class="gh-loading-header">
-                    <div class="gh-spinner"></div>
-                    <h3>Fetching Data</h3>
+                <div class="gh-spinner"></div>
+                <div class="gh-loading-status">
+                    <div class="gh-loading-message" id="loading-message">Loading...</div>
+                    <div class="gh-loading-percentage" id="loading-percentage">0%</div>
                 </div>
-                <div class="gh-loading-message" id="loading-message">Initializing request...</div>
                 <div class="gh-progress-container">
                     <div class="gh-progress-bar" id="loading-progress-bar" style="width: 0%"></div>
                 </div>
             </div>
         `;
     }
-    
-    /**
+      /**
      * Update progress information
      * @param {string} stage - The current stage of the process
      * @param {number} progress - Progress percentage (0-100)
      * @param {string} message - Current progress message
      * @param {Object} data - Additional data related to the current stage
      */    updateProgressInfo(stage, progress, message, data) {
-        // Get the loading message and progress bar elements
+        // Get the loading UI elements
         const messageElement = document.getElementById('loading-message');
         const progressBar = document.getElementById('loading-progress-bar');
+        const percentageElement = document.getElementById('loading-percentage');
         
         if (!messageElement || !progressBar) return;
         
-        // Update the message and progress bar
-        messageElement.textContent = message;
+        // Update the progress bar
         progressBar.style.width = `${progress}%`;
         
-        // Display current semester being fetched
-        if (stage === 'fetching_semester' && data) {
-            const semesterName = `${data.semesterName} ${data.semesterYear}`;
-            let statusText = `Fetching ${semesterName} (${data.semesterId})...`;
-            
-            // If filtering by a specific semester, show that information
-            if (this.semesterSelect && this.semesterSelect.value !== 'all') {
-                const selectedOption = this.semesterSelect.options[this.semesterSelect.selectedIndex];
-                statusText += ` (Filtering for ${selectedOption.textContent})`;
-            }
-            
-            messageElement.textContent = statusText;
-        } else if (stage === 'complete') {
-            let completionText = 'All data fetched successfully!';
-            
-            // If filtering by a specific semester, show that information
-            if (this.semesterSelect && this.semesterSelect.value !== 'all') {
-                const selectedOption = this.semesterSelect.options[this.semesterSelect.selectedIndex];
-                completionText += ` (Showing only ${selectedOption.textContent})`;
-            }
-            
-            messageElement.textContent = completionText;
+        // Update percentage display with rounded value
+        if (percentageElement) {
+            percentageElement.textContent = `${Math.round(progress)}%`;
+        }
+        
+        // Display simple loading text based on progress
+        if (progress < 100) {
+            messageElement.textContent = "Loading...";
+        } else {
+            messageElement.textContent = "Complete";
         }
     }
     
@@ -1229,10 +1214,14 @@ class UiController {
         try {
             // Get the selected fetch mode
             const selectedMode = document.querySelector('input[name="fetch-mode"]:checked').value;
-            
-            // Show loading indicator
+              // Show loading indicator with simplified UI
             const resultsContainer = document.getElementById('advanced-results');
-            resultsContainer.innerHTML = '<div class="gh-loading"><div class="gh-spinner"></div><p>Fetching data...</p></div>';
+            resultsContainer.innerHTML = `<div class="gh-loading">
+                <div class="gh-spinner"></div>
+                <div class="gh-loading-status">
+                    <p>Loading... <span class="gh-loading-percentage">0%</span></p>
+                </div>
+            </div>`;
             Helpers.showElement(document.getElementById('advanced-results-container'));
             
             // Get timeout value and validate it
@@ -1362,14 +1351,12 @@ class UiController {
             // Fetch data for each student ID
             const results = await this.apiService.fetchMultipleStudentsCGPA(
                 studentIds,
-                (status, progress, currentId, completed, total) => {
-                    // Update progress in UI if needed
+                (status, progress, currentId, completed, total) => {                    // Update progress in UI with simplified loading UI and percentage indicator
                     resultsContainer.innerHTML = `<div class="gh-loading">
                         <div class="gh-spinner"></div>
-                        <p>Fetching data: ${completed}/${total} (${progress}%)</p>
-                        <p>Current ID: ${currentId}</p>
-                        <p><small>Timeout setting: ${timeout} seconds per request</small></p>
-                        ${fetchOptions.semesterId ? `<p><small>Filtering for semester ID: ${fetchOptions.semesterId}</small></p>` : ''}
+                        <div class="gh-loading-status">
+                            <p>Loading... <span class="gh-loading-percentage">${progress}%</span></p>
+                        </div>
                     </div>`;
                     
                     // Re-add timer display during progress updates
