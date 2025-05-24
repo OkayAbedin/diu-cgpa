@@ -72,6 +72,9 @@ This tool communicates with DIU's academic database through a secure API and pro
 The application implements a weighted average calculation for CGPA:
 - Each course's grade point (0.00 to 4.00) is multiplied by its credit hours
 - These weighted values are summed up across all courses
+- For retaken courses, only the best grade is considered in the CGPA calculation
+- Courses with grades 'F' or 'I' (Incomplete) are included in GPA calculation but are not shown in total credit count display
+- Retaken courses are marked with a retake indicator to show academic progress
 - The total is divided by the total credit hours to get the CGPA
 - Results are formatted to two decimal places
 
