@@ -27,7 +27,7 @@ class ApiService {    constructor() {
         this.maxRetries = 3;
         
         // Global batch size for parallel API requests
-        this.BATCH_SIZE = 5;
+        this.BATCH_SIZE = 12;
         
         console.log(`API Service initialized with base URL: ${this.baseUrl}`);
     }
