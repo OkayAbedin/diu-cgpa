@@ -1338,9 +1338,9 @@ class UiController {
                     
                     // Split by commas, newlines, or spaces
                     studentIds = multipleIdsText.split(/[\s,]+/).filter(id => id.trim().length > 0);
-                      if (studentIds.length > 50) {
-                        throw new Error('Too many IDs. Maximum of 50 students allowed.');
-                    }
+                    //   if (studentIds.length > 50) {
+                    //     throw new Error('Too many IDs. Maximum of 50 students allowed.');
+                    // }
                     
                     break;
                     
