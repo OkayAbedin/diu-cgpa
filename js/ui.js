@@ -1209,20 +1209,10 @@ class UiController {
     /**
      * Handle advanced fetch click
      * Fetches student data based on the selected fetch mode (Single, Range, or Multiple)
-     */
-    async handleAdvancedFetchClick() {
+     */    async handleAdvancedFetchClick() {
         try {
             // Get the selected fetch mode
             const selectedMode = document.querySelector('input[name="fetch-mode"]:checked').value;
-              // Show loading indicator with simplified UI
-            const resultsContainer = document.getElementById('advanced-results');
-            resultsContainer.innerHTML = `<div class="gh-loading">
-                <div class="gh-spinner"></div>
-                <div class="gh-loading-status">
-                    <p>Loading... <span class="gh-loading-percentage">0%</span></p>
-                </div>
-            </div>`;
-            Helpers.showElement(document.getElementById('advanced-results-container'));
             
             // Get timeout value and validate it
             let timeout = parseInt(document.getElementById('advanced-timeout').value, 10) || 15;
@@ -1231,6 +1221,27 @@ class UiController {
             if (timeout > 120) timeout = 120;
             
             console.log(`Setting API timeout to ${timeout} seconds`);
+            
+            // Set custom API options
+            this.apiService.setTimeout(timeout);
+            
+            // Clear any previous error message
+            Helpers.hideElement(document.getElementById('advanced-error-message'));
+            
+            // Create a global variable to track the start time
+            window.fetchStartTime = performance.now();
+              // Initial loading indicator with enhanced styling
+            const resultsContainer = document.getElementById('advanced-results');
+            resultsContainer.innerHTML = `<div class="gh-loading">
+                <div class="gh-spinner"></div>
+                <div class="gh-loading-status">
+                    <p><strong>Loading</strong> <span class="gh-loading-percentage">0%</span></p>
+                    <p class="gh-loading-details">Initializing request...</p>
+                    <p class="gh-loading-count">Preparing data...</p>
+                    <p class="gh-loading-timeout">Timeout: ${timeout} seconds per request</p>
+                </div>
+            </div>`;
+            Helpers.showElement(document.getElementById('advanced-results-container'));
               // Set custom API options
             this.apiService.setTimeout(timeout);
             
@@ -1273,8 +1284,7 @@ class UiController {
                     timerElement.textContent = `Time elapsed: ${elapsedTime} seconds`;
                 }
             }, 100);
-            
-            let studentIds = [];
+              let studentIds = [];
               // Get student IDs based on the selected mode
             switch (selectedMode) {
                 case 'single':
@@ -1337,10 +1347,21 @@ class UiController {
                 default:
                     throw new Error('Please select a fetch mode');
             }
-            
-            if (studentIds.length === 0) {
+              if (studentIds.length === 0) {
                 throw new Error('No valid student IDs provided');
-            }            // Fetch data for each student ID
+            }
+              // Update loading UI with student count using enhanced styling
+            resultsContainer.innerHTML = `<div class="gh-loading">
+                <div class="gh-spinner"></div>
+                <div class="gh-loading-status">
+                    <p><strong>Loading</strong> <span class="gh-loading-percentage">0%</span></p>
+                    <p class="gh-loading-details">Starting fetch process...</p>
+                    <p class="gh-loading-count">Preparing to fetch <strong>${studentIds.length}</strong> student${studentIds.length > 1 ? 's' : ''}</p>
+                    <p class="gh-loading-timeout">Timeout: ${timeout} seconds per request</p>
+                </div>
+            </div>`;
+            
+            // Fetch data for each student ID
             const fetchOptions = {};
             
             // Add semester selection for single student mode
@@ -1351,11 +1372,16 @@ class UiController {
             // Fetch data for each student ID
             const results = await this.apiService.fetchMultipleStudentsCGPA(
                 studentIds,
-                (status, progress, currentId, completed, total) => {                    // Update progress in UI with simplified loading UI and percentage indicator
+                (status, progress, currentId, completed, total) => {                    // Update progress in UI with detailed loading information and better alignment
                     resultsContainer.innerHTML = `<div class="gh-loading">
                         <div class="gh-spinner"></div>
                         <div class="gh-loading-status">
-                            <p>Loading... <span class="gh-loading-percentage">${progress}%</span></p>
+                            <p><strong>Loading</strong> <span class="gh-loading-percentage">${progress}%</span></p>
+                            <p class="gh-loading-details">${status === 'Processing batch' ? 'Processing batch of students' : 
+                              currentId && currentId.includes('-') ? `Processing student ${currentId}` : 'Preparing data'}</p>
+                            <p class="gh-loading-count">Completed: <strong>${completed}</strong> of <strong>${total}</strong> students</p>
+                            ${fetchOptions.semesterId ? `<p class="gh-loading-semester">Semester: <strong>${fetchOptions.semesterId}</strong></p>` : ''}
+                            <p class="gh-loading-timeout">Timeout: ${timeout} seconds per request</p>
                         </div>
                     </div>`;
                     
