@@ -1323,9 +1323,9 @@ class UiController {
                         throw new Error('Start number must be less than or equal to end number');
                     }
                     
-                    if (end - start > 100) {
-                        throw new Error('Range too large. Maximum of 100 students allowed.');
-                    }
+                    // if (end - start > 100) {
+                    //     throw new Error('Range too large. Maximum of 100 students allowed.');
+                    // }
                     
                     studentIds = this.apiService.generateStudentIdRange(prefix, start, end);
                     break;
