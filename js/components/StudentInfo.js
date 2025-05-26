@@ -21,6 +21,7 @@ class StudentInfo {
         const batch = studentInfo.batch || studentInfo.batchName || studentInfo.batchNo || 'Unknown Batch';
         const status = studentInfo.status || studentInfo.studentStatus || '';
         const faculty = studentInfo.facShortName || studentInfo.facultyShortName || 'Unknown Faculty';
+        const campus = studentInfo.campusName;
         
         // Get CGPA from student info if available, otherwise it will be filled in later
         const cgpa = studentInfo.cgpa || '0.00';
@@ -57,7 +58,7 @@ class StudentInfo {
                         <div class="stat-label">Faculty</div>
                     </div>
                     <div class="stat-item">
-                        <div class="stat-value">DSC</div>
+                        <div class="stat-value">${campus}</div>
                         <div class="stat-label">Campus</div>
                     </div>
                 </div>
