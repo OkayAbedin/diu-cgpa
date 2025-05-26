@@ -13,14 +13,14 @@ class StudentInfo {
         if (!studentInfo) {
             return '<p>No student information available.</p>';
         }
-        
-        // Support multiple possible property names from API
+          // Support multiple possible property names from API
         const studentName = studentInfo.name || studentInfo.studentName || studentInfo.fullName || 'Unknown Student';
         const studentId = studentInfo.id || studentInfo.studentId || 'Unknown ID';
         const program = studentInfo.program || studentInfo.programName || studentInfo.course || 'Unknown Program';
         const department = studentInfo.department || studentInfo.departmentName || 'Unknown Department';
         const batch = studentInfo.batch || studentInfo.batchName || studentInfo.batchNo || 'Unknown Batch';
         const status = studentInfo.status || studentInfo.studentStatus || '';
+        const faculty = studentInfo.facShortName || studentInfo.facultyShortName || 'Unknown Faculty';
         
         // Get CGPA from student info if available, otherwise it will be filled in later
         const cgpa = studentInfo.cgpa || '0.00';
@@ -52,9 +52,8 @@ class StudentInfo {
                     <div class="stat-item">
                         <div class="stat-value" id="total-credits">-</div>
                         <div class="stat-label">Credits</div>
-                    </div>
-                    <div class="stat-item">
-                        <div class="stat-value">FSIT</div>
+                    </div>                    <div class="stat-item">
+                        <div class="stat-value">${faculty}</div>
                         <div class="stat-label">Faculty</div>
                     </div>
                     <div class="stat-item">
