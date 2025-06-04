@@ -134,12 +134,10 @@
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
-        }
-
-        /* Dark mode styles for the overlay */
+        }        /* Dark mode styles for the overlay */
         [data-theme="dark"] .api-notice-modal {
             background: #2d3748;
-            color: #e2e8f0;
+            color: #ffffff;
         }
 
         [data-theme="dark"] .api-notice-header {
@@ -147,11 +145,15 @@
         }
 
         [data-theme="dark"] .api-notice-header h3 {
-            color: #e2e8f0;
+            color: #ffffff;
         }
 
         [data-theme="dark"] .api-notice-content p {
-            color: #cbd5e0;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .api-notice-content p strong {
+            color: #ffffff;
         }
 
         [data-theme="dark"] .api-notice-footer {
@@ -159,7 +161,11 @@
         }
 
         [data-theme="dark"] .api-notice-footer .text-muted {
-            color: #a0aec0;
+            color: #ffffff;
+        }
+
+        [data-theme="dark"] .api-notice-footer i {
+            color: #4fd1c5;
         }
 
         /* Critical tab navigation styles that override any problematic CSS */
