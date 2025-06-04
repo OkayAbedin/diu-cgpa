@@ -38,8 +38,130 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Google Fonts - GitHub uses system fonts, but we'll use similar web fonts -->    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/styles/main.css">
-    <link rel="stylesheet" href="assets/styles/manual-calculator.css">
-    <style>
+    <link rel="stylesheet" href="assets/styles/manual-calculator.css">    <style>
+        /* API Notice Overlay Styles */
+        .api-notice-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            backdrop-filter: blur(5px);
+            z-index: 9999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .api-notice-modal {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            max-width: 500px;
+            width: 100%;
+            animation: slideIn 0.3s ease-out;
+        }
+
+        .api-notice-header {
+            padding: 24px 24px 16px;
+            text-align: center;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .api-notice-icon {
+            width: 64px;
+            height: 64px;
+            background: #fef3cd;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 16px;
+        }
+
+        .api-notice-icon i {
+            font-size: 28px;
+            color: #f59e0b;
+        }
+
+        .api-notice-header h3 {
+            margin: 0;
+            font-size: 20px;
+            font-weight: 600;
+            color: #1a202c;
+        }
+
+        .api-notice-content {
+            padding: 24px;
+        }
+
+        .api-notice-content p {
+            margin: 0 0 16px;
+            color: #4a5568;
+            line-height: 1.6;
+        }
+
+        .api-notice-content p:last-child {
+            margin-bottom: 0;
+        }
+
+        .api-notice-footer {
+            margin-top: 24px;
+            padding-top: 16px;
+            border-top: 1px solid #e2e8f0;
+            text-align: center;
+        }
+
+        .api-notice-footer .text-muted {
+            color: #718096;
+            font-size: 14px;
+            margin: 0;
+        }
+
+        .api-notice-footer i {
+            margin-right: 8px;
+            color: #4299e1;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-20px) scale(0.95);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        /* Dark mode styles for the overlay */
+        [data-theme="dark"] .api-notice-modal {
+            background: #2d3748;
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .api-notice-header {
+            border-bottom-color: #4a5568;
+        }
+
+        [data-theme="dark"] .api-notice-header h3 {
+            color: #e2e8f0;
+        }
+
+        [data-theme="dark"] .api-notice-content p {
+            color: #cbd5e0;
+        }
+
+        [data-theme="dark"] .api-notice-footer {
+            border-top-color: #4a5568;
+        }
+
+        [data-theme="dark"] .api-notice-footer .text-muted {
+            color: #a0aec0;
+        }
+
         /* Critical tab navigation styles that override any problematic CSS */
         .tab-pane {
             display: none;
@@ -66,6 +188,28 @@
     </style>
 </head>
 <body>
+    <!-- API Notice Overlay -->
+    <div id="api-notice-overlay" class="api-notice-overlay">
+        <div class="api-notice-modal">
+            <div class="api-notice-header">
+                <div class="api-notice-icon">
+                    <i class="fas fa-exclamation-triangle"></i>
+                </div>
+                <h3>Service Temporarily Unavailable</h3>
+            </div>
+            <div class="api-notice-content">
+                <p><strong>Important Notice:</strong></p>
+                <p>Daffodil International University has upgraded their API security on <strong>4th June 2025</strong> and now it is not openly accessible.</p>
+                <p>We are working to restore the service as soon as possible. Thank you for your patience.</p>
+                <div class="api-notice-footer">
+                    <p class="text-muted">
+                        <i class="fas fa-tools"></i> Our team is actively working on a solution
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+    
     <div class="app-container">
         <!-- Header - Updated to match the design in the image -->
         <header class="gh-header">
@@ -614,10 +758,47 @@
                 <button id="timeout-dialog-confirm" class="gh-btn gh-btn-primary">Confirm</button>
             </div>
         </div>
-    </div>
-
-    <!-- Directly load our simplified navigation.js before any other scripts -->
+    </div>    <!-- Directly load our simplified navigation.js before any other scripts -->
     <script src="js/navigation.js"></script>
+
+    <script>
+        // API Notice Overlay - Prevent all interactions
+        document.addEventListener('DOMContentLoaded', function() {
+            const overlay = document.getElementById('api-notice-overlay');
+            
+            // Prevent closing the overlay
+            overlay.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+            
+            // Prevent keyboard interactions that might close the overlay
+            document.addEventListener('keydown', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                return false;
+            });
+            
+            // Prevent context menu
+            document.addEventListener('contextmenu', function(e) {
+                e.preventDefault();
+                return false;
+            });
+            
+            // Prevent scrolling
+            document.body.style.overflow = 'hidden';
+            
+            // Block all form interactions and button clicks outside the overlay
+            const allInteractiveElements = document.querySelectorAll('input, button, select, textarea, a');
+            allInteractiveElements.forEach(element => {
+                if (!overlay.contains(element)) {
+                    element.setAttribute('disabled', 'true');
+                    element.style.pointerEvents = 'none';
+                }
+            });
+        });
+    </script>
 
     <!-- JavaScript Files - Rearranged for proper dependency order -->
     <!-- Third-party libraries -->
