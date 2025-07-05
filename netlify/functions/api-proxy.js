@@ -57,7 +57,7 @@ exports.handler = async function(event, context) {
       : '';
     
     // Build the target URL correctly with proper handling of path and query parameters
-    let url = `http://peoplepulse.diu.edu.bd:8189/result`;
+    let url = `https://gateway7.diu.edu.bd/api/student/portal/check/result/semester`;
     
     // Handle paths like /semesterList or /studentInfo correctly
     if (path && path !== '/') {

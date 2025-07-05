@@ -39,20 +39,9 @@
     <!-- Google Fonts - GitHub uses system fonts, but we'll use similar web fonts -->    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="assets/styles/main.css">
     <link rel="stylesheet" href="assets/styles/manual-calculator.css">    <style>
-        /* API Notice Overlay Styles */
+        /* API Notice Overlay Styles - Disabled */
         .api-notice-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8);
-            backdrop-filter: blur(5px);
-            z-index: 9999;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 20px;
+            display: none !important;
         }
 
         .api-notice-modal {
@@ -168,11 +157,12 @@
             color: #4fd1c5;
         }
 
-        /* Force hide any overlay elements that might be injected */
+        /* Force hide any overlay elements */
         .api-notice-overlay,
         [id*="notice-overlay"],
         [class*="service-unavailable"],
-        [class*="temporarily-unavailable"] {
+        [class*="temporarily-unavailable"],
+        #api-notice-overlay {
             display: none !important;
             visibility: hidden !important;
             opacity: 0 !important;
@@ -212,167 +202,10 @@
 <body>
     
     <script>
-        // Remove any existing overlays on page load
-        document.addEventListener('DOMContentLoaded', function() {
-            // Remove any overlay elements that might exist
-            const overlays = document.querySelectorAll('.api-notice-overlay, [id*="notice"], [class*="modal"], [class*="overlay"]');
-            overlays.forEach(overlay => {
-                if (overlay.style.position === 'fixed' && overlay.style.zIndex > 1000) {
-                    overlay.remove();
-                }
-            });
-            
-            // Also check for any elements that might be blocking the page
-            const allElements = document.querySelectorAll('*');
-            allElements.forEach(el => {
-                const style = window.getComputedStyle(el);
-                if (style.position === 'fixed' && 
-                    style.zIndex > 1000 && 
-                    style.width === '100%' && 
-                    style.height === '100%') {
-                    el.remove();
-                }
-            });
-            
-            // Add global overlay dismissal functionality
-            setupOverlayDismissal();
-        });
+        // API Service restored - overlay management scripts removed
+        // Service is now working with new API endpoint
         
-        function setupOverlayDismissal() {
-            // Add ESC key listener to close overlays
-            document.addEventListener('keydown', function(e) {
-                if (e.key === 'Escape') {
-                    dismissAllOverlays();
-                }
-            });
-            
-            // Add click listener to dismiss overlays when clicking outside modal content
-            document.addEventListener('click', function(e) {
-                // Check if clicked element is an overlay background
-                const style = window.getComputedStyle(e.target);
-                if (style.position === 'fixed' && 
-                    style.zIndex > 1000 && 
-                    (style.width === '100%' || style.width === '100vw')) {
-                    
-                    // Check if this is likely an overlay background (not the modal content)
-                    if (e.target.children.length > 0) {
-                        const firstChild = e.target.children[0];
-                        const childStyle = window.getComputedStyle(firstChild);
-                        if (childStyle.width !== '100%' && childStyle.width !== '100vw') {
-                            dismissAllOverlays();
-                        }
-                    }
-                }
-            });
-        }
-        
-        function dismissAllOverlays() {
-            // Remove common overlay classes and IDs
-            const overlaySelectors = [
-                '.api-notice-overlay',
-                '.modal-overlay', 
-                '.overlay',
-                '[id*="notice"]',
-                '[id*="modal"]',
-                '[class*="modal"]',
-                '[class*="overlay"]'
-            ];
-            
-            overlaySelectors.forEach(selector => {
-                const elements = document.querySelectorAll(selector);
-                elements.forEach(el => {
-                    const style = window.getComputedStyle(el);
-                    if (style.position === 'fixed' && parseInt(style.zIndex) > 1000) {
-                        el.style.display = 'none';
-                        setTimeout(() => el.remove(), 100);
-                    }
-                });
-            });
-            
-            // Also remove any fixed positioned elements that cover the whole screen
-            const allFixed = document.querySelectorAll('*');
-            allFixed.forEach(el => {
-                const style = window.getComputedStyle(el);
-                if (style.position === 'fixed' && 
-                    parseInt(style.zIndex) > 1000 && 
-                    style.top === '0px' && 
-                    style.left === '0px' &&
-                    (style.width === '100%' || style.width === '100vw') &&
-                    (style.height === '100%' || style.height === '100vh')) {
-                    el.style.display = 'none';
-                    setTimeout(() => el.remove(), 100);
-                }
-            });
-        }
-        
-        // Make dismissAllOverlays available globally
-        window.dismissAllOverlays = dismissAllOverlays;
-        
-        // Add a floating close button for persistent overlays
-        function addFloatingCloseButton() {
-            if (document.getElementById('floating-close-btn')) return; // Don't add multiple buttons
-            
-            const closeButton = document.createElement('button');
-            closeButton.id = 'floating-close-btn';
-            closeButton.innerHTML = '<i class="fas fa-times"></i> Close Overlay';
-            closeButton.style.cssText = `
-                position: fixed;
-                top: 20px;
-                right: 20px;
-                z-index: 99999;
-                background: #ff4444;
-                color: white;
-                border: none;
-                padding: 10px 15px;
-                border-radius: 5px;
-                cursor: pointer;
-                font-family: inherit;
-                font-size: 14px;
-                box-shadow: 0 2px 10px rgba(0,0,0,0.3);
-                display: flex;
-                align-items: center;
-                gap: 8px;
-            `;
-            
-            closeButton.addEventListener('click', function() {
-                dismissAllOverlays();
-                closeButton.remove();
-            });
-            
-            document.body.appendChild(closeButton);
-            
-            // Auto-remove the button after 10 seconds if no overlays are found
-            setTimeout(() => {
-                const overlays = document.querySelectorAll('[style*="position: fixed"][style*="z-index"]');
-                let hasOverlays = false;
-                overlays.forEach(el => {
-                    const style = window.getComputedStyle(el);
-                    if (parseInt(style.zIndex) > 1000) hasOverlays = true;
-                });
-                
-                if (!hasOverlays && closeButton.parentNode) {
-                    closeButton.remove();
-                }
-            }, 10000);
-        }
-        
-        // Check for overlays periodically and add close button if needed
-        setTimeout(() => {
-            const overlays = document.querySelectorAll('*');
-            let hasOverlays = false;
-            overlays.forEach(el => {
-                const style = window.getComputedStyle(el);
-                if (style.position === 'fixed' && parseInt(style.zIndex) > 1000) {
-                    hasOverlays = true;
-                }
-            });
-            
-            if (hasOverlays) {
-                addFloatingCloseButton();
-            }
-        }, 1000);
-        
-        // Clear browser cache and force refresh if overlay persists
+        // Clear browser cache for fresh start
         if ('caches' in window) {
             caches.keys().then(function(names) {
                 names.forEach(function(name) {
@@ -380,66 +213,10 @@
                 });
             });
         }
-
-        // API Notice Overlay - Prevent all interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            const overlay = document.getElementById('api-notice-overlay');
-            
-            // Prevent closing the overlay
-            overlay.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            });
-            
-            // Prevent keyboard interactions that might close the overlay
-            document.addEventListener('keydown', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            });
-            
-            // Prevent context menu
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // Prevent scrolling
-            document.body.style.overflow = 'hidden';
-            
-            // Block all form interactions and button clicks outside the overlay
-            const allInteractiveElements = document.querySelectorAll('input, button, select, textarea, a');
-            allInteractiveElements.forEach(element => {
-                if (!overlay.contains(element)) {
-                    element.setAttribute('disabled', 'true');
-                    element.style.pointerEvents = 'none';
-                }
-            });
-        });
     </script>
 
-    <!-- API Notice Overlay -->
-    <div id="api-notice-overlay" class="api-notice-overlay">
-        <div class="api-notice-modal">
-            <div class="api-notice-header">
-                <div class="api-notice-icon">
-                    <i class="fas fa-exclamation-triangle"></i>
-                </div>
-                <h3>Service Temporarily Unavailable</h3>
-            </div>
-            <div class="api-notice-content">
-                <p><strong>Important Notice:</strong></p>
-                <p>Daffodil International University has upgraded their API security on <strong>4th June 2025</strong> and now it is not openly accessible.</p>
-                <p>We are working to restore the service as soon as possible. Thank you for your patience.</p>
-                <div class="api-notice-footer">
-                    <p class="text-muted">
-                        <i class="fas fa-tools"></i> Our team is actively working on a solution
-                    </p>
-                </div>
-            </div>
-        </div>
-    </div>
+    <!-- API Notice Overlay - Disabled -->
+    <!-- Service has been restored with new API endpoint -->
     
     <div class="app-container">
         <!-- Header - Updated to match the design in the image -->
@@ -993,42 +770,8 @@
     <script src="js/navigation.js"></script>
 
     <script>
-        // API Notice Overlay - Prevent all interactions
-        document.addEventListener('DOMContentLoaded', function() {
-            const overlay = document.getElementById('api-notice-overlay');
-            
-            // Prevent closing the overlay
-            overlay.addEventListener('click', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            });
-            
-            // Prevent keyboard interactions that might close the overlay
-            document.addEventListener('keydown', function(e) {
-                e.preventDefault();
-                e.stopPropagation();
-                return false;
-            });
-            
-            // Prevent context menu
-            document.addEventListener('contextmenu', function(e) {
-                e.preventDefault();
-                return false;
-            });
-            
-            // Prevent scrolling
-            document.body.style.overflow = 'hidden';
-            
-            // Block all form interactions and button clicks outside the overlay
-            const allInteractiveElements = document.querySelectorAll('input, button, select, textarea, a');
-            allInteractiveElements.forEach(element => {
-                if (!overlay.contains(element)) {
-                    element.setAttribute('disabled', 'true');
-                    element.style.pointerEvents = 'none';
-                }
-            });
-        });
+        // Service restored - overlay prevention scripts removed
+        console.log('DIU CGPA service restored with new API endpoint');
     </script>
 
     <!-- JavaScript Files - Rearranged for proper dependency order -->

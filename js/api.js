@@ -1,6 +1,7 @@
 /**
  * API Service for DIU CGPA
  * Handles all API requests to the DIU server
+ * Updated to use new gateway API endpoint: https://gateway7.diu.edu.bd/api/student/portal/check/result/semester
  */
 
 class ApiService {    constructor() {
@@ -15,7 +16,7 @@ class ApiService {    constructor() {
         if (isProduction) {
             this.baseUrl = '/.netlify/functions/api-proxy';
         } else {
-            this.baseUrl = 'http://peoplepulse.diu.edu.bd:8189/result';
+            this.baseUrl = 'https://gateway7.diu.edu.bd/api/student/portal/check/result/semester';
         }
         
         this.missingSemesters = []; // Track missing semesters
@@ -72,7 +73,7 @@ class ApiService {    constructor() {
             if (isProduction) {
                 this.baseUrl = '/.netlify/functions/api-proxy';
             } else {
-                this.baseUrl = 'http://peoplepulse.diu.edu.bd:8189/result';
+                this.baseUrl = 'https://gateway7.diu.edu.bd/api/student/portal/check/result/semester';
             }
             
             console.log(`API base URL reset to default: ${this.baseUrl}`);
