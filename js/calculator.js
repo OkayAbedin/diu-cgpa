@@ -9,7 +9,8 @@
  * - Retaken courses are marked with a retake indicator
  */
 
-class CgpaCalculator {    /**
+class CgpaCalculator {
+    /**
      * Calculate semester GPA for a set of courses
      * @param {Array} courses - Array of course objects for a semester
      * @returns {Object} Object containing GPA and total credits
