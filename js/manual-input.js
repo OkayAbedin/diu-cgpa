@@ -1052,12 +1052,12 @@ Tip: Select all result text from your student portal and copy-paste it here. The
      */
     loadSampleData() {
         // Fill in sample student info with all available fields
-        document.getElementById('manual-student-name').value = 'John Doe';
+        document.getElementById('manual-student-name').value = 'Minhazul Abedin';
         document.getElementById('manual-student-id').value = '221-15-4919';
         document.getElementById('manual-department').value = 'Computer Science & Engineering';
         document.getElementById('manual-program').value = 'B.Sc. in Computer Science & Engineering';
-        document.getElementById('manual-batch').value = '221';
-        document.getElementById('manual-campus').value = 'Daffodil Smart City (Main Campus)';
+        document.getElementById('manual-batch').value = '61';
+        document.getElementById('manual-campus').value = 'Daffodil Smart City';
         document.getElementById('manual-faculty').value = 'Faculty of Science & Information Technology';
         document.getElementById('manual-enrollment-session').value = 'Spring 2022';
 

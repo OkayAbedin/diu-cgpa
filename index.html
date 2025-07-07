@@ -197,6 +197,44 @@
                 gap: 5px;
             }
         }
+        
+        /* Custom styling for Calculate CGPA button */
+        #calculate-manual-cgpa-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+            border: 2px solid transparent !important;
+            background-clip: padding-box !important;
+            position: relative !important;
+            overflow: hidden !important;
+        }
+        
+        #calculate-manual-cgpa-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            z-index: -2;
+        }
+        
+        #calculate-manual-cgpa-btn::after {
+            content: '';
+            position: absolute;
+            top: 2px;
+            left: 2px;
+            right: 2px;
+            bottom: 2px;
+            background: transparent;
+            z-index: -1;
+            border-radius: inherit;
+        }
+        
+        #calculate-manual-cgpa-btn:hover {
+            background: linear-gradient(135deg, #5a67d8 0%, #6b46c1 100%) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4) !important;
+        }
     </style>
 </head>
 <body>
@@ -292,16 +330,6 @@
                             </div>
                         </div>
                         
-                        <!-- API Notice -->
-                        <div class="gh-alert gh-alert-warning">
-                            <div class="gh-alert-icon">
-                                <i class="fas fa-exclamation-triangle"></i>
-                            </div>
-                            <div class="gh-alert-content">
-                                <p><strong>Note:</strong> Due to recent changes in DIU's gateway system, we've created this manual input method for calculating your CGPA. Simply paste your semester results from the student portal below.</p>
-                            </div>
-                        </div>
-                        
                         <!-- Student Information Input -->
                         <div class="gh-box">
                             <h4><i class="fas fa-user"></i> Student Information (Optional)</h4>
@@ -346,10 +374,9 @@
                                             <label for="manual-campus">Campus</label>
                                             <select id="manual-campus" class="gh-form-control">
                                                 <option value="">Select Campus</option>
-                                                <option value="Daffodil Smart City (Main Campus)">Daffodil Smart City (Main Campus)</option>
-                                                <option value="Uttara Campus">Uttara Campus</option>
-                                                <option value="Chittagong Campus">Chittagong Campus</option>
-                                                <option value="Other">Other</option>
+                                                <option value="Daffodil Smart City">Daffodil Smart City</option>
+                                                <option value="Dhanmondi">Dhanmondi</option>
+                                                <option value="Uttara">Uttara</option>
                                             </select>
                                         </div>
                                     </div>
