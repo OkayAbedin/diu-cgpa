@@ -95,29 +95,46 @@ function initNavigation() {
   
   // Function to set active tab
   function setActiveTab(tabId) {
-    // Update buttons
-    navButtons.forEach(button => {
-      // First, reset all buttons to default gray style
-      button.classList.remove('active');
-      button.classList.remove('gh-btn-primary');
+    try {
+      // Update buttons
+      navButtons.forEach(button => {
+        // First, reset all buttons to default gray style
+        button.classList.remove('active');
+        button.classList.remove('gh-btn-primary');
+        
+        // Then, add active class to the selected button
+        if (button.getAttribute('data-tab') === tabId) {
+          button.classList.add('active');
+        }
+      });
       
-      // Then, add active class to the selected button
-      if (button.getAttribute('data-tab') === tabId) {
-        button.classList.add('active');
+      // Update tab panes
+      tabPanes.forEach(pane => {
+        if (pane.id === tabId) {
+          pane.style.display = 'block';
+          pane.style.setProperty('display', 'block', 'important');
+        } else {
+          pane.style.display = 'none';
+          pane.style.setProperty('display', 'none', 'important');
+        }
+      });
+      
+      // Close mobile menu when a tab is selected
+      closeMobileMenu();
+    } catch (error) {
+      console.error('Error in setActiveTab:', error);
+      // Fallback: manually show the tab
+      const targetTab = document.getElementById(tabId);
+      if (targetTab) {
+        // Hide all tabs first
+        document.querySelectorAll('.tab-pane').forEach(pane => {
+          pane.style.display = 'none';
+        });
+        // Show target tab
+        targetTab.style.display = 'block';
+        targetTab.style.setProperty('display', 'block', 'important');
       }
-    });
-    
-    // Update tab panes
-    tabPanes.forEach(pane => {
-      if (pane.id === tabId) {
-        pane.style.display = 'block';
-      } else {
-        pane.style.display = 'none';
-      }
-    });
-    
-    // Close mobile menu when a tab is selected
-    closeMobileMenu();
+    }
   }
   
   // Add click handler to menu toggle button
@@ -143,7 +160,16 @@ function initNavigation() {
   });
   
   // Set default tab (manual-calculator due to API issues)
-  setActiveTab('manual-calculator');
+  try {
+    setActiveTab('manual-calculator');
+  } catch (error) {
+    console.error('Error setting default tab:', error);
+    // Fallback: try to show manual calculator tab directly
+    const manualTab = document.getElementById('manual-calculator');
+    if (manualTab) {
+      manualTab.style.display = 'block';
+    }
+  }
   
   // Apply saved theme on page load
   applyTheme(getThemePreference());

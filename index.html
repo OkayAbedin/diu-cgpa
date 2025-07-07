@@ -176,7 +176,7 @@
         
         /* Critical tab navigation styles that override any problematic CSS */
         .tab-pane {
-            display: none;
+            display: none !important;
         }
         .tab-pane.active {
             display: block !important;
@@ -319,7 +319,7 @@
                 <!-- Tab content container -->
                 <div class="tab-content" id="calculatorTabsContent">
                     <!-- Manual Calculator Tab (First/Default) -->
-                    <div class="tab-pane active" id="manual-calculator">
+                    <div class="tab-pane active" id="manual-calculator" style="display: block !important;">
                         <div class="gh-content-header manual-calculator-header">
                             <div class="manual-header-content">
                                 <h2>Manual CGPA Calculator</h2>
@@ -481,7 +481,7 @@
                     </div>
 
                     <!-- Automatic Calculator Tab (Second) -->
-                    <div class="tab-pane" id="auto-calculator">
+                    <div class="tab-pane" id="auto-calculator" style="display: none !important;">
                         <div class="gh-content-header fetch-cgpa-header">
                             <div class="fetch-header-content">
                                 <h2>Fetch Your CGPA</h2>
@@ -564,7 +564,7 @@
                     </div>
 
                     <!-- Advanced Fetch Tab -->
-                    <div class="tab-pane" id="advanced-fetch">
+                    <div class="tab-pane" id="advanced-fetch" style="display: none !important;">
                         <div class="gh-content-header advanced-fetch-header">
                             <div class="advanced-header-content">
                                 <h2>Advanced CGPA Fetch</h2>
@@ -697,7 +697,7 @@
                     </div>
                     
                     <!-- About Tab -->
-                    <div class="tab-pane" id="about">
+                    <div class="tab-pane" id="about" style="display: none !important;">
                         <div class="gh-content-header about-header">
                             <div class="about-header-content">
                                 <h2>About DIU CGPA</h2>
@@ -916,5 +916,39 @@
       "dateModified": "2025-05-03"
     }
     </script>
+    
+    <!-- Robust initialization script for production environments -->
+    <script>
+        // Ensure manual calculator tab is visible on page load
+        window.addEventListener('load', function() {
+            // Wait a bit for all scripts to load
+            setTimeout(function() {
+                const manualTab = document.getElementById('manual-calculator');
+                const autoTab = document.getElementById('auto-calculator');
+                const advancedTab = document.getElementById('advanced-fetch');
+                const aboutTab = document.getElementById('about');
+                
+                if (manualTab) {
+                    manualTab.style.display = 'block';
+                    manualTab.classList.add('active');
+                }
+                if (autoTab) autoTab.style.display = 'none';
+                if (advancedTab) advancedTab.style.display = 'none';
+                if (aboutTab) aboutTab.style.display = 'none';
+                
+                // Also ensure the correct navigation button is active
+                const navButtons = document.querySelectorAll('.gh-nav .gh-btn[data-tab]');
+                navButtons.forEach(button => {
+                    if (button.getAttribute('data-tab') === 'manual-calculator') {
+                        button.classList.add('active');
+                    } else {
+                        button.classList.remove('active');
+                    }
+                });
+            }, 100);
+        });
+    </script>
+    
+    <!-- External CDN Scripts -->
 </body>
 </html>

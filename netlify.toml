@@ -30,7 +30,7 @@
     X-Frame-Options = "DENY"
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
-    Content-Security-Policy = "default-src 'self' *.cloudflare.com *.jsdelivr.net *.bootstrap.com cdn.jsdelivr.net *.fontawesome.com fonts.googleapis.com cdnjs.cloudflare.com *.netlify.app *.diu.edu.bd 'unsafe-inline'; img-src 'self' data: *.netlify.app; connect-src 'self' *.netlify.app *.diu.edu.bd;"
+    Content-Security-Policy = "default-src 'self' *.cloudflare.com *.jsdelivr.net *.bootstrap.com cdn.jsdelivr.net *.fontawesome.com fonts.googleapis.com cdnjs.cloudflare.com *.netlify.app *.diu.edu.bd 'unsafe-inline' 'unsafe-eval' data:; img-src 'self' data: *.netlify.app; connect-src 'self' *.netlify.app *.diu.edu.bd;"
     
 # Cache control for better performance and SEO
 [[headers]]

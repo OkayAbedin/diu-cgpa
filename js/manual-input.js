@@ -47,8 +47,13 @@ class ManualCgpaInput {
      * Add a new semester input area
      */
     addSemesterInput() {
-        const container = document.getElementById('semester-input-list');
-        const semesterIndex = container.children.length + 1;
+        try {
+            const container = document.getElementById('semester-input-list');
+            if (!container) {
+                console.error('Semester input container not found');
+                return;
+            }
+            const semesterIndex = container.children.length + 1;
 
         const semesterHtml = `
             <div class="semester-input-container" data-semester="${semesterIndex}">
@@ -87,6 +92,9 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         `;
 
         container.insertAdjacentHTML('beforeend', semesterHtml);
+        } catch (error) {
+            console.error('Error adding semester input:', error);
+        }
     }
 
     /**
@@ -1281,7 +1289,19 @@ Total Credit	15.00	SGPA	3.64`;
 // Initialize manual CGPA input system
 let manualCgpaInput;
 document.addEventListener('DOMContentLoaded', () => {
-    manualCgpaInput = new ManualCgpaInput();
+    try {
+        manualCgpaInput = new ManualCgpaInput();
+    } catch (error) {
+        console.error('Error initializing ManualCgpaInput:', error);
+        // Retry after a delay
+        setTimeout(() => {
+            try {
+                manualCgpaInput = new ManualCgpaInput();
+            } catch (retryError) {
+                console.error('Retry failed for ManualCgpaInput:', retryError);
+            }
+        }, 1000);
+    }
 });
 
 // Export for global access
