@@ -142,8 +142,8 @@ function initNavigation() {
     });
   });
   
-  // Set default tab (auto-calculator)
-  setActiveTab('auto-calculator');
+  // Set default tab (manual-calculator due to API issues)
+  setActiveTab('manual-calculator');
   
   // Apply saved theme on page load
   applyTheme(getThemePreference());

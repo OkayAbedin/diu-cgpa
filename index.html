@@ -241,13 +241,13 @@
                 <nav class="gh-nav">
                     <ul>
                         <li>
-                            <a href="#" class="gh-btn" data-tab="auto-calculator">
-                                <i class="fas fa-search"></i> <span class="btn-text">Fetch CGPA</span>
+                            <a href="#" class="gh-btn" data-tab="manual-calculator">
+                                <i class="fas fa-calculator"></i> <span class="btn-text">Calculate CGPA</span>
                             </a>
                         </li>
                         <li>
-                            <a href="#" class="gh-btn" data-tab="manual-calculator">
-                                <i class="fas fa-calculator"></i> <span class="btn-text">Calculate CGPA</span>
+                            <a href="#" class="gh-btn" data-tab="auto-calculator">
+                                <i class="fas fa-search"></i> <span class="btn-text">Fetch CGPA</span>
                             </a>
                         </li>
                         <li>
@@ -280,8 +280,181 @@
             <div class="gh-container">
                 <!-- Tab content container -->
                 <div class="tab-content" id="calculatorTabsContent">
-                    <!-- Automatic Calculator Tab -->
-                    <div class="tab-pane active" id="auto-calculator">
+                    <!-- Manual Calculator Tab (First/Default) -->
+                    <div class="tab-pane active" id="manual-calculator">
+                        <div class="gh-content-header manual-calculator-header">
+                            <div class="manual-header-content">
+                                <h2>Manual CGPA Calculator</h2>
+                                <p class="gh-desc">Enter your details and paste semester results from student portal</p>
+                            </div>
+                            <div class="manual-header-icon">
+                                <i class="fas fa-edit"></i>
+                            </div>
+                        </div>
+                        
+                        <!-- API Notice -->
+                        <div class="gh-alert gh-alert-warning">
+                            <div class="gh-alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="gh-alert-content">
+                                <p><strong>Note:</strong> Due to recent changes in DIU's gateway system, we've created this manual input method for calculating your CGPA. Simply paste your semester results from the student portal below.</p>
+                            </div>
+                        </div>
+                        
+                        <!-- Student Information Input -->
+                        <div class="gh-box">
+                            <h4><i class="fas fa-user"></i> Student Information (Optional)</h4>
+                            <div class="manual-student-info">
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-student-name">Full Name</label>
+                                            <input type="text" id="manual-student-name" class="gh-form-control" placeholder="Enter your full name">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-student-id">Student ID</label>
+                                            <input type="text" id="manual-student-id" class="gh-form-control" placeholder="e.g. 221-15-4919">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-department">Department</label>
+                                            <input type="text" id="manual-department" class="gh-form-control" placeholder="e.g. Computer Science & Engineering">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-program">Program</label>
+                                            <input type="text" id="manual-program" class="gh-form-control" placeholder="e.g. B.Sc. in Computer Science & Engineering">
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-batch">Batch</label>
+                                            <input type="text" id="manual-batch" class="gh-form-control" placeholder="e.g. 221">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-campus">Campus</label>
+                                            <select id="manual-campus" class="gh-form-control">
+                                                <option value="">Select Campus</option>
+                                                <option value="Daffodil Smart City (Main Campus)">Daffodil Smart City (Main Campus)</option>
+                                                <option value="Uttara Campus">Uttara Campus</option>
+                                                <option value="Chittagong Campus">Chittagong Campus</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-faculty">Faculty</label>
+                                            <select id="manual-faculty" class="gh-form-control">
+                                                <option value="">Select Faculty</option>
+                                                <option value="Faculty of Science & Information Technology">Faculty of Science & Information Technology</option>
+                                                <option value="Faculty of Engineering">Faculty of Engineering</option>
+                                                <option value="Faculty of Business & Entrepreneurship">Faculty of Business & Entrepreneurship</option>
+                                                <option value="Faculty of Humanities & Social Science">Faculty of Humanities & Social Science</option>
+                                                <option value="Faculty of Allied Health Science">Faculty of Allied Health Science</option>
+                                                <option value="Faculty of Law">Faculty of Law</option>
+                                                <option value="Other">Other</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="manual-enrollment-session">Enrollment Session</label>
+                                            <input type="text" id="manual-enrollment-session" class="gh-form-control" placeholder="e.g. Spring 2022">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Semester Results Input -->
+                        <div class="gh-box">
+                            <h4><i class="fas fa-table"></i> Semester Results</h4>
+                            
+                            <div id="semester-input-list">
+                                <!-- Semester input areas will be added here -->
+                            </div>
+                            
+                            <div class="gh-button-group">
+                                <button id="add-semester-input-btn" class="gh-btn gh-btn-secondary">
+                                    <i class="fas fa-plus"></i> Add Semester
+                                </button>
+                                <button id="load-sample-data-btn" class="gh-btn gh-btn-outline">
+                                    <i class="fas fa-file-import"></i> Load Sample Data
+                                </button>
+                            </div>
+                        </div>
+                        
+                        <!-- Calculate Button -->
+                        <div class="gh-box text-center">
+                            <button id="calculate-manual-cgpa-btn" class="gh-btn gh-btn-primary gh-btn-lg">
+                                <i class="fas fa-calculator"></i> Calculate CGPA
+                            </button>
+                        </div>
+                        
+                        <!-- Results Display (hidden initially) -->
+                        <section id="manual-loading" class="gh-loading hidden">
+                            <div class="gh-spinner"></div>
+                            <p>Processing your results...</p>
+                        </section>
+                        
+                        <section id="manual-student-info" class="gh-box hidden"></section>
+                        
+                        <section id="manual-results-container" class="hidden">
+                            <div class="gh-chart-box" id="manual-cgpa-progress-container">
+                                <div class="gh-chart-header">
+                                    <h3>CGPA Progress</h3>
+                                    <p class="chart-description">Track your academic performance over time</p>
+                                </div>
+                                <div class="gh-chart-body">
+                                    <canvas id="manual-cgpa-chart"></canvas>
+                                </div>
+                            </div>
+                            
+                            <div class="gh-section-title">
+                                <h3>Semester Results</h3>
+                                <div class="gh-section-actions">
+                                    <button id="manual-save-pdf-btn" class="gh-btn gh-btn-sm gh-btn-secondary">
+                                        <i class="fas fa-file-pdf"></i> Save as PDF
+                                    </button>
+                                    <button id="manual-export-csv-btn" class="gh-btn gh-btn-sm gh-btn-secondary">
+                                        <i class="fas fa-file-csv"></i> Export as CSV
+                                    </button>
+                                </div>
+                            </div>
+                            <!-- Hidden elements to maintain JavaScript functionality -->
+                            <div style="display: none;">
+                                <div id="manual-total-cgpa"></div>
+                                <div id="manual-total-credits"></div>
+                            </div>
+                            <div id="manual-semester-results" class="gh-list"></div>
+                        </section>
+                        
+                        <section id="manual-error-message" class="gh-alert gh-alert-error hidden">
+                            <div class="gh-alert-icon">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="gh-alert-content">
+                                <p>Error processing your data. Please check the format and try again.</p>
+                            </div>
+                        </section>
+                    </div>
+
+                    <!-- Automatic Calculator Tab (Second) -->
+                    <div class="tab-pane" id="auto-calculator">
                         <div class="gh-content-header fetch-cgpa-header">
                             <div class="fetch-header-content">
                                 <h2>Fetch Your CGPA</h2>
@@ -292,18 +465,31 @@
                             </div>
                         </div>
                         
+                        <!-- API Notice -->
+                        <div class="gh-alert gh-alert-warning">
+                            <div class="gh-alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="gh-alert-content">
+                                <p><strong>API Service Temporarily Unavailable</strong></p>
+                                <p>Due to recent changes in DIU's gateway system, automatic CGPA fetching is currently unavailable. Please use the <strong>Manual Input</strong> tab to calculate your CGPA by pasting your semester results directly from the student portal.</p>
+                            </div>
+                        </div>
+                        
                         <div class="gh-box">
                             <div class="gh-form">
                                 <div class="form-group">
                                     <label for="student-id">Student ID</label>
                                     <div class="gh-input-group">
-                                        <input type="text" id="student-id" placeholder="e.g. 221-15-4919 or 024XXXXXXXXXXXXX">
-                                        <button id="calculate-btn" class="gh-btn gh-btn-primary">Calculate CGPA</button>
+                                        <input type="text" id="student-id" placeholder="e.g. 221-15-4919 or 024XXXXXXXXXXXXX" disabled>
+                                        <button id="calculate-btn" class="gh-btn gh-btn-primary" disabled>Calculate CGPA</button>
                                     </div>
+                                    <small class="text-muted">Currently disabled - Please use Manual Input tab</small>
                                 </div>
                             </div>
                         </div>
-                          <section id="loading" class="gh-loading hidden">
+                          
+                        <section id="loading" class="gh-loading hidden">
                             <div class="gh-spinner"></div>
                             <p>Loading...</p>
                         </section>
@@ -349,148 +535,7 @@
                             </div>
                         </section>
                     </div>
-                      <!-- Manual Calculator Tab -->
-                    <div class="tab-pane" id="manual-calculator">
-                        <div class="gh-content-header manual-calculator-header">
-                            <div class="manual-header-content">
-                                <h2>Calculate CGPA Manually</h2>
-                                <p class="gh-desc">Add your courses to manually calculate your expected CGPA</p>
-                            </div>
-                            <div class="manual-header-icon">
-                                <i class="fas fa-edit"></i>
-                            </div>
-                        </div>
-                        
-                        <div class="gh-box">
-                            <!-- Instructions for users -->
-                            <div class="gh-manual-instructions">
-                                <p><i class="fas fa-info-circle"></i> Add semesters and courses to calculate your expected CGPA. You can add multiple semesters and multiple courses per semester.</p>
-                            </div>
-                            
-                            <div id="manual-semester-list">
-                                <!-- Semester entries will be added dynamically -->
-                            </div>
-                            
-                            <div class="gh-button-group">
-                                <button id="add-semester-btn" class="gh-btn gh-btn-secondary">
-                                    <i class="fas fa-plus"></i> Add Semester
-                                </button>
-                                <button id="calculate-manual-btn" class="gh-btn gh-btn-primary">
-                                    <i class="fas fa-calculator"></i> Calculate CGPA
-                                </button>
-                            </div>
-                        </div>
-                        
-                        <!-- Template for semester (hidden, will be cloned by JavaScript) -->
-                        <template id="semester-template">
-                            <div class="gh-semester">
-                                <div class="gh-semester-header">
-                                    <h4>Semester <span class="semester-number">1</span></h4>
-                                    <div class="gh-semester-actions">
-                                        <span class="semester-gpa-badge">GPA: <span class="semester-gpa">0.00</span></span>
-                                        <button class="gh-btn gh-btn-sm gh-btn-danger remove-semester-btn">
-                                            <i class="fas fa-trash"></i>
-                                            <span>Remove</span>
-                                        </button>
-                                    </div>
-                                </div>
-                                
-                                <div class="courses-container">
-                                    <!-- Course rows will be added here -->
-                                </div>
-                                
-                                <div class="semester-footer">
-                                    <button class="gh-btn gh-btn-secondary add-course-btn">
-                                        <i class="fas fa-plus"></i> Add Course
-                                    </button>
-                                    <div class="semester-summary">
-                                        <span>Total Credits: <span class="semester-credit-count">0</span></span>
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                          <!-- Template for course row (hidden, will be cloned by JavaScript) -->
-                        <template id="course-template">
-                            <div class="gh-course-row">
-                                <div class="gh-course-inputs">
-                                    <input type="text" class="gh-form-control course-name" placeholder="Course Name/Code (optional)">
-                                    <input type="number" class="gh-form-control course-credit" placeholder="Credit" min="0.5" max="4" step="0.5" required>
-                                    <select class="gh-form-select course-grade">
-                                        <option value="" disabled selected>Select Grade</option>
-                                        <option value="4.00">A+ (4.00)</option>
-                                        <option value="3.75">A (3.75)</option>
-                                        <option value="3.50">A- (3.50)</option>
-                                        <option value="3.25">B+ (3.25)</option>
-                                        <option value="3.00">B (3.00)</option>
-                                        <option value="2.75">B- (2.75)</option>
-                                        <option value="2.50">C+ (2.50)</option>
-                                        <option value="2.25">C (2.25)</option>
-                                        <option value="2.00">D (2.00)</option>
-                                        <option value="0.00">F (0.00)</option>
-                                        <option value="custom">Custom Grade</option>
-                                    </select>
-                                    <button class="gh-btn gh-btn-icon gh-btn-danger remove-course-btn" title="Remove Course" aria-label="Remove Course">
-                                        <i class="fas fa-times"></i>
-                                    </button>
-                                    <div class="custom-grade-container" style="display: none;">
-                                        <input type="number" class="gh-form-control custom-grade-input" placeholder="Grade Point" min="0" max="4" step="0.01">
-                                    </div>
-                                </div>
-                            </div>
-                        </template>
-                          <div class="gh-stats-container hidden" id="manual-results-container">
-                            <!-- CGPA Display Card (Similar to student-info) -->
-                            <div class="gh-box" id="manual-cgpa-display">
-                                <div class="student-info-container">
-                                    <div class="cgpa-display">
-                                        <div class="cgpa-circle">
-                                            <div class="cgpa-value" id="manual-cgpa-value">0.00</div>
-                                        </div>
-                                    </div>
-                                    <div class="student-stats">
-                                        <div class="stat-item">
-                                            <div class="stat-value" id="manual-total-semesters">0</div>
-                                            <div class="stat-label">Semesters</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-value" id="manual-total-credits-value">0</div>
-                                            <div class="stat-label">Credits</div>
-                                        </div>
-                                        <div class="stat-item">
-                                            <div class="stat-value" id="manual-last-updated">Today</div>
-                                            <div class="stat-label">Last Updated</div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>                            <!-- CGPA Progress Chart -->
-                            <div class="gh-chart-box" id="manual-chart-container">
-                                <div class="gh-chart-header">
-                                    <h3>CGPA Progress</h3>
-                                    <p class="chart-description">Visualization of your semester-by-semester performance</p>
-                                </div>
-                                <div class="gh-chart-body">
-                                    <canvas id="manual-cgpa-chart"></canvas>
-                                </div>
-                            </div>
-                              <!-- Manual Export Options -->
-                            <div class="gh-section-title">
-                                <h3>Export Options</h3>
-                                <div class="gh-section-actions">
-                                    <button id="manual-export-csv-btn" class="gh-btn gh-btn-sm gh-btn-secondary">
-                                        <i class="fas fa-file-csv"></i> Export as CSV
-                                    </button>
-                                </div>
-                            </div>
-                            
-                            <!-- Hidden legacy elements for backward compatibility -->
-                            <div style="display: none;">
-                                <div id="manual-total-cgpa">CGPA: 0.00</div>
-                                <div id="manual-total-credits">Total Credits: 0</div>
-                                <div id="manual-semester-count">Total Semesters: 0</div>
-                            </div>
-                        </div>
-                    </div>
-                    
+
                     <!-- Advanced Fetch Tab -->
                     <div class="tab-pane" id="advanced-fetch">
                         <div class="gh-content-header advanced-fetch-header">
@@ -503,15 +548,28 @@
                             </div>
                         </div>
                         
+                        <!-- API Notice -->
+                        <div class="gh-alert gh-alert-warning">
+                            <div class="gh-alert-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="gh-alert-content">
+                                <p><strong>Advanced Fetch Currently Unavailable</strong></p>
+                                <p>Due to recent changes in DIU's gateway system, advanced fetch options are currently unavailable. Please use the <strong>Manual Input</strong> tab to calculate your CGPA.</p>
+                            </div>
+                        </div>
+                        
                         <div class="gh-box">
                             <div class="gh-form">
                                 <!-- Fetch Options -->
                                 <div class="gh-section-title">
                                     <h3>Fetch Options</h3>
-                                </div>                                <!-- Timeout setting -->
+                                </div>
+                                
+                                <!-- Timeout setting -->
                                 <div class="form-group">
                                     <label for="advanced-timeout">Response Timeout (seconds)</label>
-                                    <input type="number" id="advanced-timeout" class="gh-form-control" value="15" min="5" max="120">
+                                    <input type="number" id="advanced-timeout" class="gh-form-control" value="15" min="5" max="120" disabled>
                                     <small>How long to wait for the server response before timing out. Default: 15 seconds.</small>
                                 </div>
                                 
@@ -523,31 +581,30 @@
                                 <div class="form-group">
                                     <div class="gh-radio-group">
                                         <div class="gh-radio">
-                                            <input type="radio" name="fetch-mode" id="fetch-single" value="single" checked>
+                                            <input type="radio" name="fetch-mode" id="fetch-single" value="single" checked disabled>
                                             <label for="fetch-single">Single Student</label>
                                         </div>
                                         <div class="gh-radio">
-                                            <input type="radio" name="fetch-mode" id="fetch-range" value="range">
+                                            <input type="radio" name="fetch-mode" id="fetch-range" value="range" disabled>
                                             <label for="fetch-range">ID Range</label>
                                         </div>
                                         <div class="gh-radio">
-                                            <input type="radio" name="fetch-mode" id="fetch-multiple" value="multiple">
+                                            <input type="radio" name="fetch-mode" id="fetch-multiple" value="multiple" disabled>
                                             <label for="fetch-multiple">Multiple IDs</label>
                                         </div>
                                     </div>
-                                    <input type="hidden" id="fetch-mode" value="single">
                                 </div>
                                 
-                                <!-- Single Student -->                                <div id="single-student-form" class="fetch-form-section">
+                                <!-- Single Student -->
+                                <div id="single-student-form" class="fetch-form-section">
                                     <div class="form-group">
                                         <label for="advanced-student-id">Student ID</label>
-                                        <input type="text" id="advanced-student-id" class="gh-form-control" placeholder="e.g. 221-15-4919 or 024XXXXXXXXXXXXX">
+                                        <input type="text" id="advanced-student-id" class="gh-form-control" placeholder="e.g. 221-15-4919 or 024XXXXXXXXXXXXX" disabled>
                                     </div>
                                     <div class="form-group">
                                         <label for="semester-select">Select Semester</label>
-                                        <select id="semester-select" class="gh-form-control">
+                                        <select id="semester-select" class="gh-form-control" disabled>
                                             <option value="all">All Semesters</option>
-                                            <!-- Semester options will be populated dynamically -->
                                         </select>
                                     </div>
                                 </div>
@@ -556,15 +613,15 @@
                                 <div id="id-range-form" class="fetch-form-section hidden">
                                     <div class="form-group">
                                         <label for="id-range-prefix">ID Prefix</label>
-                                        <input type="text" id="id-range-prefix" class="gh-form-control" placeholder="e.g. 221-15-">
+                                        <input type="text" id="id-range-prefix" class="gh-form-control" placeholder="e.g. 221-15-" disabled>
                                         <small>Common prefix for all IDs in the range</small>
                                     </div>
                                     <div class="form-group">
                                         <label>ID Range</label>
                                         <div class="gh-input-group">
-                                            <input type="number" id="id-range-start" class="gh-form-control" placeholder="Start" min="1">
+                                            <input type="number" id="id-range-start" class="gh-form-control" placeholder="Start" min="1" disabled>
                                             <span class="gh-input-group-text">to</span>
-                                            <input type="number" id="id-range-end" class="gh-form-control" placeholder="End" min="1">
+                                            <input type="number" id="id-range-end" class="gh-form-control" placeholder="End" min="1" disabled>
                                         </div>
                                         <small>For example, 4500 to 4550 will try IDs like 221-15-4500, 221-15-4501, etc.</small>
                                     </div>
@@ -574,13 +631,15 @@
                                 <div id="multiple-ids-form" class="fetch-form-section hidden">
                                     <div class="form-group">
                                         <label for="multiple-student-ids">Multiple Student IDs</label>
-                                        <textarea id="multiple-student-ids" class="gh-form-control" rows="5" placeholder="Enter one ID per line, e.g.:&#10;221-15-4919&#10;024XXXXXXXXXXXXX&#10;"></textarea>
+                                        <textarea id="multiple-student-ids" class="gh-form-control" rows="5" placeholder="Enter one ID per line, e.g.:&#10;221-15-4919&#10;024XXXXXXXXXXXXX&#10;" disabled></textarea>
                                     </div>
                                 </div>
                                 
-                                <button id="advanced-fetch-btn" class="gh-btn gh-btn-primary">
+                                <button id="advanced-fetch-btn" class="gh-btn gh-btn-primary" disabled>
                                     <i class="fas fa-search"></i> Fetch CGPA
                                 </button>
+                                
+                                <p class="text-muted"><small>Currently disabled - Please use Manual Input tab</small></p>
                             </div>
                         </div>
                         
@@ -621,25 +680,26 @@
                                 <i class="fas fa-info-circle"></i>
                             </div>
                         </div>
-                          <div class="gh-box gh-markdown-body">
+                          
+                        <div class="gh-box gh-markdown-body">
                             <h3>About DIU CGPA</h3>
                             <p>DIU CGPA is a modern web application designed specifically for <strong>Daffodil International University</strong> students to easily track, calculate, and analyze their academic progress. This tool provides a more user-friendly alternative to the university's official system while maintaining accurate CGPA calculations based on DIU's grading policy.</p>
                             
                             <h4>Key Features</h4>
                             <ul>
-                                <li><strong>Automatic CGPA Calculation:</strong> Fetch your complete academic record using just your student ID</li>
-                                <li><strong>Manual Calculator:</strong> Plan your future semesters by adding hypothetical courses with custom grades</li>
-                                <li><strong>Advanced Fetch Options:</strong> Use batch processing for multiple student IDs or ID ranges with configurable timeout settings</li>
+                                <li><strong>Manual CGPA Calculator:</strong> Enter your semester results directly from the student portal</li>
+                                <li><strong>Smart Result Parser:</strong> Automatically detects and parses semester result tables</li>
+                                <li><strong>Interactive Visualization:</strong> Track your semester-by-semester progress with dynamic charts</li>
                                 <li><strong>Academic Transcript:</strong> Generate and save professional PDF transcripts of your results</li>
                                 <li><strong>Data Export:</strong> Export your results to CSV format for further analysis</li>
-                                <li><strong>Interactive Visualization:</strong> Track your semester-by-semester progress with dynamic charts showing both semester and cumulative GPAs</li>
                                 <li><strong>Visual GPA Indicator:</strong> Color-coded circular GPA display that changes based on performance level</li>
                                 <li><strong>Dark Mode Support:</strong> Comfortable viewing experience in any lighting condition</li>
                                 <li><strong>Mobile-Friendly Design:</strong> Fully responsive interface works on all devices</li>
+                                <li><strong>Sample Data:</strong> Load sample data to test the calculator functionality</li>
                             </ul>
 
                             <h4>How It Works</h4>
-                            <p>This tool communicates with DIU's academic database through a secure API and processes the raw data to provide you with a clean, understandable representation of your academic performance. All calculations strictly follow <a href="https://daffodilvarsity.edu.bd/article/rules-and-regulation" target="_blank" rel="noopener">DIU's official grading policy</a>, with grades ranging from A+ (4.00) to F (0.00).</p>
+                            <p>This tool uses a manual input system where you can paste your semester result tables directly from the DIU student portal. The smart parser automatically detects course information, credits, grades, and calculates your CGPA following <a href="https://daffodilvarsity.edu.bd/article/rules-and-regulation" target="_blank" rel="noopener">DIU's official grading policy</a>, with grades ranging from A+ (4.00) to F (0.00).</p>
 
                             <h4>Privacy & Security</h4>
                             <p>Your privacy matters to us. This application:</p>
@@ -647,9 +707,20 @@
                                 <li>Does not store your student ID or academic records on any server</li>
                                 <li>Processes all data locally in your browser</li>
                                 <li>Does not use cookies to track your activity</li>
-                                <li>Makes direct API calls to the university system with no third-party intermediaries</li>
-                                <li>Provides configurable response timeout options to handle server delays</li>
+                                <li>No data is transmitted to external servers</li>
+                                <li>All calculations happen client-side for maximum privacy</li>
                             </ul>
+
+                            <h4>Using the Manual Calculator</h4>
+                            <p>To use the manual CGPA calculator:</p>
+                            <ol>
+                                <li>Go to your DIU student portal and view your semester results</li>
+                                <li>Select and copy the entire result table for each semester</li>
+                                <li>Paste the data into the semester input areas in this tool</li>
+                                <li>Optionally fill in your student information</li>
+                                <li>Click "Calculate CGPA" to see your results with charts and analysis</li>
+                                <li>Export your results as PDF or CSV if needed</li>
+                            </ol>
 
                             <h4>Development</h4>
                             <p>This is an open-source project built with modern web technologies:</p>
@@ -658,7 +729,7 @@
                                 <li>Chart.js for data visualization</li>
                                 <li>Bootstrap 5 for responsive design</li>
                                 <li>HTML2PDF.js for PDF generation</li>
-                                <li>Netlify for hosting and serverless functions</li>
+                                <li>Netlify for hosting</li>
                             </ul>
                             <p>The source code is available on GitHub, and contributions are welcome. If you're a developer interested in contributing or reporting issues, please visit the <a href="https://github.com/okayabedin/diu-cgpa" target="_blank" rel="noopener">GitHub Repository</a>.</p>
                             
@@ -671,7 +742,7 @@
                             
                             <div class="gh-about-footer">
                                 <p>Made with ❤️ by <a href="https://bio.link/minhazabedin" target="_blank" rel="noopener">Minhaz</a> | <a href="https://github.com/okayabedin/diu-cgpa" target="_blank" rel="noopener">GitHub Repository</a></p>
-                                <p class="gh-version">Version 2.0.0 | Last Updated: May 2025</p>
+                                <p class="gh-version">Version 2.1.0 | Last Updated: July 2025</p>
                             </div>
                         </div>
                     </div>
@@ -786,7 +857,8 @@
 
     <!-- Core functionality -->
     <script src="js/api.js"></script>
-    <script src="js/calculator.js"></script>    <!-- UI Components -->
+    <script src="js/calculator.js"></script>
+    <script src="js/manual-input.js"></script>    <!-- UI Components -->
     <script src="js/components/StudentInfo.js"></script>
     <script src="js/components/SemesterList.js"></script>
     <script src="js/components/ResultCard.js"></script>    <!-- UI Controller - loaded last -->

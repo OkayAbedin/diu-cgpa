@@ -328,6 +328,19 @@
     border-color: var(--color-btn-secondary-hover-border);
 }
 
+/* Outline button style */
+.gh-btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-bg);
+    transition: all 0.2s ease;
+}
+
+.gh-btn-outline:hover {
+    background-color: var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-text);
+}
+
 /* Student name and details styling */
 #manual-cgpa-display .student-name {
     font-size: 20px;
@@ -397,4 +410,175 @@
 [data-theme="dark"] .gh-btn-secondary:hover {
     background-color: var(--color-btn-secondary-hover-bg);
     border-color: var(--color-btn-secondary-hover-border);
+}
+
+/* Manual Input System Styles */
+.manual-student-info {
+    margin-bottom: 20px;
+}
+
+.manual-student-info .form-group {
+    margin-bottom: 15px;
+}
+
+.manual-student-info label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+.semester-input-container {
+    background-color: var(--color-box-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+}
+
+.semester-input-header {
+    background-color: var(--color-box-header);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.semester-input-header h5 {
+    margin: 0;
+    color: var(--color-text);
+    font-weight: 600;
+}
+
+.semester-remove-btn {
+    background: none;
+    border: none;
+    color: var(--color-btn-danger-bg);
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.semester-remove-btn:hover {
+    background-color: var(--color-btn-danger-bg);
+    color: white;
+}
+
+.semester-input-body {
+    padding: 16px;
+}
+
+.semester-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    border: 1px solid var(--color-border);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    background-color: var(--color-bg);
+    color: var(--color-text);
+    resize: vertical;
+    transition: border-color 0.2s ease;
+}
+
+.semester-textarea:focus {
+    outline: none;
+    border-color: var(--color-btn-primary-bg);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.semester-textarea::placeholder {
+    color: var(--color-text-secondary);
+}
+
+.example-format {
+    background-color: var(--color-box-header);
+    padding: 12px;
+    border-radius: 6px;
+    margin: 10px 0;
+    border-left: 3px solid var(--color-btn-primary-bg);
+}
+
+.example-format code {
+    font-family: 'Courier New', monospace;
+    font-size: 12px;
+    line-height: 1.6;
+    color: var(--color-text);
+    white-space: pre-line;
+}
+
+.semester-input-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border);
+    background-color: var(--color-box-header);
+    font-size: 13px;
+    color: var(--color-text-secondary);
+}
+
+.semester-parse-status {
+    margin-top: 8px;
+    padding: 8px;
+    border-radius: 4px;
+    font-size: 12px;
+    font-weight: 500;
+}
+
+.semester-parse-status.success {
+    background-color: rgba(56, 178, 172, 0.1);
+    color: var(--color-success);
+    border: 1px solid var(--color-success);
+}
+
+.semester-parse-status.error {
+    background-color: rgba(229, 62, 62, 0.1);
+    color: var(--color-btn-danger-bg);
+    border: 1px solid var(--color-btn-danger-bg);
+}
+
+.semester-parse-status.warning {
+    background-color: rgba(245, 158, 11, 0.1);
+    color: #f59e0b;
+    border: 1px solid #f59e0b;
+}
+
+/* Dark mode adjustments for manual input */
+[data-theme="dark"] .semester-textarea {
+    background-color: var(--color-bg);
+    border-color: var(--color-border);
+    color: var(--color-text);
+}
+
+[data-theme="dark"] .example-format code {
+    color: var(--color-text);
+}
+
+/* Responsive design for manual input */
+@media (max-width: 768px) {
+    .manual-student-info .row .col-md-6 {
+        margin-bottom: 10px;
+    }
+    
+    .semester-input-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .semester-remove-btn {
+        align-self: flex-end;
+    }
+    
+    .semester-textarea {
+        min-height: 150px;
+        font-size: 12px;
+    }
+    
+    .example-format code {
+        font-size: 11px;
+    }
 }
