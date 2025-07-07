@@ -430,17 +430,18 @@
 }
 
 .semester-input-container {
-    background-color: var(--color-box-bg);
-    border: 1px solid var(--color-border);
+    background-color: var(--color-box-bg, #ffffff);
+    border: 1px solid var(--color-border, #e0e0e0);
     border-radius: 8px;
     margin-bottom: 20px;
     overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
 }
 
 .semester-input-header {
-    background-color: var(--color-box-header);
+    background-color: var(--color-box-header, #f8f9fa);
     padding: 12px 16px;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
     display: flex;
     justify-content: space-between;
     align-items: center;
@@ -448,22 +449,29 @@
 
 .semester-input-header h5 {
     margin: 0;
-    color: var(--color-text);
+    color: var(--color-text, #333333);
     font-weight: 600;
+    font-size: 16px;
+}
+
+.semester-input-header h5 i {
+    margin-right: 8px;
+    color: var(--color-btn-primary-bg, #4361ee);
 }
 
 .semester-remove-btn {
     background: none;
     border: none;
-    color: var(--color-btn-danger-bg);
+    color: var(--color-btn-danger-bg, #dc3545);
     cursor: pointer;
-    padding: 4px 8px;
+    padding: 6px 12px;
     border-radius: 4px;
     transition: all 0.2s ease;
+    font-size: 14px;
 }
 
 .semester-remove-btn:hover {
-    background-color: var(--color-btn-danger-bg);
+    background-color: var(--color-btn-danger-bg, #dc3545);
     color: white;
 }
 
@@ -471,98 +479,83 @@
     padding: 16px;
 }
 
+.semester-input-body label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-text, #333333);
+}
+
 .semester-textarea {
     width: 100%;
     min-height: 200px;
     padding: 12px;
-    border: 1px solid var(--color-border);
+    border: 1px solid var(--color-border, #e0e0e0);
     border-radius: 6px;
     font-family: 'Courier New', monospace;
     font-size: 13px;
     line-height: 1.4;
-    background-color: var(--color-bg);
-    color: var(--color-text);
+    background-color: var(--color-bg, #ffffff);
+    color: var(--color-text, #333333);
     resize: vertical;
     transition: border-color 0.2s ease;
+    box-sizing: border-box;
 }
 
 .semester-textarea:focus {
     outline: none;
-    border-color: var(--color-btn-primary-bg);
+    border-color: var(--color-btn-primary-bg, #4361ee);
     box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
 }
 
 .semester-textarea::placeholder {
-    color: var(--color-text-secondary);
-}
-
-.example-format {
-    background-color: var(--color-box-header);
-    padding: 12px;
-    border-radius: 6px;
-    margin: 10px 0;
-    border-left: 3px solid var(--color-btn-primary-bg);
-}
-
-.example-format code {
-    font-family: 'Courier New', monospace;
-    font-size: 12px;
-    line-height: 1.6;
-    color: var(--color-text);
-    white-space: pre-line;
+    color: var(--color-text-secondary, #6c757d);
 }
 
 .semester-input-footer {
     padding: 12px 16px;
-    border-top: 1px solid var(--color-border);
-    background-color: var(--color-box-header);
-    font-size: 13px;
-    color: var(--color-text-secondary);
+    background-color: var(--color-box-header, #f8f9fa);
+    border-top: 1px solid var(--color-border, #e0e0e0);
+    font-size: 14px;
+    color: var(--color-text-secondary, #6c757d);
+}
+
+.semester-input-footer i {
+    margin-right: 8px;
+    color: var(--color-btn-primary-bg, #4361ee);
 }
 
 .semester-parse-status {
-    margin-top: 8px;
-    padding: 8px;
+    margin-top: 10px;
+    padding: 8px 12px;
     border-radius: 4px;
-    font-size: 12px;
-    font-weight: 500;
+    font-size: 14px;
 }
 
 .semester-parse-status.success {
-    background-color: rgba(56, 178, 172, 0.1);
-    color: var(--color-success);
-    border: 1px solid var(--color-success);
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
 }
 
 .semester-parse-status.error {
-    background-color: rgba(229, 62, 62, 0.1);
-    color: var(--color-btn-danger-bg);
-    border: 1px solid var(--color-btn-danger-bg);
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
 }
 
-.semester-parse-status.warning {
-    background-color: rgba(245, 158, 11, 0.1);
-    color: #f59e0b;
-    border: 1px solid #f59e0b;
+/* Ensure semester input list container has proper styling */
+#semester-input-list {
+    margin-bottom: 20px;
 }
 
-/* Dark mode adjustments for manual input */
-[data-theme="dark"] .semester-textarea {
-    background-color: var(--color-bg);
-    border-color: var(--color-border);
-    color: var(--color-text);
+/* Override any problematic styles that might interfere */
+.semester-input-container * {
+    box-sizing: border-box;
 }
 
-[data-theme="dark"] .example-format code {
-    color: var(--color-text);
-}
-
-/* Responsive design for manual input */
+/* Responsive design for semester inputs */
 @media (max-width: 768px) {
-    .manual-student-info .row .col-md-6 {
-        margin-bottom: 10px;
-    }
-    
     .semester-input-header {
         flex-direction: column;
         align-items: flex-start;
@@ -574,11 +567,585 @@
     }
     
     .semester-textarea {
-        min-height: 150px;
         font-size: 12px;
-    }
-    
-    .example-format code {
-        font-size: 11px;
+        min-height: 150px;
     }
 }
+
+/* Original styles (keeping for compatibility) */
+
+/* Manual Calculator Layout and Controls */
+.gh-manual-instructions {
+    background-color: var(--color-box-header);
+    padding: 12px 16px;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    border-left: 3px solid var(--color-btn-primary-bg);
+}
+
+.gh-manual-instructions i {
+    color: var(--color-btn-primary-bg);
+    margin-right: 6px;
+}
+
+.gh-semester {
+    background-color: var(--color-box-bg);
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+    overflow: hidden;
+}
+
+.gh-semester-header {
+    background-color: var(--color-box-header);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.gh-semester-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.semester-gpa-badge {
+    background-color: var(--color-btn-primary-bg);
+    color: white;
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.9rem;
+    font-weight: 500;
+}
+
+.courses-container {
+    padding: 16px;
+}
+
+.gh-course-row {
+    margin-bottom: 12px;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+.gh-course-inputs {
+    display: grid;
+    grid-template-columns: 2fr 1fr 1fr auto;
+    gap: 10px;
+    align-items: center;
+}
+
+.gh-course-inputs .custom-grade-container {
+    grid-column: 1 / -1;
+    margin-top: 5px;
+}
+
+.gh-course-inputs .remove-course-btn {
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    transition: all 0.2s ease;
+}
+
+.gh-course-inputs .remove-course-btn:hover {
+    background-color: var(--color-btn-danger-hover-bg);
+    transform: scale(1.05);
+}
+
+.gh-course-inputs .remove-course-btn:focus {
+    outline: 2px solid var(--color-btn-danger-bg);
+    outline-offset: 2px;
+}
+
+.gh-course-inputs .remove-course-btn i {
+    font-size: 12px;
+}
+
+.semester-footer {
+    padding: 12px 16px;
+    border-top: 1px solid var(--color-border);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.semester-summary {
+    color: var(--color-text-secondary);
+    font-size: 0.9rem;
+}
+
+/* Input validation styling */
+.gh-input-error {
+    border-color: var(--color-btn-danger-bg) !important;
+    box-shadow: 0 0 0 1px var(--color-btn-danger-bg);
+}
+
+/* Responsive styles for manual calculator */
+@media (max-width: 992px) {
+    .gh-course-inputs {
+        grid-template-columns: 1fr 1fr;
+        grid-template-rows: auto auto;
+        padding-right: 40px; /* Make space for the remove button */
+    }
+    
+    .gh-course-inputs .course-name {
+        grid-column: 1 / 3;
+        grid-row: 1;
+    }
+    
+    .gh-course-inputs .course-credit {
+        grid-column: 1;
+        grid-row: 2;
+    }
+    
+    .gh-course-inputs .course-grade {
+        grid-column: 2;
+        grid-row: 2;
+    }
+    
+    .gh-course-inputs .remove-course-btn {
+        position: absolute;
+        top: 50%;
+        right: 0;
+        transform: translateY(-50%);
+    }
+}
+
+@media (max-width: 768px) {
+    .gh-semester-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+    }
+    
+    .gh-semester-actions {
+        width: 100%;
+        justify-content: space-between;
+    }
+    
+    .semester-footer {
+        flex-direction: column;
+        gap: 10px;
+        align-items: flex-start;
+    }
+    
+    /* Further optimize for very small screens */
+    .gh-course-inputs {
+        grid-template-columns: 1fr;
+        grid-template-rows: repeat(3, auto);
+    }
+    
+    .gh-course-inputs .course-name,
+    .gh-course-inputs .course-credit,
+    .gh-course-inputs .course-grade {
+        grid-column: 1;
+    }
+    
+    .gh-course-inputs .course-name {
+        grid-row: 1;
+    }
+    
+    .gh-course-inputs .course-credit {
+        grid-row: 2;
+    }
+    
+    .gh-course-inputs .course-grade {
+        grid-row: 3;
+    }
+}
+
+/* Manual Calculation Results */
+#manual-results-container {
+    margin-top: 24px;
+}
+
+#manual-cgpa-display {
+    margin-bottom: 24px;
+}
+
+#manual-cgpa-display .cgpa-circle {
+    width: 120px;
+    height: 120px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: conic-gradient(#4CAF50 0% 0%, #e0e0e0 0% 100%);
+    position: relative;
+    box-shadow: 0px 4px 12px rgba(0, 0, 0, 0.1);
+}
+
+#manual-cgpa-display .cgpa-circle::before {
+    content: '';
+    position: absolute;
+    width: 80%;
+    height: 80%;
+    border-radius: 50%;
+    background-color: var(--color-bg);
+    z-index: 1;
+}
+
+#manual-cgpa-display .cgpa-value {
+    position: relative;
+    z-index: 2;
+    font-size: 28px;
+    font-weight: 700;
+    color: #4CAF50;
+}
+
+#manual-chart-container {
+    height: 340px;
+    margin-bottom: 24px;
+}
+
+#manual-chart-container .gh-chart-body {
+    padding: 16px;
+    height: 280px;
+}
+
+/* Add animation for the CGPA circle */
+@keyframes fillCircle {
+    from { background: conic-gradient(var(--cgpa-color) 0% 0%, #e0e0e0 0% 100%); }
+    to { background: conic-gradient(var(--cgpa-color) 0% var(--cgpa-percentage), #e0e0e0 var(--cgpa-percentage) 100%); }
+}
+
+#manual-cgpa-display .cgpa-circle {
+    animation: fillCircle 1s ease-out forwards;
+}
+
+/* Make sure the student-info-container styles are visible for manual results */
+#manual-cgpa-display .student-info-container {
+    display: flex;
+    align-items: center;
+    padding: 20px;
+    flex-wrap: wrap;
+    gap: 20px;
+}
+
+#manual-cgpa-display .student-details {
+    flex: 1;
+    min-width: 200px;
+}
+
+#manual-cgpa-display .department-display {
+    text-align: center;
+    padding: 0 15px;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+}
+
+#manual-cgpa-display .student-stats {
+    display: flex;
+    gap: 20px;
+    padding-left: 15px;
+}
+
+#manual-cgpa-display .stat-item {
+    text-align: center;
+}
+
+#manual-cgpa-display .stat-value {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+}
+
+#manual-cgpa-display .stat-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+}
+
+/* Export section styling */
+.gh-section-title {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+    padding: 8px 0;
+    border-bottom: 1px solid var(--color-border);
+}
+
+.gh-section-title h3 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin: 0;
+}
+
+.gh-section-actions {
+    display: flex;
+    gap: 8px;
+}
+
+.gh-btn-sm {
+    padding: 6px 12px;
+    font-size: 14px;
+}
+
+.gh-btn-secondary {
+    background-color: var(--color-btn-secondary-bg);
+    color: var(--color-btn-secondary-text);
+    border: 1px solid var(--color-btn-secondary-border);
+    border-radius: 4px;
+    transition: all 0.2s ease-in-out;
+}
+
+.gh-btn-secondary:hover {
+    background-color: var(--color-btn-secondary-hover-bg);
+    border-color: var(--color-btn-secondary-hover-border);
+}
+
+/* Outline button style */
+.gh-btn-outline {
+    background-color: transparent;
+    border: 2px solid var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-bg);
+    transition: all 0.2s ease;
+}
+
+.gh-btn-outline:hover {
+    background-color: var(--color-btn-primary-bg);
+    color: var(--color-btn-primary-text);
+}
+
+/* Student name and details styling */
+#manual-cgpa-display .student-name {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 0 0 4px 0;
+    color: var(--color-text-primary);
+}
+
+#manual-cgpa-display .student-id {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin: 0;
+}
+
+#manual-cgpa-display .department-value {
+    font-size: 16px;
+    font-weight: 500;
+    color: var(--color-text-primary);
+}
+
+#manual-cgpa-display .department-label {
+    font-size: 12px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+}
+
+/* Additional responsive styles for the results */
+@media (max-width: 768px) {
+    #manual-cgpa-display .student-info-container {
+        flex-direction: column;
+        align-items: center;
+        text-align: center;
+    }
+    
+    #manual-cgpa-display .department-display {
+        margin: 10px 0;
+        padding: 10px 0;
+        border-left: none;
+        border-right: none;
+        border-top: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+        width: 100%;
+    }
+    
+    #manual-cgpa-display .student-stats {
+        padding-left: 0;
+        justify-content: space-around;
+        width: 100%;
+    }
+}
+
+/* Manual Calculation Results Dark Mode Support */
+[data-theme="dark"] #manual-cgpa-display .cgpa-circle::before {
+    background-color: var(--color-box-bg);
+}
+
+[data-theme="dark"] .gh-section-title {
+    border-color: var(--color-border);
+}
+
+[data-theme="dark"] .gh-btn-secondary {
+    background-color: var(--color-btn-secondary-bg);
+    color: var(--color-btn-secondary-text);
+    border-color: var(--color-btn-secondary-border);
+}
+
+[data-theme="dark"] .gh-btn-secondary:hover {
+    background-color: var(--color-btn-secondary-hover-bg);
+    border-color: var(--color-btn-secondary-hover-border);
+}
+
+/* Manual Input System Styles */
+.manual-student-info {
+    margin-bottom: 20px;
+}
+
+.manual-student-info .form-group {
+    margin-bottom: 15px;
+}
+
+.manual-student-info label {
+    display: block;
+    margin-bottom: 5px;
+    font-weight: 600;
+    color: var(--color-text);
+    font-size: 14px;
+}
+
+.semester-input-container {
+    background-color: var(--color-box-bg, #ffffff);
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 8px;
+    margin-bottom: 20px;
+    overflow: hidden;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.semester-input-header {
+    background-color: var(--color-box-header, #f8f9fa);
+    padding: 12px 16px;
+    border-bottom: 1px solid var(--color-border, #e0e0e0);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.semester-input-header h5 {
+    margin: 0;
+    color: var(--color-text, #333333);
+    font-weight: 600;
+    font-size: 16px;
+}
+
+.semester-input-header h5 i {
+    margin-right: 8px;
+    color: var(--color-btn-primary-bg, #4361ee);
+}
+
+.semester-remove-btn {
+    background: none;
+    border: none;
+    color: var(--color-btn-danger-bg, #dc3545);
+    cursor: pointer;
+    padding: 6px 12px;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+    font-size: 14px;
+}
+
+.semester-remove-btn:hover {
+    background-color: var(--color-btn-danger-bg, #dc3545);
+    color: white;
+}
+
+.semester-input-body {
+    padding: 16px;
+}
+
+.semester-input-body label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-text, #333333);
+}
+
+.semester-textarea {
+    width: 100%;
+    min-height: 200px;
+    padding: 12px;
+    border: 1px solid var(--color-border, #e0e0e0);
+    border-radius: 6px;
+    font-family: 'Courier New', monospace;
+    font-size: 13px;
+    line-height: 1.4;
+    background-color: var(--color-bg, #ffffff);
+    color: var(--color-text, #333333);
+    resize: vertical;
+    transition: border-color 0.2s ease;
+    box-sizing: border-box;
+}
+
+.semester-textarea:focus {
+    outline: none;
+    border-color: var(--color-btn-primary-bg, #4361ee);
+    box-shadow: 0 0 0 3px rgba(67, 97, 238, 0.1);
+}
+
+.semester-textarea::placeholder {
+    color: var(--color-text-secondary, #6c757d);
+}
+
+.semester-input-footer {
+    padding: 12px 16px;
+    background-color: var(--color-box-header, #f8f9fa);
+    border-top: 1px solid var(--color-border, #e0e0e0);
+    font-size: 14px;
+    color: var(--color-text-secondary, #6c757d);
+}
+
+.semester-input-footer i {
+    margin-right: 8px;
+    color: var(--color-btn-primary-bg, #4361ee);
+}
+
+.semester-parse-status {
+    margin-top: 10px;
+    padding: 8px 12px;
+    border-radius: 4px;
+    font-size: 14px;
+}
+
+.semester-parse-status.success {
+    background-color: #d4edda;
+    color: #155724;
+    border: 1px solid #c3e6cb;
+}
+
+.semester-parse-status.error {
+    background-color: #f8d7da;
+    color: #721c24;
+    border: 1px solid #f5c6cb;
+}
+
+/* Ensure semester input list container has proper styling */
+#semester-input-list {
+    margin-bottom: 20px;
+}
+
+/* Override any problematic styles that might interfere */
+.semester-input-container * {
+    box-sizing: border-box;
+}
+
+/* Responsive design for semester inputs */
+@media (max-width: 768px) {
+    .semester-input-header {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 8px;
+    }
+    
+    .semester-remove-btn {
+        align-self: flex-end;
+    }
+    
+    .semester-textarea {
+        font-size: 12px;
+        min-height: 150px;
+    }
+}
+
+/* Original styles (keeping for compatibility) */

@@ -40,7 +40,9 @@ class ManualCgpaInput {
         });
 
         // Add first semester input by default
-        this.addSemesterInput();
+        setTimeout(() => {
+            this.addSemesterInput();
+        }, 100);
     }
 
     /**
