@@ -72,16 +72,15 @@ class ManualCgpaInput {
                         class="semester-textarea" 
                         placeholder="Paste the table content from your student portal here. Example:
 
-Result of Spring, 2025
+Result of Spring, 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
-1	CSE412	Artificial Intelligence Lab	1.00	A+	4.00
-2	CSE332	Compiler Design Lab	1.00	A+	4.00
-3	CSE413	Mobile Application Design	1.00	A+	4.00
-4	CSE414	Mobile Application Design Lab	2.00	A+	4.00
-5	CSE331	Compiler Design	3.00	A+	4.00
-6	CSE411	Artificial Intelligence	3.00	A+	4.00
-7	CSE335	Computer Architecture and Organization	3.00	A+	4.00
-Total Credit	14.00	SGPA	4.00
+1	CSE-115	Introduction to Biology and chemistry for Computation	2.00	A+	4.00
+2	PHY-113	Basic Physics	2.00	A+	4.00
+3	CSE112	Computer Fundamentals 	3.00	A+	4.00
+4	ENG113	Basic Functional English and English Spoken	3.00	A-	3.50
+5	PHY114	Basic Physics Lab	1.00	A+	4.00
+6	MAT111	Basic Mathematics	3.00	A+	4.00
+Total Credit	14.00	SGPA	3.89
 
 Tip: Select all result text from your student portal and copy-paste it here. The system supports multiple formats and will automatically detect courses."
                         oninput="manualCgpaInput.parseSemesterData(this, ${semesterIndex})"></textarea>
@@ -1183,16 +1182,15 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         this.addSemesterInput();
         const firstTextarea = document.querySelector('#semester-1-data');
         if (firstTextarea) {
-            firstTextarea.value = `Result of Spring, 2025
+            firstTextarea.value = `Result of Spring, 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
-1	CSE412	Artificial Intelligence Lab	1.00	A+	4.00
-2	CSE332	Compiler Design Lab	1.00	A+	4.00
-3	CSE413	Mobile Application Design	1.00	A+	4.00
-4	CSE414	Mobile Application Design Lab	2.00	A+	4.00
-5	CSE331	Compiler Design	3.00	A+	4.00
-6	CSE411	Artificial Intelligence	3.00	A+	4.00
-7	CSE335	Computer Architecture and Organization	3.00	A+	4.00
-Total Credit	14.00	SGPA	4.00`;
+1	CSE-115	Introduction to Biology and chemistry for Computation	2.00	A+	4.00
+2	PHY-113	Basic Physics	2.00	A+	4.00
+3	CSE112	Computer Fundamentals 	3.00	A+	4.00
+4	ENG113	Basic Functional English and English Spoken	3.00	A-	3.50
+5	PHY114	Basic Physics Lab	1.00	A+	4.00
+6	MAT111	Basic Mathematics	3.00	A+	4.00
+Total Credit	14.00	SGPA	3.89`;
             this.parseSemesterData(firstTextarea, 1);
         }
 
@@ -1200,16 +1198,11 @@ Total Credit	14.00	SGPA	4.00`;
         this.addSemesterInput();
         const secondTextarea = document.querySelector('#semester-2-data');
         if (secondTextarea) {
-            secondTextarea.value = `Result of Fall, 2024
+            secondTextarea.value = `Result of Summer, 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
-1	CSE321	Database Management System	3.00	A	3.75
-2	CSE322	Database Management System Lab	1.00	A+	4.00
-3	CSE323	Operating System and System Programming	3.00	A-	3.50
-4	CSE324	Operating System and System Programming Lab	1.00	A	3.75
-5	CSE325	Computer Networks	3.00	B+	3.25
-6	CSE326	Computer Networks Lab	1.00	A+	4.00
-7	ENG213	English Composition	3.00	A	3.75
-Total Credit	15.00	SGPA	3.68`;
+1	MAT121	Mathematics-II: Calculus, Complex Variables and Linear Algebra	3.00	A+	4.00
+2	ENG123	Writing and Comprehension	3.00	A+	4.00
+Total Credit	6.00	SGPA	4.00`;
             this.parseSemesterData(secondTextarea, 2);
         }
 
@@ -1217,17 +1210,35 @@ Total Credit	15.00	SGPA	3.68`;
         this.addSemesterInput();
         const thirdTextarea = document.querySelector('#semester-3-data');
         if (thirdTextarea) {
-            thirdTextarea.value = `Result of Summer, 2024
+            thirdTextarea.value = `Result of Fall, 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
-1	CSE211	Data Structure and Algorithm	3.00	A+	4.00
-2	CSE212	Data Structure and Algorithm Lab	1.00	A+	4.00
-3	CSE213	Object Oriented Programming	3.00	A	3.75
-4	CSE214	Object Oriented Programming Lab	1.00	A+	4.00
-5	MAT215	Calculus and Analytical Geometry	3.00	B+	3.25
-6	PHY216	Physics II	3.00	B	3.00
-7	PHY217	Physics II Lab	1.00	A-	3.50
-Total Credit	15.00	SGPA	3.64`;
+1	GED121	Bangladesh Studies	3.00	A+	4.00
+2	CSE132	Electrical Circuits	2.00	A+	4.00
+3	CSE123	Problem Solving Lab	1.00	A+	4.00
+4	CSE133	Electrical Circuits Lab	1.00	A+	4.00
+5	CSE131	Discrete Mathematics	3.00	A+	4.00
+6	GED131	Art of Living	3.00	A+	4.00
+7	CSE122	Programming and Problem Solving	3.00	A+	4.00
+8	CSE-124	Business Application Design and Employability	1.00	A+	4.00
+Total Credit	17.00	SGPA	4.00`;
             this.parseSemesterData(thirdTextarea, 3);
+        }
+
+        // Add fourth semester with sample data
+        this.addSemesterInput();
+        const fourthTextarea = document.querySelector('#semester-4-data');
+        if (fourthTextarea) {
+            fourthTextarea.value = `Result of Spring, 2023
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	MAT211	Engineering Mathematics	3.00	A	3.75
+2	CSE213	Basic Electronics Lab	2.00	A+	4.00
+3	CSE215	Object Oriented Programming Lab	1.00	A+	4.00
+4	CSE225	Data Communication	3.00	A+	4.00
+5	CSE214	Object Oriented Programming	3.00	A+	4.00
+6	CSE212	Basic Electronics	1.00	A+	4.00
+7	GED216	History of Bangladesh and Bangla Language	3.00	A+	4.00
+Total Credit	16.00	SGPA	3.95`;
+            this.parseSemesterData(fourthTextarea, 4);
         }
 
         // Show a notification
