@@ -782,7 +782,34 @@ class ResultCard {
         }
         
         // Sort semesters chronologically (oldest first) as in the image
-        const sortedSemesters = [...semesterData].sort((a, b) => a.id.localeCompare(b.id));
+        // Extract year and term from semester name if they exist
+        semesterData.forEach(semester => {
+            if (!semester.year || !semester.term) {
+                const parts = semester.name.split(' ');
+                // Try to extract term (Fall, Spring, Summer) and year from semester name
+                if (parts.length >= 2) {
+                    const termMap = { 'Fall': 3, 'Spring': 1, 'Summer': 2 };
+                    // Remove comma and other punctuation from term name
+                    const termName = parts[0].replace(/[,\s]/g, '');
+                    semester.extractedTerm = termMap[termName] || 0;
+                    semester.extractedYear = parseInt(parts[parts.length - 1]) || 0;
+                }
+            }
+        });
+        
+        // Sort semesters chronologically (oldest first) using either explicit year/term or extracted values
+        const sortedSemesters = [...semesterData].sort((a, b) => {
+            const aYear = a.year || a.extractedYear || 0;
+            const bYear = b.year || b.extractedYear || 0;
+            
+            if (aYear !== bYear) {
+                return aYear - bYear; // Sort by year first
+            }
+            
+            const aTerm = a.term || a.extractedTerm || 0;
+            const bTerm = b.term || b.extractedTerm || 0;
+            return aTerm - bTerm; // Then by term (Spring=1, Summer=2, Fall=3)
+        });
         
         // Add each semester table
         sortedSemesters.forEach(semester => {

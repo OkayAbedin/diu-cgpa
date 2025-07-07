@@ -858,7 +858,9 @@ Tip: Select all result text from your student portal and copy-paste it here. The
                 // Try to extract term (Fall, Spring, Summer) and year from semester name
                 if (parts.length >= 2) {
                     const termMap = { 'Fall': 3, 'Spring': 1, 'Summer': 2 };
-                    semester.extractedTerm = termMap[parts[0]] || 0;
+                    // Remove comma and other punctuation from term name
+                    const termName = parts[0].replace(/[,\s]/g, '');
+                    semester.extractedTerm = termMap[termName] || 0;
                     semester.extractedYear = parseInt(parts[parts.length - 1]) || 0;
                 }
             }
@@ -1096,14 +1098,30 @@ Tip: Select all result text from your student portal and copy-paste it here. The
                 semesterName: this.studentInfo.enrollmentSession || 'Enrollment Session'
             };
 
-            // Prepare semester data for PDF
-            const semesterData = this.calculatedData.semesters.map(semester => ({
-                id: semester.name || 'Unknown',
-                name: semester.name || 'Unknown Semester',
-                gpa: semester.gpa || '0.00',
-                totalCredits: semester.totalCredits || '0',
-                courses: semester.courses || []
-            }));
+            // Prepare semester data for PDF with proper chronological sorting
+            const semesterData = this.calculatedData.semesters.map(semester => {
+                const semesterInfo = {
+                    id: semester.name || 'Unknown',
+                    name: semester.name || 'Unknown Semester',
+                    gpa: semester.gpa || '0.00',
+                    totalCredits: semester.totalCredits || '0',
+                    courses: semester.courses || []
+                };
+                
+                // Extract year and term from semester name for proper sorting
+                if (semester.name) {
+                    const parts = semester.name.split(' ');
+                    if (parts.length >= 2) {
+                        const termMap = { 'Fall': 3, 'Spring': 1, 'Summer': 2 };
+                        // Remove comma and other punctuation from term name
+                        const termName = parts[0].replace(/[,\s]/g, '');
+                        semesterInfo.extractedTerm = termMap[termName] || 0;
+                        semesterInfo.extractedYear = parseInt(parts[parts.length - 1]) || 0;
+                    }
+                }
+                
+                return semesterInfo;
+            });
 
             // Prepare CGPA data for PDF
             const cgpaData = {
