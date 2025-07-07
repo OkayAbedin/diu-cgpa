@@ -485,49 +485,55 @@ Tip: Select all result text from your student portal and copy-paste it here. The
      * Hide input sections (student info and semester inputs)
      */
     hideInputSections() {
-        // Hide student information section
-        const studentInfoSection = document.querySelector('.gh-box:has(#manual-student-name)') || 
-                                  document.querySelector('[data-section="student-info"]');
-        if (!studentInfoSection) {
-            // Try to find it by looking for the student info form elements
-            const studentNameInput = document.getElementById('manual-student-name');
-            if (studentNameInput) {
-                const parentBox = studentNameInput.closest('.gh-box');
-                if (parentBox) {
-                    parentBox.style.display = 'none';
-                }
+        // Hide student information section - use more direct approach
+        const studentNameInput = document.getElementById('manual-student-name');
+        if (studentNameInput) {
+            const studentInfoBox = studentNameInput.closest('.gh-box');
+            if (studentInfoBox) {
+                studentInfoBox.style.display = 'none';
+            } else {
+                // Fallback: try to find by looking for all gh-box elements
+                const allBoxes = document.querySelectorAll('.gh-box');
+                allBoxes.forEach(box => {
+                    if (box.querySelector('#manual-student-name')) {
+                        box.style.display = 'none';
+                    }
+                });
             }
-        } else {
-            studentInfoSection.style.display = 'none';
         }
 
-        // Hide semester results input section
-        const semesterSection = document.querySelector('.gh-box:has(#semester-input-list)');
-        if (!semesterSection) {
-            // Try to find it by looking for the semester input list
-            const semesterInputList = document.getElementById('semester-input-list');
-            if (semesterInputList) {
-                const parentBox = semesterInputList.closest('.gh-box');
-                if (parentBox) {
-                    parentBox.style.display = 'none';
-                }
+        // Hide semester results input section - use more direct approach
+        const semesterInputList = document.getElementById('semester-input-list');
+        if (semesterInputList) {
+            const semesterBox = semesterInputList.closest('.gh-box');
+            if (semesterBox) {
+                semesterBox.style.display = 'none';
+            } else {
+                // Fallback: try to find by looking for all gh-box elements
+                const allBoxes = document.querySelectorAll('.gh-box');
+                allBoxes.forEach(box => {
+                    if (box.querySelector('#semester-input-list')) {
+                        box.style.display = 'none';
+                    }
+                });
             }
-        } else {
-            semesterSection.style.display = 'none';
         }
 
-        // Hide calculate button section
-        const calculateSection = document.querySelector('.gh-box:has(#calculate-manual-cgpa-btn)');
-        if (!calculateSection) {
-            const calculateBtn = document.getElementById('calculate-manual-cgpa-btn');
-            if (calculateBtn) {
-                const parentBox = calculateBtn.closest('.gh-box');
-                if (parentBox) {
-                    parentBox.style.display = 'none';
-                }
+        // Hide calculate button section - use more direct approach
+        const calculateBtn = document.getElementById('calculate-manual-cgpa-btn');
+        if (calculateBtn) {
+            const calculateBox = calculateBtn.closest('.gh-box');
+            if (calculateBox) {
+                calculateBox.style.display = 'none';
+            } else {
+                // Fallback: try to find by looking for all gh-box elements
+                const allBoxes = document.querySelectorAll('.gh-box');
+                allBoxes.forEach(box => {
+                    if (box.querySelector('#calculate-manual-cgpa-btn')) {
+                        box.style.display = 'none';
+                    }
+                });
             }
-        } else {
-            calculateSection.style.display = 'none';
         }
     }
 
@@ -535,47 +541,55 @@ Tip: Select all result text from your student portal and copy-paste it here. The
      * Show input sections (student info and semester inputs) - used on error
      */
     showInputSections() {
-        // Show student information section
-        const studentInfoSection = document.querySelector('.gh-box:has(#manual-student-name)') || 
-                                  document.querySelector('[data-section="student-info"]');
-        if (!studentInfoSection) {
-            const studentNameInput = document.getElementById('manual-student-name');
-            if (studentNameInput) {
-                const parentBox = studentNameInput.closest('.gh-box');
-                if (parentBox) {
-                    parentBox.style.display = 'block';
-                }
+        // Show student information section - use more direct approach
+        const studentNameInput = document.getElementById('manual-student-name');
+        if (studentNameInput) {
+            const studentInfoBox = studentNameInput.closest('.gh-box');
+            if (studentInfoBox) {
+                studentInfoBox.style.display = 'block';
+            } else {
+                // Fallback: try to find by looking for all gh-box elements
+                const allBoxes = document.querySelectorAll('.gh-box');
+                allBoxes.forEach(box => {
+                    if (box.querySelector('#manual-student-name')) {
+                        box.style.display = 'block';
+                    }
+                });
             }
-        } else {
-            studentInfoSection.style.display = 'block';
         }
 
-        // Show semester results input section
-        const semesterSection = document.querySelector('.gh-box:has(#semester-input-list)');
-        if (!semesterSection) {
-            const semesterInputList = document.getElementById('semester-input-list');
-            if (semesterInputList) {
-                const parentBox = semesterInputList.closest('.gh-box');
-                if (parentBox) {
-                    parentBox.style.display = 'block';
-                }
+        // Show semester results input section - use more direct approach
+        const semesterInputList = document.getElementById('semester-input-list');
+        if (semesterInputList) {
+            const semesterBox = semesterInputList.closest('.gh-box');
+            if (semesterBox) {
+                semesterBox.style.display = 'block';
+            } else {
+                // Fallback: try to find by looking for all gh-box elements
+                const allBoxes = document.querySelectorAll('.gh-box');
+                allBoxes.forEach(box => {
+                    if (box.querySelector('#semester-input-list')) {
+                        box.style.display = 'block';
+                    }
+                });
             }
-        } else {
-            semesterSection.style.display = 'block';
         }
 
-        // Show calculate button section
-        const calculateSection = document.querySelector('.gh-box:has(#calculate-manual-cgpa-btn)');
-        if (!calculateSection) {
-            const calculateBtn = document.getElementById('calculate-manual-cgpa-btn');
-            if (calculateBtn) {
-                const parentBox = calculateBtn.closest('.gh-box');
-                if (parentBox) {
-                    parentBox.style.display = 'block';
-                }
+        // Show calculate button section - use more direct approach
+        const calculateBtn = document.getElementById('calculate-manual-cgpa-btn');
+        if (calculateBtn) {
+            const calculateBox = calculateBtn.closest('.gh-box');
+            if (calculateBox) {
+                calculateBox.style.display = 'block';
+            } else {
+                // Fallback: try to find by looking for all gh-box elements
+                const allBoxes = document.querySelectorAll('.gh-box');
+                allBoxes.forEach(box => {
+                    if (box.querySelector('#calculate-manual-cgpa-btn')) {
+                        box.style.display = 'block';
+                    }
+                });
             }
-        } else {
-            calculateSection.style.display = 'block';
         }
     }
 
@@ -654,17 +668,20 @@ Tip: Select all result text from your student portal and copy-paste it here. The
      * Create mock API response structure
      */
     createMockApiResponse(semesterData) {
-        // Group courses by semester
+        // Group courses by semester and preserve semester names
         const semesterGroups = {};
+        const semesterNames = {};
         
         semesterData.semesters.forEach((semester, index) => {
             const semesterId = (100 + index).toString(); // Generate mock semester IDs
             semesterGroups[semesterId] = semester.courses;
+            semesterNames[semesterId] = semester.name;
         });
 
         return {
             studentInfo: this.studentInfo,
             results: semesterGroups,
+            semesterNames: semesterNames, // Preserve semester names
             missingSemesters: [],
             hasMissingSemesters: false
         };
@@ -683,13 +700,14 @@ Tip: Select all result text from your student portal and copy-paste it here. The
 
         // Process semester data using the exact same logic as the original UI
         const semesterResults = mockApiResponse.results;
+        const semesterNames = mockApiResponse.semesterNames || {};
         const semesterData = [];
         
         Object.entries(semesterResults).forEach(([semesterId, courses], index) => {
             const semesterGpa = this.calculator.calculateSemesterGpa(courses);
             const semester = {
                 id: semesterId,
-                name: `Semester ${index + 1}`,
+                name: semesterNames[semesterId] || `Semester ${index + 1}`, // Use preserved name or fallback
                 gpa: semesterGpa.gpa,
                 totalCredits: semesterGpa.totalCredits,
                 courses: courses
