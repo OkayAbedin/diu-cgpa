@@ -430,6 +430,9 @@ Tip: Select all result text from your student portal and copy-paste it here. The
      */
     calculateManualCgpa() {
         try {
+            // Hide the input forms when calculation starts
+            this.hideInputSections();
+            
             // Show loading
             document.getElementById('manual-loading').classList.remove('hidden');
             document.getElementById('manual-error-message').classList.add('hidden');
@@ -460,9 +463,110 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             console.error('Error calculating manual CGPA:', error);
             document.getElementById('manual-loading').classList.add('hidden');
             
+            // Show input sections again on error
+            this.showInputSections();
+            
             const errorDiv = document.getElementById('manual-error-message');
             errorDiv.querySelector('p').textContent = error.message;
             errorDiv.classList.remove('hidden');
+        }
+    }
+
+    /**
+     * Hide input sections (student info and semester inputs)
+     */
+    hideInputSections() {
+        // Hide student information section
+        const studentInfoSection = document.querySelector('.gh-box:has(#manual-student-name)') || 
+                                  document.querySelector('[data-section="student-info"]');
+        if (!studentInfoSection) {
+            // Try to find it by looking for the student info form elements
+            const studentNameInput = document.getElementById('manual-student-name');
+            if (studentNameInput) {
+                const parentBox = studentNameInput.closest('.gh-box');
+                if (parentBox) {
+                    parentBox.style.display = 'none';
+                }
+            }
+        } else {
+            studentInfoSection.style.display = 'none';
+        }
+
+        // Hide semester results input section
+        const semesterSection = document.querySelector('.gh-box:has(#semester-input-list)');
+        if (!semesterSection) {
+            // Try to find it by looking for the semester input list
+            const semesterInputList = document.getElementById('semester-input-list');
+            if (semesterInputList) {
+                const parentBox = semesterInputList.closest('.gh-box');
+                if (parentBox) {
+                    parentBox.style.display = 'none';
+                }
+            }
+        } else {
+            semesterSection.style.display = 'none';
+        }
+
+        // Hide calculate button section
+        const calculateSection = document.querySelector('.gh-box:has(#calculate-manual-cgpa-btn)');
+        if (!calculateSection) {
+            const calculateBtn = document.getElementById('calculate-manual-cgpa-btn');
+            if (calculateBtn) {
+                const parentBox = calculateBtn.closest('.gh-box');
+                if (parentBox) {
+                    parentBox.style.display = 'none';
+                }
+            }
+        } else {
+            calculateSection.style.display = 'none';
+        }
+    }
+
+    /**
+     * Show input sections (student info and semester inputs) - used on error
+     */
+    showInputSections() {
+        // Show student information section
+        const studentInfoSection = document.querySelector('.gh-box:has(#manual-student-name)') || 
+                                  document.querySelector('[data-section="student-info"]');
+        if (!studentInfoSection) {
+            const studentNameInput = document.getElementById('manual-student-name');
+            if (studentNameInput) {
+                const parentBox = studentNameInput.closest('.gh-box');
+                if (parentBox) {
+                    parentBox.style.display = 'block';
+                }
+            }
+        } else {
+            studentInfoSection.style.display = 'block';
+        }
+
+        // Show semester results input section
+        const semesterSection = document.querySelector('.gh-box:has(#semester-input-list)');
+        if (!semesterSection) {
+            const semesterInputList = document.getElementById('semester-input-list');
+            if (semesterInputList) {
+                const parentBox = semesterInputList.closest('.gh-box');
+                if (parentBox) {
+                    parentBox.style.display = 'block';
+                }
+            }
+        } else {
+            semesterSection.style.display = 'block';
+        }
+
+        // Show calculate button section
+        const calculateSection = document.querySelector('.gh-box:has(#calculate-manual-cgpa-btn)');
+        if (!calculateSection) {
+            const calculateBtn = document.getElementById('calculate-manual-cgpa-btn');
+            if (calculateBtn) {
+                const parentBox = calculateBtn.closest('.gh-box');
+                if (parentBox) {
+                    parentBox.style.display = 'block';
+                }
+            }
+        } else {
+            calculateSection.style.display = 'block';
         }
     }
 
