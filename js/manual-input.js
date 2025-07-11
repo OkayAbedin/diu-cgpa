@@ -747,7 +747,32 @@ Tip: Select all result text from your student portal and copy-paste it here. The
     }
 
     /**
-     * Custom student info renderer for manual input that excludes Batch, Faculty, and Campus
+     * Create abbreviation from text by taking first letter of each significant word
+     * Excludes prepositions, conjunctions, and other small words
+     * @param {string} text - Text to abbreviate
+     * @returns {string} Abbreviation
+     */
+    createAbbreviation(text) {
+        if (!text || typeof text !== 'string') return text;
+        
+        // Words to exclude from abbreviations (prepositions, conjunctions, articles, etc.)
+        const excludeWords = new Set([
+            'of', 'and', 'or', 'but', 'in', 'on', 'at', 'to', 'for', 'with', 'by',
+            'from', 'up', 'about', 'into', 'through', 'during', 'before', 'after',
+            'above', 'below', 'between', 'among', 'under', 'over', 'the', 'a', 'an',
+            '&', 'as', 'is', 'are', 'was', 'were', 'be', 'been', 'being', 'have',
+            'has', 'had', 'do', 'does', 'did', 'will', 'would', 'could', 'should'
+        ]);
+        
+        return text
+            .split(' ')
+            .filter(word => word.length > 0 && !excludeWords.has(word.toLowerCase()))
+            .map(word => word.charAt(0).toUpperCase())
+            .join('');
+    }
+
+    /**
+     * Custom student info renderer for manual input that shows all entered information
      * @param {Object} studentInfo - Student information object
      * @returns {string} HTML string for student info
      */
@@ -760,6 +785,11 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         const studentName = studentInfo.name || studentInfo.studentName || studentInfo.fullName || 'Unknown Student';
         const studentId = studentInfo.studentId || studentInfo.id || 'Unknown ID';
         const department = studentInfo.department || studentInfo.departmentName || 'Unknown Department';
+        const program = studentInfo.program || 'B.Sc. in Computer Science & Engineering';
+        const batch = studentInfo.batch || 'Batch';
+        const campus = this.createAbbreviation(studentInfo.campus) || 'Campus';
+        const faculty = this.createAbbreviation(studentInfo.faculty) || 'Faculty';
+        const enrollmentSession = studentInfo.enrollmentSession || 'Enrollment Session';
         
         // Get CGPA from student info if available, otherwise it will be filled in later
         const cgpa = studentInfo.cgpa || '0.00';
@@ -774,12 +804,29 @@ Tip: Select all result text from your student portal and copy-paste it here. The
                 <div class="student-details">
                     <h2 class="student-name">${studentName}</h2>
                     <p class="student-id">${studentId}</p>
+                    <div class="student-program">${program}</div>
                 </div>
                 <div class="department-display">
                     <div class="department-value">${department}</div>
                     <div class="department-label">Department</div>
                 </div>
                 <div class="student-stats">
+                    <div class="stat-item">
+                        <div class="stat-value">${batch}</div>
+                        <div class="stat-label">Batch</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${campus}</div>
+                        <div class="stat-label">Campus</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${faculty}</div>
+                        <div class="stat-label">Faculty</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value">${enrollmentSession}</div>
+                        <div class="stat-label">Session</div>
+                    </div>
                     <div class="stat-item">
                         <div class="stat-value" id="total-semesters">-</div>
                         <div class="stat-label">Semesters</div>

@@ -288,6 +288,71 @@
     color: var(--color-text-secondary);
 }
 
+/* Additional student info styling for manual calculator results */
+#manual-cgpa-display .student-program {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+#manual-cgpa-display .student-additional-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 15px;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    min-width: 200px;
+}
+
+#manual-cgpa-display .info-row {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+#manual-cgpa-display .info-item {
+    text-align: center;
+    flex: 1;
+}
+
+#manual-cgpa-display .info-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 2px;
+}
+
+#manual-cgpa-display .info-label {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Responsive adjustments for additional info */
+@media (max-width: 768px) {
+    #manual-cgpa-display .student-additional-info {
+        margin: 10px 0;
+        padding: 15px 0;
+        border-left: none;
+        border-right: none;
+        border-top: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+        width: 100%;
+    }
+    
+    #manual-cgpa-display .info-row {
+        justify-content: space-around;
+    }
+    
+    #manual-cgpa-display .info-item {
+        flex: 0 1 auto;
+        min-width: 80px;
+    }
+}
+
 /* Export section styling */
 .gh-section-title {
     display: flex;
@@ -925,6 +990,71 @@
     color: var(--color-text-secondary);
 }
 
+/* Additional student info styling for manual calculator results */
+#manual-cgpa-display .student-program {
+    font-size: 14px;
+    color: var(--color-text-secondary);
+    margin-top: 4px;
+    font-style: italic;
+}
+
+#manual-cgpa-display .student-additional-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 0 15px;
+    border-left: 1px solid var(--color-border);
+    border-right: 1px solid var(--color-border);
+    min-width: 200px;
+}
+
+#manual-cgpa-display .info-row {
+    display: flex;
+    gap: 20px;
+    justify-content: space-between;
+}
+
+#manual-cgpa-display .info-item {
+    text-align: center;
+    flex: 1;
+}
+
+#manual-cgpa-display .info-value {
+    font-size: 14px;
+    font-weight: 500;
+    color: var(--color-text);
+    margin-bottom: 2px;
+}
+
+#manual-cgpa-display .info-label {
+    font-size: 11px;
+    color: var(--color-text-secondary);
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* Responsive adjustments for additional info */
+@media (max-width: 768px) {
+    #manual-cgpa-display .student-additional-info {
+        margin: 10px 0;
+        padding: 15px 0;
+        border-left: none;
+        border-right: none;
+        border-top: 1px solid var(--color-border);
+        border-bottom: 1px solid var(--color-border);
+        width: 100%;
+    }
+    
+    #manual-cgpa-display .info-row {
+        justify-content: space-around;
+    }
+    
+    #manual-cgpa-display .info-item {
+        flex: 0 1 auto;
+        min-width: 80px;
+    }
+}
+
 /* Export section styling */
 .gh-section-title {
     display: flex;
@@ -1270,4 +1400,25 @@
     border-top-color: var(--color-border) !important;
 }
 
-/* Original styles (keeping for compatibility) */
+/* Override for expanded student stats with all info */
+#manual-cgpa-display .student-stats {
+    flex-wrap: wrap !important;
+    gap: 12px !important;
+}
+
+#manual-cgpa-display .stat-item {
+    min-width: 60px !important;
+}
+
+/* Mobile responsive for expanded stats */
+@media (max-width: 768px) {
+    #manual-cgpa-display .student-stats {
+        gap: 8px !important;
+    }
+    
+    #manual-cgpa-display .stat-item {
+        flex: 1 !important;
+        min-width: 45px !important;
+        max-width: 70px !important;
+    }
+}
