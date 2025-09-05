@@ -1138,18 +1138,22 @@ class ResultCard {
 
     // Place grading content inside a compact box positioned to the left (red area)
     const gradingBox = document.createElement('div');
-    gradingBox.style.width = '70mm';
+    // Match gradingBox width to gradingTable width so title/effective center correctly
+    gradingBox.style.width = '80mm';
     gradingBox.style.boxSizing = 'border-box';
     // Align the box flush to the left so the table starts at the desired intersection
     gradingBox.style.textAlign = 'left';
     gradingBox.style.marginLeft = '0mm';
     gradingBox.style.marginTop = '0mm';
 
-    // Center the title over the compact table by constraining its width
-    gradingTitle.style.width = '70mm';
+    // Center the title over the compact table by matching its width to the table
+    gradingTitle.style.width = '80mm';
     gradingTitle.style.margin = '0 auto 4px';
     gradingBox.appendChild(gradingTitle);
     gradingBox.appendChild(gradingTable);
+    // Ensure the effective note is centered with the same width
+    effective.style.width = '64mm';
+    effective.style.margin = '6px auto 0';
     gradingBox.appendChild(effective);
 
     gradingWrap.appendChild(gradingBox);
@@ -1166,8 +1170,8 @@ class ResultCard {
     const img = document.createElement('img');
     img.alt = 'Verification QR';
     // Make QR slightly larger
-    img.style.width = '26mm';
-    img.style.height = '26mm';
+    img.style.width = '36mm';
+    img.style.height = '36mm';
     img.style.display = 'block';
     img.style.margin = '0 auto';
     img.style.marginTop = '2mm';
@@ -1177,7 +1181,7 @@ class ResultCard {
     const caption = document.createElement('div');
     caption.style.fontSize = '9pt';
     caption.style.fontWeight = '700';
-    caption.style.marginTop = '6px';
+    caption.style.marginTop = '10px';
     caption.style.textAlign = 'center';
     caption.textContent = 'Scan the above QR code to verify semester results';
 
