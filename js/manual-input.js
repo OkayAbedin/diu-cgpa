@@ -1324,6 +1324,95 @@ Total Credit	16.00	SGPA	3.95`;
             this.parseSemesterData(fourthTextarea, 4);
         }
 
+        // Add fifth semester with sample data (Fall 2023)
+        this.addSemesterInput();
+        const fifthTextarea = document.querySelector('#semester-5-data');
+        if (fifthTextarea) {
+            fifthTextarea.value = `Result of Fall 2023
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	ECO237	Economics	3.00	A+	4.00
+2	CSE235	Numerical Methods	3.00	A+	4.00
+3	CSE226	Software Project I	1.00	A+	4.00
+4	STA227	Statistics and Probability	3.00	A+	4.00
+5	CSE236	Software Project II	1.00	A+	4.00
+6	CSE134	Data Structure	3.00	A+	4.00
+7	CSE231	Algorithms	3.00	A+	4.00
+8	CSE135	Data Structure Lab	1.00	A+	4.00
+9	CSE232	Algorithms Lab	1.00	A+	4.00
+Total Credit	19.00	SGPA	4.00`;
+            this.parseSemesterData(fifthTextarea, 5);
+        }
+
+        // Add sixth semester with sample data (Spring 2024)
+        this.addSemesterInput();
+        const sixthTextarea = document.querySelector('#semester-6-data');
+        if (sixthTextarea) {
+            sixthTextarea.value = `Result of Spring 2024
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	CSE315	Introduction to Data Science	3.00	A+	4.00
+2	CSE334	Research and Innovation in CSE	1.00	A+	4.00
+3	CSE316	Software Project III	1.00	A+	4.00
+4	CSE224	Digital Electronics Lab	2.00	B	3.00
+5	ACT322	Financial and Managerial Accounting	2.00	A+	4.00
+6	CSE321	System Analysis & Design	3.00	A+	4.00
+7	CSE222	Object Oriented Programming II Lab	2.00	A+	4.00
+8	CSE221	Object Oriented Programming II	1.00	A+	4.00
+9	CSE223	Digital Electronics	1.00	A+	4.00
+Total Credit	16.00	SGPA	3.88`;
+            this.parseSemesterData(sixthTextarea, 6);
+        }
+
+        // Add seventh semester with sample data (Fall 2024)
+        this.addSemesterInput();
+        const seventhTextarea = document.querySelector('#semester-7-data');
+        if (seventhTextarea) {
+            seventhTextarea.value = `Result of Fall 2024
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	CSE313	Computer Networks	3.00	A+	4.00
+2	CSE325	Data Mining and Machine Learning	3.00	A+	4.00
+3	CSE445	Natural Language Processing	3.00	A+	4.00
+4	CSE311	Database Management System	3.00	A+	4.00
+5	CSE326	Data Mining and Machine Learning Lab	1.00	A+	4.00
+6	CSE324	Operating Systems Lab.	2.00	A+	4.00
+7	CSE323	Operating Systems	2.00	A+	4.00
+8	CSE312	Database Management System Lab	1.00	A+	4.00
+9	CSE314	Computer Networks Lab	1.00	A+	4.00
+Total Credit	19.00	SGPA	4.00`;
+            this.parseSemesterData(seventhTextarea, 7);
+        }
+
+        // Add eighth semester with sample data (Spring 2025)
+        this.addSemesterInput();
+        const eighthTextarea = document.querySelector('#semester-8-data');
+        if (eighthTextarea) {
+            eighthTextarea.value = `Result of Spring 2025
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	CSE412	Artificial Intelligence Lab	1.00	A+	4.00
+2	CSE413	Mobile Application Design	1.00	A+	4.00
+3	CSE414	Mobile Application Design Lab	2.00	A+	4.00
+4	CSE332	Compiler Design Lab	1.00	A+	4.00
+5	CSE411	Artificial Intelligence	3.00	A+	4.00
+6	CSE335	Computer Architecture and Organization	3.00	A+	4.00
+7	CSE331	Compiler Design	3.00	A+	4.00
+Total Credit	14.00	SGPA	4.00`;
+            this.parseSemesterData(eighthTextarea, 8);
+        }
+
+        // Add ninth semester with sample data (Summer 2025)
+        this.addSemesterInput();
+        const ninthTextarea = document.querySelector('#semester-9-data');
+        if (ninthTextarea) {
+            ninthTextarea.value = `Result of Summer 2025
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	CSE333	Software Engineering	3.00	A+	4.00
+2	CSE415	Web Engineering	2.00	A+	4.00
+3	CSE416	Web Engineering Lab	2.00	A+	4.00
+4	CSE234	Embedded Systems and IoT Lab	2.00	A+	4.00
+5	CSE233	Embedded Systems and IoT	2.00	A+	4.00
+Total Credit	11.00	SGPA	4.00`;
+            this.parseSemesterData(ninthTextarea, 9);
+        }
+
         // Show a notification
         this.showNotification('Sample data loaded successfully! You can now calculate CGPA or modify the data as needed.', 'success');
     }
