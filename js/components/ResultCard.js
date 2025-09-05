@@ -596,7 +596,7 @@ class ResultCard {
                     // Add footer
                     const footer = previewWindow.document.createElement("div");
                     footer.className = "transcript-footer";
-                    footer.innerHTML = "<p>This is not an official document. Generated with https://diucgpa.netlify.app</p>";
+                    footer.innerHTML = "<p>This document has been generated electronically and is valid without a physical signature.</p>";
                     transcriptContainer.appendChild(footer);
                       // Add to the content container
                     contentContainer.appendChild(transcriptContainer);
