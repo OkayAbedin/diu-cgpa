@@ -1201,20 +1201,17 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             this.calculatedData.semesters.forEach(semester => {
                 // Add a row for each course in the semester
                 semester.courses.forEach(course => {
-                    // Handle commas in course names
-                    const escapedName = (course.courseName || course.courseTitle || 'Unknown Course').includes(',') 
-                        ? `"${course.courseName || course.courseTitle || 'Unknown Course'}"` 
-                        : (course.courseName || course.courseTitle || 'Unknown Course');
-                    
-                    csvContent += `${semester.name},${semester.gpa},${course.courseCode || course.customCourseId || '-'},${escapedName},${course.totalCredit || '0'},${course.gradeLetter || '-'},${course.pointEquivalent || '0'}\n`;
+                    // Escape CSV fields properly
+                    const courseName = course.courseName || course.courseTitle || 'Unknown Course';
+                    csvContent += `${Helpers.escapeCsv(semester.name)},${Helpers.escapeCsv(semester.gpa)},${Helpers.escapeCsv(course.courseCode || course.customCourseId || '-')},${Helpers.escapeCsv(courseName)},${Helpers.escapeCsv(course.totalCredit || '0')},${Helpers.escapeCsv(course.gradeLetter || '-')},${Helpers.escapeCsv(course.pointEquivalent || '0')}\n`;
                 });
                 
                 // Add a summary row for the semester
-                csvContent += `${semester.name} Summary,${semester.gpa},Total Credits,${semester.totalCredits},,\n`;
+                csvContent += `${Helpers.escapeCsv(semester.name + ' Summary')},${Helpers.escapeCsv(semester.gpa)},${Helpers.escapeCsv('Total Credits')},${Helpers.escapeCsv(semester.totalCredits)},,\n`;
             });
             
             // Add CGPA summary
-            csvContent += `\nFinal CGPA,${this.calculatedData.cgpa},Total Credits,${this.calculatedData.totalCredits},,\n`;
+            csvContent += `\n${Helpers.escapeCsv('Final CGPA')},${Helpers.escapeCsv(this.calculatedData.cgpa)},${Helpers.escapeCsv('Total Credits')},${Helpers.escapeCsv(this.calculatedData.totalCredits)},,\n`;
             
             // Create and trigger download
             const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });

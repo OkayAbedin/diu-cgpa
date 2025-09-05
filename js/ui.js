@@ -324,7 +324,7 @@ class UiController {
      */
     async handleCalculate() {
         const studentId = this.studentIdInput.value.trim();
-          if (!Helpers.isValidStudentId(studentId)) {
+    if (!Helpers.isValidStudentId(studentId)) {
             alert('Please enter a student ID');
             return;
         }
@@ -1658,12 +1658,12 @@ class UiController {
                 }
             }
             
-            // Escape any fields that might contain commas
-            const escapedName = name.includes(',') ? `"${name}"` : name;
-            const escapedDepartment = department.includes(',') ? `"${department}"` : department;
+            // Escape fields using Helpers.escapeCsv to handle commas, quotes, newlines
+            const escapedName = Helpers.escapeCsv(name);
+            const escapedDepartment = Helpers.escapeCsv(department);
             
             // Start with basic student info (removed status column)
-            csvContent += `${studentId},${escapedName},${escapedDepartment},${cgpa},${totalCredits}`;
+            csvContent += `${Helpers.escapeCsv(studentId)},${escapedName},${escapedDepartment},${Helpers.escapeCsv(String(cgpa))},${Helpers.escapeCsv(String(totalCredits))}`;
             
             // Add semester GPAs
             semesterNames.forEach(semName => {
@@ -1678,7 +1678,7 @@ class UiController {
             Object.entries(this.advancedFetchResults.errors).forEach(([studentId, error]) => {
                 if (!this.advancedFetchResults.results[studentId]) {
                     // Only add if not already included in results
-                    csvContent += `${studentId},N/A,N/A,N/A,N/A`;
+                    csvContent += `${Helpers.escapeCsv(studentId)},N/A,N/A,N/A,N/A`;
                     
                     // Add N/A for all semester columns
                     semesterNames.forEach(() => {
@@ -2531,18 +2531,19 @@ class UiController {
             sortedSemesters.forEach(semester => {
                 if (semester.courses && semester.courses.length > 0) {
                     semester.courses.forEach(course => {
-                        // Handle potential commas in course titles by enclosing in quotes if needed
+                        // Use Helpers.escapeCsv for robust escaping
                         const courseTitle = course.courseName || course.courseTitle || '';
-                        const escapedTitle = courseTitle.includes(',') ? `"${courseTitle}"` : courseTitle;
-                        
+                        const escapedTitle = Helpers.escapeCsv(courseTitle);
+
                         // Look for course code in either courseCode or customCourseId property
                         const courseCode = course.courseCode || course.customCourseId || '';
-                        
-                        csvContent += `${semester.name},${semester.gpa},${courseCode},${escapedTitle},${course.totalCredit || '0'},${course.gradeLetter || '-'},${course.pointEquivalent || '0'}\n`;
+                        const escapedCourseCode = Helpers.escapeCsv(courseCode);
+
+                        csvContent += `${Helpers.escapeCsv(semester.name)},${Helpers.escapeCsv(String(semester.gpa))},${escapedCourseCode},${escapedTitle},${Helpers.escapeCsv(String(course.totalCredit || '0'))},${Helpers.escapeCsv(String(course.gradeLetter || '-'))},${Helpers.escapeCsv(String(course.pointEquivalent || '0'))}\n`;
                     });
                 } else {
                     // Add a row for semesters with no courses
-                    csvContent += `${semester.name},${semester.gpa},,,,,\n`;
+                    csvContent += `${Helpers.escapeCsv(semester.name)},${Helpers.escapeCsv(String(semester.gpa))},,,,,\n`;
                 }
             });
             
@@ -2663,14 +2664,14 @@ class UiController {
         semesters.forEach(semester => {
             // Add a row for each course in the semester
             semester.courses.forEach(course => {
-                // Handle commas in course names
-                const escapedName = course.courseName.includes(',') ? `"${course.courseName}"` : course.courseName;
-                
-                csvContent += `${semester.name},${semester.gpa},${escapedName},${course.totalCredit},${course.gradeLetter},${course.pointEquivalent}\n`;
+                // Use Helpers.escapeCsv for robust escaping
+                const escapedName = Helpers.escapeCsv(course.courseName);
+
+                csvContent += `${Helpers.escapeCsv(semester.name)},${Helpers.escapeCsv(String(semester.gpa))},${escapedName},${Helpers.escapeCsv(String(course.totalCredit))},${Helpers.escapeCsv(String(course.gradeLetter))},${Helpers.escapeCsv(String(course.pointEquivalent))}\n`;
             });
             
             // Add a summary row for the semester
-            csvContent += `${semester.name} Summary,${semester.gpa},Total Credits,${semester.totalCredits},,\n`;
+            csvContent += `${Helpers.escapeCsv(semester.name + ' Summary')},${Helpers.escapeCsv(String(semester.gpa))},${Helpers.escapeCsv('Total Credits')},${Helpers.escapeCsv(String(semester.totalCredits))},,\n`;
         });
         
         // Add CGPA summary

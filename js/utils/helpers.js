@@ -39,6 +39,21 @@ class Helpers {
     static formatNumber(number) {
         return parseFloat(number).toFixed(2);
     }
+
+    /**
+     * Escape a value for CSV output. Wraps values containing commas, quotes or newlines
+     * in double quotes and escapes internal double quotes.
+     * @param {string|number} value
+     * @returns {string}
+     */
+    static escapeCsv(value) {
+        if (value === null || value === undefined) return '';
+        const str = String(value);
+        if (/[",\n\r]/.test(str)) {
+            return '"' + str.replace(/"/g, '""') + '"';
+        }
+        return str;
+    }
 }
 
 // Export as global variable
