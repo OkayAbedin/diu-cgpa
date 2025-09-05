@@ -593,6 +593,24 @@ class ResultCard {
                     
                     transcriptContainer.appendChild(cgpaSummary);
                     
+                    // Add QR verification section before footer
+                    try {
+                        const qrSection = this.createQRVerificationSection();
+                        // When using previewWindow DOM, we need to import node via HTML string
+                        // Create a wrapper and set innerHTML
+                        const wrapper = previewWindow.document.createElement('div');
+                        wrapper.innerHTML = qrSection.outerHTML;
+                        transcriptContainer.appendChild(wrapper);
+                    } catch (e) {
+                        // Fallback: create a simple verification text if QR insertion fails
+                        const ver = previewWindow.document.createElement('div');
+                        ver.style.marginTop = '15mm';
+                        ver.style.marginBottom = '10mm';
+                        ver.style.textAlign = 'left';
+                        ver.innerHTML = '<strong>Verify Semester Results</strong>';
+                        transcriptContainer.appendChild(ver);
+                    }
+
                     // Add footer
                     const footer = previewWindow.document.createElement("div");
                     footer.className = "transcript-footer";
@@ -646,7 +664,20 @@ class ResultCard {
         
         // Add CGPA and Total Credits Summary Box
         container.appendChild(this.createCGPASummary(semesterData, cgpaData));
-        
+
+        // Add QR verification section (left aligned QR + text) before footer
+        try {
+            const qr = this.createQRVerificationSection();
+            container.appendChild(qr);
+        } catch (err) {
+            const ver = document.createElement('div');
+            ver.style.marginTop = '15mm';
+            ver.style.marginBottom = '10mm';
+            ver.style.textAlign = 'left';
+            ver.innerHTML = '<strong>Verify Semester Results</strong>';
+            container.appendChild(ver);
+        }
+
         // Add transcript footer
         container.appendChild(this.createTranscriptFooter());
         
@@ -998,6 +1029,145 @@ class ResultCard {
      * Create transcript footer with disclaimer text
      * @returns {HTMLElement} Footer element
      */
+    /**
+     * Create QR verification section (left aligned QR and text)
+     * @returns {HTMLElement}
+     */
+    createQRVerificationSection() {
+        // Use a table to ensure consistent layout in printed PDF
+        const table = document.createElement('table');
+        table.style.width = '100%';
+        table.style.borderCollapse = 'collapse';
+        table.style.pageBreakInside = 'avoid';
+        table.style.marginTop = '12mm';
+        table.style.marginBottom = '6mm';
+
+        const tr = document.createElement('tr');
+
+    // Left cell will contain the UGC grading system table (compact)
+    const tdLeft = document.createElement('td');
+    // Make left column narrow/compact — use fixed width to prevent expansion
+    tdLeft.style.width = '80mm';
+    tdLeft.style.maxWidth = '80mm';
+    tdLeft.style.verticalAlign = 'top';
+    // Build grading table
+    const gradingWrap = document.createElement('div');
+    gradingWrap.style.width = '100%';
+    gradingWrap.style.boxSizing = 'border-box';
+    // Make grading content compact so it appears much smaller than main tables
+    gradingWrap.style.fontSize = '7pt';
+    gradingWrap.style.lineHeight = '1.05';
+
+    const gradingTitle = document.createElement('div');
+    gradingTitle.style.fontWeight = '700';
+    gradingTitle.style.marginBottom = '4px';
+    gradingTitle.style.fontSize = '8pt';
+    gradingTitle.textContent = 'UGC Uniform Grading System';
+
+    const gradingTable = document.createElement('table');
+    // Constrain grading table to a small fixed width and use fixed layout for tighter columns
+    gradingTable.style.width = '80mm';
+    gradingTable.style.maxWidth = '80mm';
+    gradingTable.style.tableLayout = 'fixed';
+    gradingTable.style.borderCollapse = 'collapse';
+    // Use much smaller font and tighter cell padding for a compact look
+    gradingTable.style.fontSize = '7pt';
+
+    const gtHead = document.createElement('thead');
+    const headRow = document.createElement('tr');
+    // Fixed column widths to keep overall table compact
+    const colWidths = ['28mm','12mm','12mm','26mm'];
+    ['Marks (%)','Grade','Grade Point','Remarks'].forEach((h,i)=>{
+        const th = document.createElement('th');
+        th.textContent = h;
+        th.style.border = '1px solid #000';
+        th.style.padding = '1px 3px';
+        th.style.textAlign = 'center';
+        th.style.fontWeight = '700';
+        th.style.width = colWidths[i];
+        th.style.overflow = 'hidden';
+        headRow.appendChild(th);
+    });
+    gtHead.appendChild(headRow);
+
+    const gtBody = document.createElement('tbody');
+    const rows = [
+        ['80–100','A+','4.00','Outstanding'],
+        ['75–79','A','3.75','Excellent'],
+        ['70–74','A−','3.50','Very Good'],
+        ['65–69','B+','3.25','Good'],
+        ['60–64','B','3.00','Satisfactory'],
+        ['55–59','B−','2.75','Above Average'],
+        ['50–54','C+','2.50','Average'],
+        ['45–49','C','2.25','Below Average'],
+        ['40–44','D','2.00','Pass'],
+        ['00–39','F','0.00','Fail']
+    ];
+
+    rows.forEach(r=>{
+        const tr = document.createElement('tr');
+        r.forEach((c,idx)=>{
+            const td = document.createElement('td');
+            td.textContent = c;
+            td.style.border = '1px solid #000';
+            td.style.padding = '1px 3px';
+            td.style.textAlign = idx===3 ? 'left' : 'center';
+            td.style.overflow = 'hidden';
+            td.style.whiteSpace = 'nowrap';
+            td.style.textOverflow = 'ellipsis';
+            tr.appendChild(td);
+        });
+        gtBody.appendChild(tr);
+    });
+
+    gradingTable.appendChild(gtHead);
+    gradingTable.appendChild(gtBody);
+
+    const effective = document.createElement('div');
+    effective.style.fontSize = '8pt';
+    effective.style.marginTop = '6px';
+    effective.textContent = 'Effective from Summer Semester 2007';
+
+    gradingWrap.appendChild(gradingTitle);
+    gradingWrap.appendChild(gradingTable);
+    gradingWrap.appendChild(effective);
+    tdLeft.appendChild(gradingWrap);
+
+    // Right cell contains the QR and centered caption (compact)
+    const tdRight = document.createElement('td');
+    tdRight.style.width = '40mm';
+    tdRight.style.maxWidth = '40mm';
+    tdRight.style.verticalAlign = 'center';
+    tdRight.style.textAlign = 'center';
+
+    // Place QR image directly into the right cell (no box)
+    const img = document.createElement('img');
+    img.alt = 'Verification QR';
+    // Make QR slightly larger
+    img.style.width = '26mm';
+    img.style.height = '26mm';
+    img.style.display = 'block';
+    img.style.margin = '0 auto';
+    img.style.marginTop = '2mm';
+    // Use local asset path so preview and generated transcript can load it
+    img.src = 'assets/img/QR.png';
+
+    const caption = document.createElement('div');
+    caption.style.fontSize = '9pt';
+    caption.style.fontWeight = '700';
+    caption.style.marginTop = '6px';
+    caption.style.textAlign = 'center';
+    caption.textContent = 'Scan the above QR code to verify semester results';
+
+    tdRight.appendChild(img);
+    tdRight.appendChild(caption);
+
+    tr.appendChild(tdLeft);
+    tr.appendChild(tdRight);
+        table.appendChild(tr);
+
+        return table;
+    }
     createTranscriptFooter() {
         const footer = document.createElement('div');
         footer.className = 'transcript-footer';
