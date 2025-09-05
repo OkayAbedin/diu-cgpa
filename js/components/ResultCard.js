@@ -1046,37 +1046,44 @@ class ResultCard {
 
     // Left cell will contain the UGC grading system table (compact)
     const tdLeft = document.createElement('td');
-    // Make left column narrow/compact — use fixed width to prevent expansion
-    tdLeft.style.width = '80mm';
-    tdLeft.style.maxWidth = '80mm';
+    // Make left column wide enough for layout but keep grading box compact on the left
+    tdLeft.style.width = '120mm';
+    tdLeft.style.maxWidth = '120mm';
+    // Add left padding equal to the transcript content padding so the grading box lines up
+    tdLeft.style.paddingLeft = '0mm';
     tdLeft.style.verticalAlign = 'top';
     // Build grading table
     const gradingWrap = document.createElement('div');
     gradingWrap.style.width = '100%';
     gradingWrap.style.boxSizing = 'border-box';
-    // Make grading content compact so it appears much smaller than main tables
-    gradingWrap.style.fontSize = '7pt';
+    // Make grading content compact but slightly larger for readability
+    gradingWrap.style.fontSize = '8pt';
     gradingWrap.style.lineHeight = '1.05';
+    // Center contents (title, table, effective note)
+    gradingWrap.style.textAlign = 'center';
 
     const gradingTitle = document.createElement('div');
     gradingTitle.style.fontWeight = '700';
     gradingTitle.style.marginBottom = '4px';
-    gradingTitle.style.fontSize = '8pt';
+    gradingTitle.style.fontSize = '9pt';
+    gradingTitle.style.textAlign = 'center';
     gradingTitle.textContent = 'UGC Uniform Grading System';
 
     const gradingTable = document.createElement('table');
-    // Constrain grading table to a small fixed width and use fixed layout for tighter columns
-    gradingTable.style.width = '80mm';
-    gradingTable.style.maxWidth = '80mm';
+    // Constrain grading table to a smaller fixed width and use fixed layout for tighter columns
+    gradingTable.style.width = '64mm';
+    gradingTable.style.maxWidth = '64mm';
+    // Left align the grading table inside the box so its left edge matches the red line
+    gradingTable.style.margin = '0';
     gradingTable.style.tableLayout = 'fixed';
     gradingTable.style.borderCollapse = 'collapse';
     // Use much smaller font and tighter cell padding for a compact look
-    gradingTable.style.fontSize = '7pt';
+    gradingTable.style.fontSize = '9pt';
 
     const gtHead = document.createElement('thead');
     const headRow = document.createElement('tr');
-    // Fixed column widths to keep overall table compact
-    const colWidths = ['28mm','12mm','12mm','26mm'];
+    // Fixed column widths to keep overall table compact (reduce Marks and Remarks)
+    const colWidths = ['16mm','16mm','16mm','24mm'];
     ['Marks (%)','Grade','Grade Point','Remarks'].forEach((h,i)=>{
         const th = document.createElement('th');
         th.textContent = h;
@@ -1111,7 +1118,7 @@ class ResultCard {
             td.textContent = c;
             td.style.border = '1px solid #000';
             td.style.padding = '1px 3px';
-            td.style.textAlign = idx===3 ? 'left' : 'center';
+            td.style.textAlign = 'center';
             td.style.overflow = 'hidden';
             td.style.whiteSpace = 'nowrap';
             td.style.textOverflow = 'ellipsis';
@@ -1126,11 +1133,26 @@ class ResultCard {
     const effective = document.createElement('div');
     effective.style.fontSize = '8pt';
     effective.style.marginTop = '6px';
+    effective.style.textAlign = 'center';
     effective.textContent = 'Effective from Summer Semester 2007';
 
-    gradingWrap.appendChild(gradingTitle);
-    gradingWrap.appendChild(gradingTable);
-    gradingWrap.appendChild(effective);
+    // Place grading content inside a compact box positioned to the left (red area)
+    const gradingBox = document.createElement('div');
+    gradingBox.style.width = '70mm';
+    gradingBox.style.boxSizing = 'border-box';
+    // Align the box flush to the left so the table starts at the desired intersection
+    gradingBox.style.textAlign = 'left';
+    gradingBox.style.marginLeft = '0mm';
+    gradingBox.style.marginTop = '0mm';
+
+    // Center the title over the compact table by constraining its width
+    gradingTitle.style.width = '70mm';
+    gradingTitle.style.margin = '0 auto 4px';
+    gradingBox.appendChild(gradingTitle);
+    gradingBox.appendChild(gradingTable);
+    gradingBox.appendChild(effective);
+
+    gradingWrap.appendChild(gradingBox);
     tdLeft.appendChild(gradingWrap);
 
     // Right cell contains the QR and centered caption (compact)
