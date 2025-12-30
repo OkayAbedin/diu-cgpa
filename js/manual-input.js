@@ -603,6 +603,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             department: document.getElementById('manual-department').value.trim() || 'Department',
             program: document.getElementById('manual-program').value.trim() || 'B.Sc. in Computer Science & Engineering',
             enrollmentSession: document.getElementById('manual-enrollment-session').value.trim() || 'Enrollment Session',
+            totalCreditRequirement: document.getElementById('manual-total-credit-requirement').value.trim() || '148',
             // Keep these for PDF export only - don't include campusName, facShortName, or batch for UI display
             campus: document.getElementById('manual-campus').value.trim() || 'Campus',
             faculty: document.getElementById('manual-faculty').value.trim() || 'Faculty',
@@ -1140,6 +1141,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
                 campus: this.studentInfo.campus || 'Campus',
                 faculty: this.studentInfo.faculty || 'Faculty',
                 enrollmentSession: this.studentInfo.enrollmentSession || (this.studentInfo.studentId ? `${this.studentInfo.studentId.substring(0, 3)} Batch` : 'Enrollment Session'),
+                totalCreditRequirement: this.studentInfo.totalCreditRequirement || '148',
                 // Additional fields for transcript
                 batchNo: this.studentInfo.batch || 'Batch',
                 semesterName: this.studentInfo.enrollmentSession || 'Enrollment Session'
@@ -1253,6 +1255,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         document.getElementById('manual-campus').value = 'Daffodil Smart City';
         document.getElementById('manual-faculty').value = 'Faculty of Science & Information Technology';
         document.getElementById('manual-enrollment-session').value = 'Spring 2022';
+        document.getElementById('manual-total-credit-requirement').value = '148';
 
         // Clear existing semesters
         const container = document.getElementById('semester-input-list');

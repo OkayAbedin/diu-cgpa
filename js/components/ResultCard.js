@@ -401,6 +401,222 @@ class ResultCard {
                     studentSection.appendChild(studentTable);
                     transcriptContainer.appendChild(studentSection);
                     
+                    // Add Result Summary, Grading Table, and QR Code Section BEFORE semester tables
+                    const summarySection = previewWindow.document.createElement("div");
+                    summarySection.style.marginTop = "10mm";
+                    summarySection.style.marginBottom = "8mm";
+                    summarySection.style.pageBreakInside = "avoid";
+                    
+                    // Calculate totals
+                    let totalCGPA = cgpaData?.cgpa || "0.00";
+                    let totalCredits = cgpaData?.totalCredits || "0";
+                    
+                    if (!cgpaData && semesterData && semesterData.length > 0) {
+                        let creditSum = 0;
+                        let weightedSum = 0;
+                        
+                        semesterData.forEach(sem => {
+                            const credits = parseFloat(sem.totalCredits || sem.totalCredit || 0);
+                            const gpa = parseFloat(sem.gpa || sem.cgpa || 0);
+                            
+                            if (!isNaN(credits) && !isNaN(gpa)) {
+                                creditSum += credits;
+                                weightedSum += credits * gpa;
+                            }
+                        });
+                        
+                        totalCGPA = creditSum > 0 ? (weightedSum / creditSum).toFixed(2) : "0.00";
+                        totalCredits = creditSum.toString();
+                    }
+                    
+                    // Get total credit requirement from input
+                    const totalCreditReq = studentInfo.totalCreditRequirement || "148";
+                    
+                    // ==================== OFFICIAL ACADEMIC TRANSCRIPT LAYOUT ====================
+                    // Conservative grid-based structure - No modern UI patterns
+                    
+                    const mainLayout = previewWindow.document.createElement("table");
+                    mainLayout.style.width = "100%";
+                    mainLayout.style.borderCollapse = "collapse";
+                    mainLayout.style.marginTop = "8mm";
+                    mainLayout.style.marginBottom = "8mm";
+                    
+                    const mainRow = previewWindow.document.createElement("tr");
+                    
+                    // ========== LEFT COLUMN: Academic Summary + QR Code (50%) ==========
+                    const leftCell = previewWindow.document.createElement("td");
+                    leftCell.style.width = "50%";
+                    leftCell.style.verticalAlign = "top";
+                    leftCell.style.paddingRight = "10mm";
+                    
+                    // Academic Summary Table
+                    const summaryTitle = previewWindow.document.createElement("div");
+                    summaryTitle.style.fontWeight = "bold";
+                    summaryTitle.style.fontSize = "10pt";
+                    summaryTitle.style.marginBottom = "2mm";
+                    summaryTitle.style.textAlign = "left";
+                    summaryTitle.textContent = "Academic Summary";
+                    
+                    const summaryTable = previewWindow.document.createElement("table");
+                    summaryTable.style.width = "100%";
+                    summaryTable.style.borderCollapse = "collapse";
+                    summaryTable.style.border = "1px solid #000";
+                    summaryTable.style.fontSize = "9pt";
+                    
+                    // Build summary table rows
+                    const summaryBody = previewWindow.document.createElement("tbody");
+                    
+                    // CGPA Row
+                    const cgpaRow = previewWindow.document.createElement("tr");
+                    const cgpaLabelCell = previewWindow.document.createElement("td");
+                    cgpaLabelCell.style.border = "1px solid #000";
+                    cgpaLabelCell.style.padding = "4px 6px";
+                    cgpaLabelCell.style.textAlign = "left";
+                    cgpaLabelCell.style.width = "70%";
+                    cgpaLabelCell.textContent = "CGPA";
+                    
+                    const cgpaValueCell = previewWindow.document.createElement("td");
+                    cgpaValueCell.style.border = "1px solid #000";
+                    cgpaValueCell.style.padding = "4px 6px";
+                    cgpaValueCell.style.fontWeight = "bold";
+                    cgpaValueCell.style.textAlign = "center";
+                    cgpaValueCell.textContent = totalCGPA;
+                    
+                    cgpaRow.appendChild(cgpaLabelCell);
+                    cgpaRow.appendChild(cgpaValueCell);
+                    
+                    // Credits Completed Row
+                    const creditsRow = previewWindow.document.createElement("tr");
+                    const creditsLabelCell = previewWindow.document.createElement("td");
+                    creditsLabelCell.style.border = "1px solid #000";
+                    creditsLabelCell.style.padding = "4px 6px";
+                    creditsLabelCell.style.textAlign = "left";
+                    creditsLabelCell.textContent = "Credits Completed";
+                    
+                    const creditsValueCell = previewWindow.document.createElement("td");
+                    creditsValueCell.style.border = "1px solid #000";
+                    creditsValueCell.style.padding = "4px 6px";
+                    creditsValueCell.style.fontWeight = "bold";
+                    creditsValueCell.style.textAlign = "center";
+                    creditsValueCell.textContent = totalCredits;
+                    
+                    creditsRow.appendChild(creditsLabelCell);
+                    creditsRow.appendChild(creditsValueCell);
+                    
+                    // Total Credit Requirement Row
+                    const reqRow = previewWindow.document.createElement("tr");
+                    const reqLabelCell = previewWindow.document.createElement("td");
+                    reqLabelCell.style.border = "1px solid #000";
+                    reqLabelCell.style.padding = "4px 6px";
+                    reqLabelCell.style.textAlign = "left";
+                    reqLabelCell.textContent = "Total Credit Requirement";
+                    
+                    const reqValueCell = previewWindow.document.createElement("td");
+                    reqValueCell.style.border = "1px solid #000";
+                    reqValueCell.style.padding = "4px 6px";
+                    reqValueCell.style.fontWeight = "bold";
+                    reqValueCell.style.textAlign = "center";
+                    reqValueCell.textContent = totalCreditReq;
+                    
+                    reqRow.appendChild(reqLabelCell);
+                    reqRow.appendChild(reqValueCell);
+                    
+                    summaryBody.appendChild(cgpaRow);
+                    summaryBody.appendChild(creditsRow);
+                    summaryBody.appendChild(reqRow);
+                    summaryTable.appendChild(summaryBody);
+                    
+                    leftCell.appendChild(summaryTitle);
+                    leftCell.appendChild(summaryTable);
+                    
+                    // QR Code below Academic Summary (no decoration)
+                    const qrWrapper = previewWindow.document.createElement("div");
+                    qrWrapper.style.marginTop = "8mm";
+                    qrWrapper.style.display = "flex";
+                    qrWrapper.style.alignItems = "center";
+                    qrWrapper.style.gap = "4mm";
+                    
+                    const qrImg = previewWindow.document.createElement("img");
+                    qrImg.src = "assets/img/QR.png";
+                    qrImg.alt = "Verification QR Code";
+                    qrImg.style.width = "25mm";
+                    qrImg.style.height = "25mm";
+                    qrImg.style.display = "block";
+                    qrImg.style.flexShrink = "0";
+                    
+                    const qrText = previewWindow.document.createElement("div");
+                    qrText.style.fontSize = "8pt";
+                    qrText.style.lineHeight = "1.4";
+                    qrText.style.border = "1px solid #000";
+                    qrText.style.padding = "4mm";
+                    qrText.style.height = "25mm";
+                    qrText.style.boxSizing = "border-box";
+                    qrText.style.display = "flex";
+                    qrText.style.alignItems = "center";
+                    qrText.innerHTML = "Scan the QR code on left to verify the semester-wize results at:<br>https://studentportal.diu.edu.bd/academic-result";
+                    
+                    qrWrapper.appendChild(qrImg);
+                    qrWrapper.appendChild(qrText);
+                    leftCell.appendChild(qrWrapper);
+                    
+                    // ========== RIGHT COLUMN: UGC Grading System (50%) ==========
+                    const rightCell = previewWindow.document.createElement("td");
+                    rightCell.style.width = "50%";
+                    rightCell.style.verticalAlign = "top";
+                    
+                    const gradingTitle = previewWindow.document.createElement("div");
+                    gradingTitle.style.fontWeight = "bold";
+                    gradingTitle.style.fontSize = "10pt";
+                    gradingTitle.style.marginBottom = "2mm";
+                    gradingTitle.style.textAlign = "left";
+                    gradingTitle.textContent = "UGC Uniform Grading System";
+                    
+                    const gradingTable = previewWindow.document.createElement("table");
+                    gradingTable.style.width = "100%";
+                    gradingTable.style.borderCollapse = "collapse";
+                    gradingTable.style.border = "1px solid #000";
+                    gradingTable.style.fontSize = "9pt";
+                    
+                    gradingTable.innerHTML = `
+                        <thead>
+                            <tr>
+                                <th style="border:1px solid #000;padding:4px 6px;text-align:center;font-weight:bold;background:#fff;">Marks (%)</th>
+                                <th style="border:1px solid #000;padding:4px 6px;text-align:center;font-weight:bold;background:#fff;">Grade</th>
+                                <th style="border:1px solid #000;padding:4px 6px;text-align:center;font-weight:bold;background:#fff;">Grade Point</th>
+                                <th style="border:1px solid #000;padding:4px 6px;text-align:center;font-weight:bold;background:#fff;">Remarks</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">80–100</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">A+</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">4.00</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Outstanding</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">75–79</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">A</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">3.75</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Excellent</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">70–74</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">A−</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">3.50</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Very Good</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">65–69</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">B+</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">3.25</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Good</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">60–64</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">B</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">3.00</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Satisfactory</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">55–59</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">B−</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">2.75</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Above Average</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">50–54</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">C+</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">2.50</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Average</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">45–49</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">C</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">2.25</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Below Average</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">40–44</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">D</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">2.00</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Pass</td></tr>
+                            <tr><td style="border:1px solid #000;padding:4px 6px;text-align:center;">00–39</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">F</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">0.00</td><td style="border:1px solid #000;padding:4px 6px;text-align:center;">Fail</td></tr>
+                        </tbody>
+                    `;
+                    
+                    const effective = previewWindow.document.createElement("div");
+                    effective.style.fontSize = "8pt";
+                    effective.style.marginTop = "2mm";
+                    effective.style.textAlign = "center";
+                    effective.textContent = "Effective from Summer Semester 2007";
+                    
+                    rightCell.appendChild(gradingTitle);
+                    rightCell.appendChild(gradingTable);
+                    rightCell.appendChild(effective);
+                    
+                    mainRow.appendChild(leftCell);
+                    mainRow.appendChild(rightCell);
+                    mainLayout.appendChild(mainRow);
+                    
+                    summarySection.appendChild(mainLayout);
+                    transcriptContainer.appendChild(summarySection);
+                    
                     // Add semester tables
                     if (semesterData && semesterData.length > 0) {
                         // Sort semesters chronologically (oldest first)
@@ -497,120 +713,6 @@ class ResultCard {
                         noData.textContent = "No semester data available";
                         transcriptContainer.appendChild(noData);
                     }
-                      // Add timer information display
-                    if (this.fetchTimerValue) {
-                        const timerInfo = previewWindow.document.createElement("div");
-                        timerInfo.className = "timer-info";
-                        timerInfo.style.marginTop = "10mm";
-                        timerInfo.style.fontSize = "8pt";
-                        timerInfo.style.color = "#999";
-                        timerInfo.style.textAlign = "center";
-                        timerInfo.textContent = `Data fetched in ${this.fetchTimerValue} seconds`;
-                        transcriptContainer.appendChild(timerInfo);
-                    }                    // Add CGPA and Total Credits Summary Box
-                    const cgpaSummary = previewWindow.document.createElement("div");
-                    cgpaSummary.className = "cgpa-summary";
-                    cgpaSummary.style.marginTop = "10mm";
-                    cgpaSummary.style.marginBottom = "10mm";
-                    cgpaSummary.style.textAlign = "right";
-                    
-                    // Calculate CGPA and total credits if not provided
-                    let totalCGPA = cgpaData?.cgpa || "0.00";
-                    let totalCredits = cgpaData?.totalCredits || "0";
-                    
-                    // If cgpaData is not provided, calculate from semester data
-                    if (!cgpaData && semesterData && semesterData.length > 0) {
-                        let creditSum = 0;
-                        let weightedSum = 0;
-                        
-                        semesterData.forEach(sem => {
-                            const credits = parseFloat(sem.totalCredits || sem.totalCredit || 0);
-                            const gpa = parseFloat(sem.gpa || sem.cgpa || 0);
-                            
-                            if (!isNaN(credits) && !isNaN(gpa)) {
-                                creditSum += credits;
-                                weightedSum += credits * gpa;
-                            }
-                        });
-                        
-                        totalCGPA = creditSum > 0 ? (weightedSum / creditSum).toFixed(2) : "0.00";
-                        totalCredits = creditSum.toString();
-                    }
-                    
-                    // Create summary table
-                    const summaryTable = previewWindow.document.createElement("table");
-                    summaryTable.style.width = "auto";
-                    summaryTable.style.marginLeft = "auto"; // Right align the table
-                    summaryTable.style.borderCollapse = "collapse";
-                    summaryTable.style.border = "1px solid #000";
-                    
-                    // CGPA row
-                    const cgpaRow = previewWindow.document.createElement("tr");
-                    
-                    const cgpaLabelCell = previewWindow.document.createElement("td");
-                    cgpaLabelCell.style.padding = "3px 10px";
-                    cgpaLabelCell.style.border = "1px solid #000";
-                    cgpaLabelCell.style.fontWeight = "bold";
-                    cgpaLabelCell.textContent = "CGPA";
-                    
-                    const cgpaValueCell = previewWindow.document.createElement("td");
-                    cgpaValueCell.style.padding = "3px 10px";
-                    cgpaValueCell.style.border = "1px solid #000";
-                    cgpaValueCell.style.width = "60px";
-                    cgpaValueCell.style.textAlign = "center";
-                    cgpaValueCell.style.fontWeight = "bold";
-                    cgpaValueCell.textContent = totalCGPA;
-                    
-                    cgpaRow.appendChild(cgpaLabelCell);
-                    cgpaRow.appendChild(cgpaValueCell);
-                    
-                    // Credits row
-                    const creditsRow = previewWindow.document.createElement("tr");
-                    
-                    const creditsLabelCell = previewWindow.document.createElement("td");
-                    creditsLabelCell.style.padding = "3px 10px";
-                    creditsLabelCell.style.border = "1px solid #000";
-                    creditsLabelCell.style.fontWeight = "bold";
-                    creditsLabelCell.textContent = "Credits Completed";
-                    
-                    const creditsValueCell = previewWindow.document.createElement("td");
-                    creditsValueCell.style.padding = "3px 10px";
-                    creditsValueCell.style.border = "1px solid #000";
-                    creditsValueCell.style.width = "60px";
-                    creditsValueCell.style.textAlign = "center";
-                    creditsValueCell.style.fontWeight = "bold";
-                    creditsValueCell.textContent = totalCredits;
-                    
-                    creditsRow.appendChild(creditsLabelCell);
-                    creditsRow.appendChild(creditsValueCell);
-                    
-                    // Add rows to table
-                    summaryTable.appendChild(cgpaRow);
-                    summaryTable.appendChild(creditsRow);
-                    
-                    // Add table to summary container
-                    cgpaSummary.appendChild(summaryTable);
-                    
-                    transcriptContainer.appendChild(cgpaSummary);
-                    
-                    // Add QR verification section before footer
-                    try {
-                        const qrSection = this.createQRVerificationSection();
-                        // When using previewWindow DOM, we need to import node via HTML string
-                        // Create a wrapper and set innerHTML
-                        const wrapper = previewWindow.document.createElement('div');
-                        wrapper.innerHTML = qrSection.outerHTML;
-                        transcriptContainer.appendChild(wrapper);
-                    } catch (e) {
-                        // Fallback: create a simple verification text if QR insertion fails
-                        const ver = previewWindow.document.createElement('div');
-                        ver.style.marginTop = '15mm';
-                        ver.style.marginBottom = '10mm';
-                        ver.style.textAlign = 'left';
-                        ver.innerHTML = '<strong>Verify Semester Results</strong>';
-                        transcriptContainer.appendChild(ver);
-                    }
-
                     // Add footer
                     const footer = previewWindow.document.createElement("div");
                     footer.className = "transcript-footer";
