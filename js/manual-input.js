@@ -147,7 +147,15 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         const container = document.getElementById('project-input-container');
         const button = document.getElementById('toggle-project-input-btn');
         
-        if (container.style.display === 'none') {
+        if (!container || !button) {
+            console.error('Project input elements not found');
+            return;
+        }
+        
+        // Check if container is hidden (either display:none or not visible)
+        const isHidden = container.style.display === 'none' || window.getComputedStyle(container).display === 'none';
+        
+        if (isHidden) {
             // Show the project input
             container.style.display = 'block';
             button.innerHTML = '<i class="fas fa-minus"></i> Remove Project/Thesis/Internship';
@@ -156,9 +164,14 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         } else {
             // Hide and clear the project input
             container.style.display = 'none';
-            document.getElementById('project-course-code').value = '';
-            document.getElementById('project-credits').value = '';
-            document.getElementById('project-gpa').value = '';
+            const courseCodeInput = document.getElementById('project-course-code');
+            const creditsInput = document.getElementById('project-credits');
+            const gpaInput = document.getElementById('project-gpa');
+            
+            if (courseCodeInput) courseCodeInput.value = '';
+            if (creditsInput) creditsInput.value = '';
+            if (gpaInput) gpaInput.value = '';
+            
             button.innerHTML = '<i class="fas fa-plus"></i> Add Project/Thesis/Internship';
             button.classList.remove('gh-btn-danger');
             button.classList.add('gh-btn-secondary');
