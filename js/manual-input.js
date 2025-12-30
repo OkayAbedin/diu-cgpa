@@ -1410,6 +1410,20 @@ Total Credit	11.00	SGPA	4.00`;
             this.parseSemesterData(ninthTextarea, 9);
         }
 
+        // Add tenth semester with sample data (Fall 2025)
+        this.addSemesterInput();
+        const tenthTextarea = document.querySelector('#semester-10-data');
+        if (tenthTextarea) {
+            tenthTextarea.value = `Result of Fall 2025
+SL	Course Code	Course Title	Credit	Grade	Grade Point
+1	CSE422	Computer Graphics Lab	2.00	A+	4.00
+2	CSE431	Social and Professional Issues in Computing	3.00	A+	4.00
+3	CSE423	Information Security	3.00	A+	4.00
+4	CSE421	Computer Graphics	2.00	A+	4.00
+Total Credit	10.00	SGPA	4.00`;
+            this.parseSemesterData(tenthTextarea, 10);
+        }
+
         // Show a notification
         this.showNotification('Sample data loaded successfully! You can now calculate CGPA or modify the data as needed.', 'success');
     }
