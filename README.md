@@ -116,8 +116,8 @@ MIT License
 
 ## 🙏 About
 
-- Made with ❤️ by [Minhaz](https://bio.link/minhazabedin)
-- Version 2.0.0 | Last Updated: May 2025
+- Made with ❤️ by [Minhaz](minhazabedin.vercel.app)
+- Version 2.1.0 | Last Updated: December 2025
 
 ---
 
