@@ -672,8 +672,9 @@ class ResultCard {
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5mm;">
                                     <div><strong>Semester:</strong> ${semester.name}</div>
                                     <div>
-                                        <span><strong>GPA:</strong> ${semester.gpa || semester.cgpa || "0.00"}</span>
-                                        <span style="margin-left: 10px;"><strong>Credits:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
+                                        <span><strong>Credit Taken:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
+                                        <span style="margin-left: 10px;"><strong>Credit Completed:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
+                                        <span style="margin-left: 10px;"><strong>GPA:</strong> ${semester.gpa || semester.cgpa || "0.00"}</span>
                                     </div>
                                 </div>
                             `;
@@ -725,14 +726,10 @@ class ResultCard {
                             const semesterContainer = previewWindow.document.createElement("div");
                             semesterContainer.className = "semester-table-container";
                             
-                            // Project header with bold title (no "Semester:" label)
+                            // Project header with bold title (no "Semester:" label, no stats)
                             semesterContainer.innerHTML = `
-                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5mm;">
+                                <div style="margin-bottom: 5mm;">
                                     <div><strong>${semester.name}</strong></div>
-                                    <div>
-                                        <span><strong>GPA:</strong> ${semester.gpa || semester.cgpa || "0.00"}</span>
-                                        <span style="margin-left: 10px;"><strong>Credits:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
-                                    </div>
                                 </div>
                             `;
                             
