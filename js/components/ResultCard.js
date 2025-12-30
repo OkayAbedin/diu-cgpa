@@ -530,11 +530,27 @@ class ResultCard {
                     leftCell.appendChild(summaryTable);
                     
                     // QR Code below Academic Summary (no decoration)
-                    const qrWrapper = previewWindow.document.createElement("div");
-                    qrWrapper.style.marginTop = "8mm";
-                    qrWrapper.style.display = "flex";
-                    qrWrapper.style.alignItems = "center";
-                    qrWrapper.style.gap = "4mm";
+                    const verifyTitle = previewWindow.document.createElement("div");
+                    verifyTitle.style.fontWeight = "bold";
+                    verifyTitle.style.fontSize = "10pt";
+                    verifyTitle.style.marginTop = "8mm";
+                    verifyTitle.style.marginBottom = "2mm";
+                    verifyTitle.style.textAlign = "left";
+                    verifyTitle.textContent = "Verify Result";
+
+                    const qrWrapper = previewWindow.document.createElement("table");
+                    qrWrapper.style.width = "100%";
+                    qrWrapper.style.borderCollapse = "collapse";
+                    
+                    const qrRow = previewWindow.document.createElement("tr");
+                    
+                    // Left cell: QR Code
+                    const qrImgCell = previewWindow.document.createElement("td");
+                    qrImgCell.style.width = "25mm";
+                    qrImgCell.style.verticalAlign = "middle";
+                    qrImgCell.style.padding = "0";
+                    qrImgCell.style.border = "1px solid #000";
+                    qrImgCell.style.textAlign = "center";
                     
                     const qrImg = previewWindow.document.createElement("img");
                     qrImg.src = "assets/img/QR.png";
@@ -542,21 +558,23 @@ class ResultCard {
                     qrImg.style.width = "25mm";
                     qrImg.style.height = "25mm";
                     qrImg.style.display = "block";
-                    qrImg.style.flexShrink = "0";
                     
-                    const qrText = previewWindow.document.createElement("div");
-                    qrText.style.fontSize = "8pt";
-                    qrText.style.lineHeight = "1.4";
-                    qrText.style.border = "1px solid #000";
-                    qrText.style.padding = "4mm";
-                    qrText.style.height = "25mm";
-                    qrText.style.boxSizing = "border-box";
-                    qrText.style.display = "flex";
-                    qrText.style.alignItems = "center";
-                    qrText.innerHTML = "Scan the QR code on left to verify the semester-wize results at:<br>https://studentportal.diu.edu.bd/academic-result";
+                    qrImgCell.appendChild(qrImg);
                     
-                    qrWrapper.appendChild(qrImg);
-                    qrWrapper.appendChild(qrText);
+                    // Right cell: Instructions
+                    const qrTextCell = previewWindow.document.createElement("td");
+                    qrTextCell.style.border = "1px solid #000";
+                    qrTextCell.style.padding = "4mm";
+                    qrTextCell.style.fontSize = "9pt";
+                    qrTextCell.style.lineHeight = "1.3";
+                    qrTextCell.style.verticalAlign = "middle";
+                    qrTextCell.innerHTML = "Scan the QR code on left to verify the semester-wize results at:<br>https://studentportal.diu.edu.bd/academic-result";
+                    
+                    qrRow.appendChild(qrImgCell);
+                    qrRow.appendChild(qrTextCell);
+                    qrWrapper.appendChild(qrRow);
+                    
+                    leftCell.appendChild(verifyTitle);
                     leftCell.appendChild(qrWrapper);
                     
                     // ========== RIGHT COLUMN: UGC Grading System (50%) ==========
