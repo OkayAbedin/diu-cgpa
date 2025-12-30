@@ -30,6 +30,11 @@ class ManualCgpaInput {
             this.loadSampleData();
         });
 
+        // Toggle project input button
+        document.getElementById('toggle-project-input-btn')?.addEventListener('click', () => {
+            this.toggleProjectInput();
+        });
+
         // Export buttons
         document.getElementById('manual-save-pdf-btn')?.addEventListener('click', () => {
             this.exportToPdf();
@@ -133,6 +138,31 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             const statusDiv = semesterDiv.querySelector('.semester-parse-status');
             statusDiv.id = `semester-${semesterNumber}-status`;
         });
+    }
+
+    /**
+     * Toggle project/thesis/internship input visibility
+     */
+    toggleProjectInput() {
+        const container = document.getElementById('project-input-container');
+        const button = document.getElementById('toggle-project-input-btn');
+        
+        if (container.style.display === 'none') {
+            // Show the project input
+            container.style.display = 'block';
+            button.innerHTML = '<i class="fas fa-minus"></i> Remove Project/Thesis/Internship';
+            button.classList.remove('gh-btn-secondary');
+            button.classList.add('gh-btn-danger');
+        } else {
+            // Hide and clear the project input
+            container.style.display = 'none';
+            document.getElementById('project-course-code').value = '';
+            document.getElementById('project-credits').value = '';
+            document.getElementById('project-gpa').value = '';
+            button.innerHTML = '<i class="fas fa-plus"></i> Add Project/Thesis/Internship';
+            button.classList.remove('gh-btn-danger');
+            button.classList.add('gh-btn-secondary');
+        }
     }
 
     /**
@@ -535,6 +565,15 @@ Tip: Select all result text from your student portal and copy-paste it here. The
                 });
             }
         }
+
+        // Hide project/thesis/internship input section
+        const projectInputContainer = document.getElementById('project-input-container');
+        if (projectInputContainer) {
+            const projectBox = projectInputContainer.closest('.gh-box');
+            if (projectBox) {
+                projectBox.style.display = 'none';
+            }
+        }
     }
 
     /**
@@ -591,6 +630,15 @@ Tip: Select all result text from your student portal and copy-paste it here. The
                 });
             }
         }
+
+        // Show project/thesis/internship input section
+        const projectInputContainer = document.getElementById('project-input-container');
+        if (projectInputContainer) {
+            const projectBox = projectInputContainer.closest('.gh-box');
+            if (projectBox) {
+                projectBox.style.display = 'block';
+            }
+        }
     }
 
     /**
@@ -643,12 +691,18 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             }
         });
 
+        // Check if project/thesis/internship data is present
+        const projectData = this.collectProjectData();
+        if (projectData) {
+            allSemesters.push(projectData);
+        }
+
         // Provide feedback to user
         if (totalProcessed === 0) {
             throw new Error('No semester data entered. Please paste your result data in at least one semester field.');
         }
 
-        if (allCourses.length === 0) {
+        if (allCourses.length === 0 && !projectData) {
             throw new Error(`Unable to parse any course data from ${totalProcessed} semester(s). Please check the format and try again.`);
         }
 
@@ -661,8 +715,61 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             semesters: allSemesters,
             totalCredits: allCourses.reduce((sum, course) => sum + course.totalCredit, 0),
             processedCount: totalProcessed,
-            errorCount: totalErrors
+            errorCount: totalErrors,
+            hasProject: projectData !== null
         };
+    }
+
+    /**
+     * Collect project/thesis/internship data if present
+     */
+    collectProjectData() {
+        const container = document.getElementById('project-input-container');
+        
+        // Check if project input is visible
+        if (container.style.display === 'none') {
+            return null;
+        }
+
+        const courseCode = document.getElementById('project-course-code').value.trim() || 'PROJECT';
+        const credits = parseFloat(document.getElementById('project-credits').value);
+        const gpa = parseFloat(document.getElementById('project-gpa').value);
+
+        // Validate inputs
+        if (isNaN(credits) || isNaN(gpa) || credits <= 0 || gpa < 0 || gpa > 4) {
+            return null;
+        }
+
+        // Create a semester-like object for project
+        return {
+            name: 'Project/Thesis/Internship',
+            courses: [{
+                courseCode: courseCode,
+                courseName: 'Project/Thesis/Internship',
+                totalCredit: credits,
+                gradeLetter: this.pointToGrade(gpa),
+                pointEquivalent: gpa,
+                customCourseId: courseCode
+            }],
+            totalCredits: credits,
+            sgpa: gpa
+        };
+    }
+
+    /**
+     * Convert grade point to letter grade
+     */
+    pointToGrade(point) {
+        if (point >= 4.0) return 'A+';
+        if (point >= 3.75) return 'A';
+        if (point >= 3.5) return 'A-';
+        if (point >= 3.25) return 'B+';
+        if (point >= 3.0) return 'B';
+        if (point >= 2.75) return 'B-';
+        if (point >= 2.5) return 'C+';
+        if (point >= 2.25) return 'C';
+        if (point >= 2.0) return 'D';
+        return 'F';
     }
 
     /**
@@ -1426,6 +1533,12 @@ SL	Course Code	Course Title	Credit	Grade	Grade Point
 Total Credit	10.00	SGPA	4.00`;
             this.parseSemesterData(tenthTextarea, 10);
         }
+
+        // Add Project/Thesis/Internship sample data
+        this.toggleProjectInput(); // Show the project input
+        document.getElementById('project-course-code').value = 'CSE 499';
+        document.getElementById('project-credits').value = '6.00';
+        document.getElementById('project-gpa').value = '4.00';
 
         // Show a notification
         this.showNotification('Sample data loaded successfully! You can now calculate CGPA or modify the data as needed.', 'success');

@@ -499,6 +499,57 @@
                             </div>
                         </div>
                         
+                        <!-- Project/Thesis/Internship Input -->
+                        <div class="gh-box">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
+                                <h4 style="margin: 0;"><i class="fas fa-graduation-cap"></i> Project/Thesis/Internship (Optional)</h4>
+                                <button id="toggle-project-input-btn" class="gh-btn gh-btn-secondary">
+                                    <i class="fas fa-plus"></i> Add Project/Thesis/Internship
+                                </button>
+                            </div>
+                            
+                            <div id="project-input-container" style="display: none;">
+                                <div class="form-row" style="display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 15px;">
+                                    <div class="form-group">
+                                        <label for="project-course-code"><i class="fas fa-code"></i> Course Code</label>
+                                        <input 
+                                            type="text" 
+                                            id="project-course-code" 
+                                            class="form-control" 
+                                            placeholder="e.g., CSE 499"
+                                        >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="project-credits"><i class="fas fa-calculator"></i> Total Credits</label>
+                                        <input 
+                                            type="number" 
+                                            id="project-credits" 
+                                            class="form-control" 
+                                            placeholder="e.g., 6.00"
+                                            step="0.01"
+                                            min="0"
+                                            max="12"
+                                        >
+                                    </div>
+                                    <div class="form-group">
+                                        <label for="project-gpa"><i class="fas fa-star"></i> GPA Obtained</label>
+                                        <input 
+                                            type="number" 
+                                            id="project-gpa" 
+                                            class="form-control" 
+                                            placeholder="e.g., 4.00"
+                                            step="0.01"
+                                            min="0"
+                                            max="4"
+                                        >
+                                    </div>
+                                </div>
+                                <small style="color: #666; display: block; margin-top: 10px;">
+                                    <i class="fas fa-info-circle"></i> Enter the course code, total credits and GPA for your Project/Thesis/Internship work.
+                                </small>
+                            </div>
+                        </div>
+                        
                         <!-- Calculate Button -->
                         <div class="gh-box text-center">
                             <button id="calculate-manual-cgpa-btn" class="gh-btn gh-btn-primary gh-btn-lg">
