@@ -619,9 +619,21 @@ class ResultCard {
                     
                     // Add semester tables
                     if (semesterData && semesterData.length > 0) {
-                        // Sort semesters chronologically (oldest first)
-                        // Extract year and term from semester name if they exist
+                        // Separate project/thesis/internship from regular semesters
+                        const regularSemesters = [];
+                        const projectSemesters = [];
+                        
                         semesterData.forEach(semester => {
+                            if (semester.name === 'Project/Thesis/Internship') {
+                                projectSemesters.push(semester);
+                            } else {
+                                regularSemesters.push(semester);
+                            }
+                        });
+                        
+                        // Sort regular semesters chronologically (oldest first)
+                        // Extract year and term from semester name if they exist
+                        regularSemesters.forEach(semester => {
                             if (!semester.year || !semester.term) {
                                 const parts = semester.name.split(' ');
                                 // Try to extract term (Fall, Spring, Summer) and year from semester name
@@ -636,7 +648,7 @@ class ResultCard {
                         });
                         
                         // Sort semesters chronologically (oldest first) using either explicit year/term or extracted values
-                        const sortedSemesters = [...semesterData].sort((a, b) => {
+                        const sortedSemesters = [...regularSemesters].sort((a, b) => {
                             const aYear = a.year || a.extractedYear || 0;
                             const bYear = b.year || b.extractedYear || 0;
                             
@@ -649,7 +661,7 @@ class ResultCard {
                             return aTerm - bTerm; // Then by term (Spring=1, Summer=2, Fall=3)
                         });
                         
-                        // Add each semester table
+                        // Add regular semester tables first
                         sortedSemesters.forEach(semester => {
                             // Semester container
                             const semesterContainer = previewWindow.document.createElement("div");
@@ -659,6 +671,64 @@ class ResultCard {
                             semesterContainer.innerHTML = `
                                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5mm;">
                                     <div><strong>Semester:</strong> ${semester.name}</div>
+                                    <div>
+                                        <span><strong>GPA:</strong> ${semester.gpa || semester.cgpa || "0.00"}</span>
+                                        <span style="margin-left: 10px;"><strong>Credits:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
+                                    </div>
+                                </div>
+                            `;
+                            
+                            // Semester table
+                            const semesterTable = previewWindow.document.createElement("table");
+                            semesterTable.className = "semester-table";
+                            
+                            // Table without GPA column
+                            let tableHTML = `
+                                <thead>
+                                    <tr>
+                                        <th style="width:100px;">Course Code</th>
+                                        <th>Course Title</th>
+                                        <th style="width:50px;">Credit</th>
+                                        <th style="width:60px;">Grade</th>
+                                        <th style="width:80px;">Grade Point</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                            `;
+                            
+                            // Course rows
+                            if (semester.courses && semester.courses.length > 0) {
+                                semester.courses.forEach((course) => {
+                                    tableHTML += `
+                                        <tr>
+                                            <td style="text-align:center;">${course.courseCode || course.customCourseId || "-"}</td>
+                                            <td>${course.courseName || course.courseTitle || "Unknown Course"}</td>
+                                            <td style="text-align:center;">${course.totalCredit || "0"}</td>
+                                            <td style="text-align:center;">${course.gradeLetter || "-"}</td>
+                                            <td style="text-align:center;">${course.pointEquivalent || "0"}</td>
+                                        </tr>
+                                    `;
+                                });
+                            } else {
+                                tableHTML += '<tr><td colspan="5" style="text-align:center;">No courses found for this semester</td></tr>';
+                            }
+                            
+                            semesterTable.innerHTML = tableHTML;
+                            
+                            semesterContainer.appendChild(semesterTable);
+                            transcriptContainer.appendChild(semesterContainer);
+                        });
+                        
+                        // Add project/thesis/internship tables at the END
+                        projectSemesters.forEach(semester => {
+                            // Semester container
+                            const semesterContainer = previewWindow.document.createElement("div");
+                            semesterContainer.className = "semester-table-container";
+                            
+                            // Project header with bold title (no "Semester:" label)
+                            semesterContainer.innerHTML = `
+                                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5mm;">
+                                    <div><strong>${semester.name}</strong></div>
                                     <div>
                                         <span><strong>GPA:</strong> ${semester.gpa || semester.cgpa || "0.00"}</span>
                                         <span style="margin-left: 10px;"><strong>Credits:</strong> ${semester.totalCredits || semester.totalCredit || "0"}</span>
