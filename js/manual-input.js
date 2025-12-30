@@ -1265,7 +1265,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         this.addSemesterInput();
         const firstTextarea = document.querySelector('#semester-1-data');
         if (firstTextarea) {
-            firstTextarea.value = `Result of Spring, 2022
+            firstTextarea.value = `Result of Spring 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
 1	CSE-115	Introduction to Biology and chemistry for Computation	2.00	A+	4.00
 2	PHY-113	Basic Physics	2.00	A+	4.00
@@ -1281,7 +1281,7 @@ Total Credit	14.00	SGPA	3.89`;
         this.addSemesterInput();
         const secondTextarea = document.querySelector('#semester-2-data');
         if (secondTextarea) {
-            secondTextarea.value = `Result of Summer, 2022
+            secondTextarea.value = `Result of Summer 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
 1	MAT121	Mathematics-II: Calculus, Complex Variables and Linear Algebra	3.00	A+	4.00
 2	ENG123	Writing and Comprehension	3.00	A+	4.00
@@ -1293,7 +1293,7 @@ Total Credit	6.00	SGPA	4.00`;
         this.addSemesterInput();
         const thirdTextarea = document.querySelector('#semester-3-data');
         if (thirdTextarea) {
-            thirdTextarea.value = `Result of Fall, 2022
+            thirdTextarea.value = `Result of Fall 2022
 SL	Course Code	Course Title	Credit	Grade	Grade Point
 1	GED121	Bangladesh Studies	3.00	A+	4.00
 2	CSE132	Electrical Circuits	2.00	A+	4.00
@@ -1311,7 +1311,7 @@ Total Credit	17.00	SGPA	4.00`;
         this.addSemesterInput();
         const fourthTextarea = document.querySelector('#semester-4-data');
         if (fourthTextarea) {
-            fourthTextarea.value = `Result of Spring, 2023
+            fourthTextarea.value = `Result of Spring 2023
 SL	Course Code	Course Title	Credit	Grade	Grade Point
 1	MAT211	Engineering Mathematics	3.00	A	3.75
 2	CSE213	Basic Electronics Lab	2.00	A+	4.00
