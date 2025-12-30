@@ -366,7 +366,7 @@ class ResultCard {
                     const program = previewWindow.document.createElement("div");
                     program.style.fontStyle = "italic";
                     program.style.marginBottom = "5mm";
-                    program.innerHTML = `<strong>Program:</strong> ${studentInfo.programName || "4-Year B.Sc. in Computer Science and Engineering"}`;
+                    program.innerHTML = `<strong>Program:</strong> ${studentInfo.programName || "4-Year 4-Year B.Sc. in Computer Science and Engineering"}`;
                     
                     // Student info table
                     const studentTable = previewWindow.document.createElement("table");
@@ -935,7 +935,7 @@ class ResultCard {
         const program = document.createElement('div');
         program.style.fontStyle = 'italic';
         program.style.marginBottom = '5mm';
-        program.innerHTML = '<strong>Program:</strong> 4-Year B.Sc. in Computer Science and Engineering';
+        program.innerHTML = '<strong>Program:</strong> 4-Year 4-Year B.Sc. in Computer Science and Engineering';
         
         // Create a table layout for student info
         const table = document.createElement('table');

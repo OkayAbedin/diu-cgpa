@@ -662,7 +662,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             name: document.getElementById('manual-student-name').value.trim() || 'Student Name',
             studentId: document.getElementById('manual-student-id').value.trim() || 'Student ID',
             department: document.getElementById('manual-department').value.trim() || 'Department',
-            program: document.getElementById('manual-program').value.trim() || 'B.Sc. in Computer Science & Engineering',
+            program: document.getElementById('manual-program').value.trim() || '4-Year B.Sc. in Computer Science & Engineering',
             enrollmentSession: document.getElementById('manual-enrollment-session').value.trim() || 'Enrollment Session',
             totalCreditRequirement: document.getElementById('manual-total-credit-requirement').value.trim() || '148',
             // Keep these for PDF export only - don't include campusName, facShortName, or batch for UI display
@@ -906,7 +906,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         const studentName = studentInfo.name || studentInfo.studentName || studentInfo.fullName || 'Unknown Student';
         const studentId = studentInfo.studentId || studentInfo.id || 'Unknown ID';
         const department = studentInfo.department || studentInfo.departmentName || 'Unknown Department';
-        const program = studentInfo.program || 'B.Sc. in Computer Science & Engineering';
+        const program = studentInfo.program || '4-Year B.Sc. in Computer Science & Engineering';
         const batch = studentInfo.batch || 'Batch';
         const campus = this.createAbbreviation(studentInfo.campus) || 'Campus';
         const faculty = this.createAbbreviation(studentInfo.faculty) || 'Faculty';
@@ -1255,7 +1255,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             const studentInfo = {
                 studentName: this.studentInfo.name || 'Student Name',
                 studentId: this.studentInfo.studentId || 'Student ID',
-                programName: this.studentInfo.program || 'B.Sc. in Computer Science & Engineering',
+                programName: this.studentInfo.program || '4-Year B.Sc. in Computer Science & Engineering',
                 department: this.studentInfo.department || 'Department',
                 batch: this.studentInfo.batch || 'Batch',
                 campus: this.studentInfo.campus || 'Campus',
@@ -1370,7 +1370,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         document.getElementById('manual-student-name').value = 'Minhazul Abedin';
         document.getElementById('manual-student-id').value = '221-15-4919';
         document.getElementById('manual-department').value = 'Computer Science & Engineering';
-        document.getElementById('manual-program').value = 'B.Sc. in Computer Science & Engineering';
+        document.getElementById('manual-program').value = '4-Year B.Sc. in Computer Science & Engineering';
         document.getElementById('manual-batch').value = '61';
         document.getElementById('manual-campus').value = 'Daffodil Smart City';
         document.getElementById('manual-faculty').value = 'Faculty of Science & Information Technology';
