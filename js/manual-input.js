@@ -418,7 +418,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         }
         
         // Validate grade
-        if (!grade || !grade.match(/^(A\+|A-?|B\+?-?|C\+?|D|F)$/i)) {
+        if (!grade || !grade.match(/^(A\+|A-?|B\+?-?|C\+?|D|F|I)$/i)) {
             return null;
         }
         
@@ -452,7 +452,7 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         const gradeMap = {
             'A+': 4.00, 'A': 3.75, 'A-': 3.50,
             'B+': 3.25, 'B': 3.00, 'B-': 2.75,
-            'C+': 2.50, 'C': 2.25, 'D': 2.00, 'F': 0.00,
+            'C+': 2.50, 'C': 2.25, 'D': 2.00, 'F': 0.00, 'I': 0.00,
             // Additional variations
             'APLUS': 4.00, 'AMINUS': 3.50, 'BPLUS': 3.25, 'BMINUS': 2.75, 'CPLUS': 2.50
         };
