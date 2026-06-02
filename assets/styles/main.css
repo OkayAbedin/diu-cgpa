@@ -1862,23 +1862,44 @@ textarea::placeholder {
     border-radius: var(--border-radius-medium);
     margin-bottom: var(--spacing-lg);
     overflow: hidden;
-    box-shadow: var(--shadow-small);
+    box-shadow: none;
+    border: 1px solid var(--color-border);
     transition: var(--transition-default);
 }
 
+.semester-card:hover {
+    box-shadow: var(--shadow-small);
+    border-color: rgba(67, 97, 238, 0.2);
+}
+
 .semester-header {
-    background-color: var(--color-box-header);
+    background-color: transparent;
     padding: var(--spacing-md);
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid var(--color-border);
+    border-bottom: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    border-radius: var(--border-radius-small);
+}
+
+.semester-header:hover {
+    background-color: rgba(67, 97, 238, 0.08);
 }
 
 .semester-title {
     font-weight: 600;
     font-size: 18px;
-    color: var(--color-text);
+    color: rgba(226, 232, 240, 0.5);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.2s ease;
+}
+
+.semester-header:hover .semester-title {
+    color: rgba(226, 232, 240, 1);
 }
 
 .save-pdf-btn {

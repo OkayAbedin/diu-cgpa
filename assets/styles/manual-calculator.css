@@ -524,6 +524,36 @@
     color: var(--color-btn-primary-bg, #4361ee);
 }
 
+.semester-name-input {
+    background: transparent;
+    border: none;
+    border-bottom: 1px dashed transparent;
+    color: var(--color-text, #333333);
+    font-weight: 600;
+    font-size: 16px;
+    font-family: inherit;
+    padding: 0;
+    margin: 0;
+    min-width: 80px;
+    max-width: 300px;
+    outline: none;
+    line-height: inherit;
+    vertical-align: baseline;
+    transition: border-color 0.15s ease;
+}
+
+.semester-name-input:hover {
+    border-bottom-color: var(--color-border, #aaa);
+}
+
+.semester-name-input:focus {
+    border-bottom-color: var(--color-btn-primary-bg, #4361ee);
+}
+
+[data-theme="dark"] .semester-name-input {
+    color: var(--color-text);
+}
+
 .semester-remove-btn {
     background: none;
     border: none;
