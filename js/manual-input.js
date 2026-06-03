@@ -65,7 +65,7 @@ class ManualCgpaInput {
         const semesterHtml = `
             <div class="semester-input-container" data-semester="${semesterIndex}">
                 <div class="semester-input-header">
-                    <h5><i class="fas fa-calendar-alt"></i> Semester ${semesterIndex}</h5>
+                    <h5><i class="fas fa-calendar-alt"></i> <input type="text" class="semester-name-input" value="Semester ${semesterIndex}" aria-label="Semester name" /></h5>
                     <button class="semester-remove-btn" onclick="manualCgpaInput.removeSemesterInput(this)">
                         <i class="fas fa-trash"></i> Remove
                     </button>
@@ -130,7 +130,9 @@ Tip: Select all result text from your student portal and copy-paste it here. The
             semesterDiv.setAttribute('data-semester', semesterNumber);
             
             const headerTitle = semesterDiv.querySelector('h5');
-            headerTitle.innerHTML = `<i class="fas fa-calendar-alt"></i> Semester ${semesterNumber}`;
+            const existingNameInput = headerTitle.querySelector('.semester-name-input');
+            const currentName = existingNameInput ? existingNameInput.value : `Semester ${semesterNumber}`;
+            headerTitle.innerHTML = `<i class="fas fa-calendar-alt"></i> <input type="text" class="semester-name-input" value="${currentName}" aria-label="Semester name" />`;
             
             const textarea = semesterDiv.querySelector('.semester-textarea');
             textarea.id = `semester-${semesterNumber}-data`;
@@ -685,13 +687,23 @@ Tip: Select all result text from your student portal and copy-paste it here. The
         Array.from(container.children).forEach((semesterDiv, index) => {
             const textarea = semesterDiv.querySelector('.semester-textarea');
             const data = textarea.value.trim();
-            
+            const nameInput = semesterDiv.querySelector('.semester-name-input');
+            const userSemesterName = nameInput ? nameInput.value.trim() : null;
+
             if (data) {
                 totalProcessed++;
                 try {
                     const parsedData = this.parseResultTable(data);
                     if (parsedData.courses.length > 0) {
                         allCourses.push(...parsedData.courses);
+                        // Use parsed name if available, fall back to user-edited name
+                        if (userSemesterName && parsedData.semesters.length >= 1) {
+                            parsedData.semesters.forEach(sem => {
+                                if (!sem.name || sem.name.startsWith('Semester ')) {
+                                    sem.name = userSemesterName;
+                                }
+                            });
+                        }
                         allSemesters.push(...parsedData.semesters);
                     } else {
                         totalErrors++;
