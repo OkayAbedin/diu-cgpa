@@ -517,11 +517,14 @@
     color: var(--color-text, #333333);
     font-weight: 600;
     font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .semester-input-header h5 i {
-    margin-right: 8px;
     color: var(--color-btn-primary-bg, #4361ee);
+    flex-shrink: 0;
 }
 
 .semester-name-input {
@@ -1249,11 +1252,14 @@
     color: var(--color-text, #333333);
     font-weight: 600;
     font-size: 16px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .semester-input-header h5 i {
-    margin-right: 8px;
     color: var(--color-btn-primary-bg, #4361ee);
+    flex-shrink: 0;
 }
 
 .semester-remove-btn {
